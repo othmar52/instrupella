@@ -3,7 +3,22 @@
     <h3>wave</h3>
     <div id="wave-timeline">
     </div>
-    <div id="wave-surfer" ref="wavesurfer">
+    <div
+      @click="ignoreEvent"
+      @dblclick="ignoreEvent"
+      @mouseenter="ignoreEvent"
+      @mouseleave="ignoreEvent"
+      @mouseout="ignoreEvent"
+      @mouseover="ignoreEvent"
+      @mousedown="startDrag"
+      @touchstart="startDrag"
+      @mouseup="stopDrag"
+      @touchend="stopDrag"
+      @mousemove="doDrag"
+      @touchmove="doDrag"
+    >
+      <div id="wave-surfer" ref="wavesurfer">
+    </div>
     </div>
     <div v-if="track">
       {{track.path}}
@@ -17,9 +32,17 @@ import WaveSurfer from 'wavesurfer.js'
 import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
 import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline/index.js'
 
-import { ref, defineProps, watch, defineExpose } from 'vue'
+import { ref, defineProps, watch, defineExpose, onMounted } from 'vue'
 
 const player = ref(null)
+const pixelPerSecond = ref(400)
+
+// some helpers for dragging waveform
+const dragging = ref(false)
+const dragX = ref(false)
+const startDragPlayState = ref(false)
+const lastSetSongPosition = ref(false)
+
 const props = defineProps({
   play: {
     type: Boolean,
@@ -32,6 +55,10 @@ const props = defineProps({
   timestretch: {
     type: Boolean,
     default: false
+  },
+  playbackRate: {
+    type: Number,
+    default: 1
   }
 })
 
@@ -138,7 +165,7 @@ const wavesurferOptions = () => {
     cursorWidth: 3,
     barGap: 0,
     barWidth: 0,
-    audioRate: 1,
+    audioRate: props.playbackRate,
     // forceDecode: true,
     height: 200,
     minPxPerSec: 400,
@@ -173,10 +200,10 @@ const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
 
   // let econdsPerQuarterNote = 60 / this.tracks[0].bpm
   // const secondsPerQuarterNote = 60 / this.getCurrentTrack('bpm')
-  // const pixelPerQuarterNote = secondsPerQuarterNote * this.pxPerSec
+  // const pixelPerQuarterNote = secondsPerQuarterNote * pixelPerSecond.value
   // const pixelPer4Bars = pixelPerQuarterNote * 16
   // const pixelPer16Bars = pixelPer4Bars * 16
-  // console.log("this.pxPerSec", this.pxPerSec)
+  // console.log("pixelPerSecond.value", pixelPerSecond.value)
   // console.log("secondsPerQuarterNote", secondsPerQuarterNote)
   // console.log("pixelPerQuarterNote", pixelPerQuarterNote)
   // console.log("pixelPer4Bars", pixelPer4Bars)
@@ -208,6 +235,92 @@ const nudgeBehind = () => {
     player.value.setVolume(1)
   }, player.value.params.skipLength * 1000)
 }
+
+const ignoreEvent = (event) => {
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+const startDrag = (event) => {
+  // console.log('start drag', player.value.params.interact)
+  player.value.params.interact = false
+  // player.value.toggleInteraction()
+  event.preventDefault()
+  event.stopPropagation()
+  startDragPlayState.value = player.value.isPlaying()
+  dragging.value = true
+  dragX.value = event.clientX
+  if (typeof dragX.value === 'undefined') {
+    dragX.value = event.touches[0].pageX
+  }
+  lastSetSongPosition.value = player.value.getCurrentTime()
+  // console.log('lastSetSongPosition.value', lastSetSongPosition.value)
+}
+
+const stopDrag = (event) => {
+  // TODO: how to support multitouch?
+  //    e.g. press play/pause during "holding" the waveform in place
+  if (event.target.nodeName === 'WAVE') {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+  if (dragging.value === true) {
+    if (startDragPlayState.value === true) {
+      player.value.play()
+    }
+    setTimeout(() => {
+      player.value.params.interact = true
+    }, 100)
+  }
+  dragging.value = false
+  // console.log('dragging.value', dragging.value)
+}
+
+const doDrag = (event) => {
+  if (dragging.value === false) {
+    return
+  }
+  event.preventDefault()
+  event.stopPropagation()
+  // mouse or touch event
+  let clientX = event.clientX
+  if (typeof clientX === 'undefined') {
+    clientX = event.touches[0].pageX
+  }
+  const pixelDelta = clientX - dragX.value
+  let targetSecond = lastSetSongPosition.value - pixelDelta / pixelPerSecond.value
+  if (targetSecond < 0) {
+    targetSecond = 0
+  }
+
+  const targetSeekPercent = targetSecond / (player.value.getDuration())
+  player.value.seekAndCenter(targetSeekPercent)
+
+  const targetSecond2 = targetSecond + 0.001
+  player.value.play(targetSecond, targetSecond2)
+  /*
+  const targetSecond2 =  targetSecond + 0.001
+  player.value.play(targetSecond,targetSecond2)
+  const playPromise = player.value.play(targetSecond,targetSecond2)
+  if (playPromise !== undefined) {
+    playPromise.then(_ => {
+      // Automatic playback started!
+      // Show playing UI.
+      console.log('catched error1', _)
+    })
+    .catch(error => {
+      // Auto-play was prevented
+      // Show paused UI.
+      console.log('catched error2', error)
+    });
+  }
+  */
+}
+
+onMounted(() => {
+  window.addEventListener('mouseup', stopDrag)
+})
+
 defineExpose({
   nudgeBehind,
   nudgeAhead,

@@ -1,7 +1,7 @@
 <template>
   <div :class="`deck deck-${index}`">
-      pitch: {{ pitch }}
-    <WaveBig :track="track" :play="play" ref="player"/>
+      playbackRate: {{ playbackRate }}
+    <WaveBig :track="track" :play="play" ref="player"  :playbackRate="playbackRate"/>
     <br>
 
     <div id="deck-minimap" class="deck-minimap">
@@ -19,7 +19,8 @@
 import { ref, defineProps } from 'vue'
 import WaveBig from '@/components/WaveBig.vue'
 const play = ref(false)
-const pitch = ref(1)
+const playbackRate = ref(1)
+
 defineProps({
   index: {
     type: Number,
