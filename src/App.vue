@@ -1,21 +1,8 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <InstruPella />
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+<script setup>
+import InstruPella from './components/InstruPella.vue'
+require('halfmoon/css/halfmoon-variables.min.css')
 </script>
-
-<style lang="scss">
-#app {
-
-}
-</style>
