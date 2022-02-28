@@ -6,10 +6,10 @@ module.exports = defineConfig({
   configureWebpack: {
     module: {
       rules: [
-      {
-        test: /\.scss$/,
-        use: ["sass-loader"]
-      },
+        {
+          test: /\.scss$/,
+          use: ['sass-loader']
+        }
       // ...
       ]
     }

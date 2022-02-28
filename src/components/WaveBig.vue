@@ -43,6 +43,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  mute: {
+    type: Boolean,
+    default: false
+  },
   track: {
     type: Object,
     default: null
@@ -69,6 +73,10 @@ watch(() => props.play, () => {
     return
   }
   togglePlay()
+})
+
+watch(() => props.mute, () => {
+  player.value.toggleMute()
 })
 
 const initPlayer = () => {
@@ -119,7 +127,7 @@ const wavesurferOptions = () => {
       MinimapPlugin.create({
         // plugin options ...
         container: '#deck-minimap',
-        height: 80
+        height: 60
       }),
       TimelinePlugin.create({
         // plugin options ...
@@ -310,9 +318,8 @@ const doDrag = (event) => {
   */
 }
 
-
 watch(() => props.playbackRate, () => {
-  player.value.setPlaybackRate(props.playbackRate);
+  player.value.setPlaybackRate(props.playbackRate)
 })
 onMounted(() => {
   window.addEventListener('mouseup', stopDrag)

@@ -4,19 +4,42 @@
     <WaveBig
       :track="track"
       :play="play"
+      :mute="mute"
       ref="player"
       :playbackRate="playbackRate"
       class="wave-big"
     />
     <br>
-    
+
     <div class="d-flex">
-      <button :class="buttonClasses" type="button" @click="$refs.player.seekZero()">|&lt;</button>
+      <Button
+        label="|&lt;"
+        :permaClasses="`${buttonClasses}`"
+        @click="$refs.player.seekZero()"
+      />
       <div id="deck-minimap" class="deck-minimap m-10"> </div>
-      <button :class="buttonClasses" type="button" @click="togglePlay" v-html="play ? '&#9611;&#9611;' : '&#x25B6;'"></button>
-      <button :class="buttonClasses" type="button" @click="$refs.player.nudgeBehind()">&#x2796;</button>
-      <button :class="buttonClasses" type="button" @click="$refs.player.nudgeAhead()">&#x2795;</button>
-      <button :class="buttonClasses" type="button" @click="$refs.player.nudgeAhead()">&#x1f507;</button>
+      <Button
+        :label="play ? '&#9611;&#9611;' : '&#x25B6;'"
+        :permaClasses="`${buttonClasses}`"
+        :activeClass="play ? 'btn-primary' : ''"
+        @click="togglePlay"
+      />
+      <Button
+        label="&#x2796;"
+        :permaClasses="`rounded-circle ${buttonClasses}`"
+        @click="$refs.player.nudgeBehind()"
+      />
+      <Button
+        label="&#x2795;"
+        :permaClasses="`rounded-circle ${buttonClasses}`"
+        @click="$refs.player.nudgeAhead()"
+      />
+      <Button
+        label="&#x1f507;"
+        :permaClasses="`${buttonClasses}`"
+        :activeClass="mute ? 'btn-danger' : ''"
+        @click="toggleMute"
+      />
     </div>
     <br>
     <PitchControl
@@ -28,10 +51,14 @@
 <script setup>
 import { ref, defineProps } from 'vue'
 import WaveBig from '@/components/WaveBig.vue'
+import Button from '@/components/Button.vue'
 import PitchControl from '@/components/PitchControl.vue'
 const play = ref(false)
+const mute = ref(false)
 const playbackRate = ref(1)
-const buttonClasses = ref('btn btn-square btn-primary btn-lg m-10')
+const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
+
+// const muteState = computed(() => false )
 
 defineProps({
   index: {
@@ -45,6 +72,9 @@ defineProps({
 })
 const togglePlay = () => {
   play.value = !play.value
+}
+const toggleMute = () => {
+  mute.value = !mute.value
 }
 const setPitch = (newPitchValue) => {
   playbackRate.value = newPitchValue

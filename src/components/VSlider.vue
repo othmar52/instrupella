@@ -32,11 +32,11 @@ const props = defineProps({
   },
   nudge: {
     type: Number,
-    default: 0.05
+    default: 0.005
   }
 })
 const factor = computed(() => {
-  return parseFloat(localSliderValue.value).toFixed(2)
+  return parseFloat(localSliderValue.value).toFixed(3)
 })
 const emit = defineEmits([
   'sliderChange'
