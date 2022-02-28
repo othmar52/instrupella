@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, defineProps, defineEmits, defineExpose, computed } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 const localSliderValue = ref(1)
 const props = defineProps({
   minSliderValue: {

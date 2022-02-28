@@ -27,7 +27,7 @@ import WaveSurfer from 'wavesurfer.js'
 import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
 import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline/index.js'
 
-import { ref, defineProps, watch, defineExpose, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 
 const player = ref(null)
 const pixelPerSecond = ref(400)
@@ -77,6 +77,11 @@ watch(() => props.play, () => {
 
 watch(() => props.mute, () => {
   player.value.toggleMute()
+})
+
+watch(() => props.track, () => {
+  console.log('watch track WaveBig', props.track)
+  initPlayer()
 })
 
 const initPlayer = () => {
@@ -322,6 +327,7 @@ watch(() => props.playbackRate, () => {
   player.value.setPlaybackRate(props.playbackRate)
 })
 onMounted(() => {
+  console.log('props.track', props.track)
   window.addEventListener('mouseup', stopDrag)
 })
 

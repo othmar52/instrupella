@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted, defineProps, defineExpose } from 'vue'
+import { watch, onMounted } from 'vue'
 const props = defineProps({
   permaClasses: {
     type: String,

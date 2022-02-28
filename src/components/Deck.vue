@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue'
+import { ref } from 'vue'
 import WaveBig from '@/components/WaveBig.vue'
 import Button from '@/components/Button.vue'
 import PitchControl from '@/components/PitchControl.vue'

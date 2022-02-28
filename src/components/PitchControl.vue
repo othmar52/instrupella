@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps, defineEmits, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import VSlider from '@/components/VSlider.vue'
 import Button from '@/components/Button.vue'
 const buttonClasses = ref('btn btn-square btn-lg m-10')
