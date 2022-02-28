@@ -1,6 +1,5 @@
 <template>
   <div class="wave">
-    <h3>wave</h3>
     <div id="wave-timeline">
     </div>
     <div
@@ -20,10 +19,6 @@
       <div id="wave-surfer" ref="wavesurfer">
     </div>
     </div>
-    <div v-if="track">
-      {{track.path}}
-    </div>
-    <span @click="initPlayer">init player</span>
   </div>
 </template>
 
@@ -79,21 +74,18 @@ watch(() => props.play, () => {
 const initPlayer = () => {
   // console.log("initPlayer()")
   if (player.value !== null) {
-    console.log('player.value', player.value)
     player.value.destroy()
   }
-  console.log('creating wavesurfer begin')
   player.value = WaveSurfer.create(
     wavesurferOptions()
   )
-  console.log('creating wavesurfer end')
   player.value.load(props.track.path)
   /*
-  if (this.getCurrentTrack('bpmdetect') > 0) {
-    this.referenceTempo = this.getCurrentTrack('bpmdetect')
+  if (props.track.bpmdetect > 0) {
+    this.referenceTempo = props.track.bpmdetect
   }
-  if (this.getCurrentTrack('bpm') > 0) {
-    this.referenceTempo = this.getCurrentTrack('bpm')
+  if (props.track.bpm > 0) {
+    this.referenceTempo = props.track.bpm
   }
   this.acaBpm = this.referenceTempo * this.acaPitch
   // console.log('this.acaBpm', this.acaBpm)
@@ -106,14 +98,14 @@ const initPlayer = () => {
       return
     }
     // we do not know the downbeat - so start immediatly
-    if (this.getCurrentTrack('downbeat') === 0) {
-      // console.log("starting immediatly", this.getCurrentTrack('downbeat'))
+    if (props.track.downbeat === 0) {
+      // console.log("starting immediatly", props.track.downbeat)
       this.$refs.metronome.play()
       return
     }
     // let milliSecondsPerQuarterNote = 60000 / this.tracks[0].bpm
     // console.log('audioprocess', this.metronome, this.metronomeRunning, milliSecondsPerQuarterNote)
-    if (player.getCurrentTime() >= this.getCurrentTrack('downbeat')) {
+    if (player.getCurrentTime() >= props.track.downbeat) {
       this.$refs.metronome.play()
     }
   })
@@ -126,7 +118,8 @@ const wavesurferOptions = () => {
     plugins: [
       MinimapPlugin.create({
         // plugin options ...
-        container: '#deck-minimap'
+        container: '#deck-minimap',
+        height: 80
       }),
       TimelinePlugin.create({
         // plugin options ...
@@ -153,7 +146,7 @@ const wavesurferOptions = () => {
       })
     ],
     container: '#wave-surfer',
-    backgroundColor: '#121212',
+    backgroundColor: '#111417',
     // backend: 'WebAudio', // change tempo and pitch
     // backend: 'MediaElement',  // change tempo and keep pitch
     backend: (props.timestretch) ? 'MediaElement' : 'WebAudio',
@@ -175,7 +168,7 @@ const wavesurferOptions = () => {
     autoCenter: true,
     maxCanvasWidth: 4000,
     pixelRatio: 1,
-    // autoCenterImmediately: true,
+    autoCenterImmediately: true,
     partialRender: true,
     responsive: true,
     interact: true,
@@ -185,11 +178,11 @@ const wavesurferOptions = () => {
 }
 const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
   if (this.track.downbeat < 0.001) {
-    console.log("parseInt(this.getCurrentTrack('downbeat'))", parseInt(this.track.downbeat))
+    console.log('parseInt(props.track.downbeat)', parseInt(this.track.downbeat))
     return 0
   }
   if (this.track.bpmdetect === 0) {
-    console.log("parseInt(this.getCurrentTrack('bpm'))", parseInt(this.track.bpmdetect))
+    console.log('parseInt(props.track.bpm)', parseInt(this.track.bpmdetect))
     return 0
   }
   // offset needs seconds and not pixel
@@ -199,7 +192,7 @@ const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
   const secondsFor16Bars = secondsPerQuarterNote * 4 * 16
 
   // let econdsPerQuarterNote = 60 / this.tracks[0].bpm
-  // const secondsPerQuarterNote = 60 / this.getCurrentTrack('bpm')
+  // const secondsPerQuarterNote = 60 / props.track.bpm
   // const pixelPerQuarterNote = secondsPerQuarterNote * pixelPerSecond.value
   // const pixelPer4Bars = pixelPerQuarterNote * 16
   // const pixelPer16Bars = pixelPer4Bars * 16
@@ -317,6 +310,10 @@ const doDrag = (event) => {
   */
 }
 
+
+watch(() => props.playbackRate, () => {
+  player.value.setPlaybackRate(props.playbackRate);
+})
 onMounted(() => {
   window.addEventListener('mouseup', stopDrag)
 })
@@ -333,9 +330,10 @@ defineExpose({
 #wave-timeline {
   position: absolute;
   z-index:100;
-  width: 80vw;
+  width: 80%;
 }
 wave {
   z-index: 101;
+  position: relative;
 }
 </style>
