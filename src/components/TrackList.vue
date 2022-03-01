@@ -4,9 +4,17 @@
     <thead>
       <tr colspan="5">
         <th>
-          <form class=" form-inline d-none d-md-flex ml-auto" action="..." method="..."> <!-- d-none = display: none, d-md-flex = display: flex on medium screens and up (width > 768px), ml-auto = margin-left: auto -->
+          <div>
             <input type="text" class="form-control" placeholder="Search" v-model="searchInput" @keyup="searchEntries">
-          </form>
+          </div>
+          <div>
+            <span
+              v-for="tempo in bpmFilterValues" :key="tempo"
+              @click="setBpmFilter(tempo)"
+              :class="`btn btn-default ${(bpmFilter === tempo) ? 'btn-primary' : ''}`">
+              {{tempo}} BPM
+            </span>
+          </div>
         </th>
       </tr>
       <tr>
@@ -35,13 +43,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 const props = defineProps({
   tracks: {
     type: Array,
     default: []
   }
 })
+const bpmFilterValues = ref([])
+console.log(bpmFilterValues)
+const bpmFilter = ref(null)
 const length = ref(0)
 const searchInput = ref('')
 const filteredEntries = ref([])
@@ -62,27 +73,41 @@ const loadTrack = (trackIndex) => {
     block: 'end'
   })
 }
+const setBpmFilter = (tempo) => {
+  bpmFilter.value = (bpmFilter.value === tempo) ? null : tempo
+  searchEntries()
+}
 const searchEntries = () => {
+  filteredEntries.value = props.tracks
   if (searchInput.value !== '') {
-    // console.log('searchInput', searchInput.value)
-    filteredEntries.value = props.tracks.filter(track => {
-      if (!track.artist || !track.title || !track.path) {
-        return false
-      }
-      return (
-        track.artist.toLowerCase().includes(
-          searchInput.value.toLowerCase()
-        ) ||
-        track.title.toLowerCase().includes(
-          searchInput.value.toLowerCase()
-        ) ||
-        track.path.toLowerCase().includes(
-          searchInput.value.toLowerCase()
-        )
-      )
+    filteredEntries.value = filteredEntries.value.filter(track => {
+      return searchTermMatches(track, searchInput.value.toLowerCase())
     })
   }
+  if (bpmFilter.value !== null) {
+    filteredEntries.value = filteredEntries.value.filter(track => {
+      return tempoMatches(track, bpmFilter.value)
+    })
+  }
+  return filteredEntries.value
 }
+
+const searchTermMatches = (track, searchTerm) => {
+  for (const propName of ['artist', 'title', 'path']) {
+    if (track[propName] && track[propName].toLowerCase().includes(searchTerm)) {
+      return true
+    }
+  }
+  return false
+}
+
+const tempoMatches = (track, tempo) => {
+  if (track.bpmdetect && track.bpmdetect >= tempo - 5 && track.bpmdetect <= tempo + 5) {
+    return true
+  }
+  return false
+}
+
 const formatDuration = (duration) => {
   // thanks to https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds#answer-11486026
   // Hours, minutes and seconds
@@ -105,9 +130,39 @@ const formatDuration = (duration) => {
 const trackCount = computed(() => props.tracks.length)
 
 const tracksToRender = computed(() => {
-  return (searchInput.value !== '') ? filteredEntries.value : props.tracks
+  return filteredEntries.value
 })
 
+// thanks to https://stackoverflow.com/questions/8273047/javascript-function-similar-to-python-range#8273091
+const range = (start, stop, step) => {
+  if (typeof stop === 'undefined') {
+    // one param defined
+    stop = start
+    start = 0
+  }
+
+  if (typeof step === 'undefined') {
+    step = 1
+  }
+
+  if ((step > 0 && start >= stop) || (step < 0 && start <= stop)) {
+    return []
+  }
+
+  const result = []
+  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
+    result.push(i)
+  }
+  return result
+}
+
+onMounted(() => {
+  bpmFilterValues.value = range(80, 180, 10)
+})
+
+watch(() => props.tracks, () => {
+  searchEntries()
+})
 </script>
 
 <style scoped lang="scss">
