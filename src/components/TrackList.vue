@@ -1,17 +1,28 @@
 <template>
-  <p></p>
+  <div class="card">
   <table class="track-list">
     <thead>
-      <tr colspan="5">
-        <th>
-          <div>
-            <input type="text" class="form-control" placeholder="Search" v-model="searchInput" @keyup="searchEntries">
+      <tr>
+        <th colspan="5">
+          <div class="container-fluid">
+          <div class="row justify-content-center">
+            <div class="col-sm-6 col-md-5 col-lg-6">
+              <input
+                type="search"
+                class="form-control form-control-lg"
+                placeholder="Search"
+                v-model="searchInput"
+                @keyup="searchEntries"
+                @search="searchEntries"
+              >
+            </div>
+          </div>
           </div>
           <div>
             <span
               v-for="tempo in bpmFilterValues" :key="tempo"
               @click="setBpmFilter(tempo)"
-              :class="`btn btn-default ${(bpmFilter === tempo) ? 'btn-primary' : ''}`">
+              :class="`btn btn-default ${(bpmFilter === tempo) ? 'btn-primary' : ''} m-5`">
               {{tempo}} BPM
             </span>
           </div>
@@ -20,8 +31,8 @@
       <tr>
         <th>
             Artist - Title
-            count {{trackCount}}
-            </th>
+            count {{filteredEntries.length}}
+        </th>
         <th>KEY</th>
         <th>BPM</th>
         <th>LENGTH</th>
@@ -29,21 +40,22 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="track in tracksToRender" :key="track.id">
+      <tr v-for="track in filteredEntries" :key="track.id">
         <td>{{ track.artist }} - {{ track.title }}</td>
         <td>{{ track.key }}</td>
         <td>{{ parseInt(track.bpmdetect) }}</td>
         <td>{{ formatDuration(track.length) }}</td>
         <td @click="loadTrack(track.id)">
-          <strong class="btn btn-default">LOAD</strong>
+          <strong class="btn btn-default btn-primary">LOAD</strong>
         </td>
       </tr>
     </tbody>
   </table>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 const props = defineProps({
   tracks: {
     type: Array,
@@ -51,7 +63,6 @@ const props = defineProps({
   }
 })
 const bpmFilterValues = ref([])
-console.log(bpmFilterValues)
 const bpmFilter = ref(null)
 const length = ref(0)
 const searchInput = ref('')
@@ -63,7 +74,7 @@ const emit = defineEmits([
 
 const loadTrack = (trackIndex) => {
   // console.log('loadTrack(trackIndex)', trackIndex)
-  emit('selectTrack', trackIndex)
+  
   const element = document.querySelector('.deck-0')
   if (!element) {
     return
@@ -72,6 +83,7 @@ const loadTrack = (trackIndex) => {
     behavior: 'smooth',
     block: 'end'
   })
+  setTimeout(() => { emit('selectTrack', trackIndex) }, 200)
 }
 const setBpmFilter = (tempo) => {
   bpmFilter.value = (bpmFilter.value === tempo) ? null : tempo
@@ -89,7 +101,6 @@ const searchEntries = () => {
       return tempoMatches(track, bpmFilter.value)
     })
   }
-  return filteredEntries.value
 }
 
 const searchTermMatches = (track, searchTerm) => {
@@ -127,22 +138,12 @@ const formatDuration = (duration) => {
   return ret
 }
 
-const trackCount = computed(() => props.tracks.length)
-
-const tracksToRender = computed(() => {
-  return filteredEntries.value
-})
-
 // thanks to https://stackoverflow.com/questions/8273047/javascript-function-similar-to-python-range#8273091
-const range = (start, stop, step) => {
+const range = (start, stop, step = 1) => {
   if (typeof stop === 'undefined') {
     // one param defined
     stop = start
     start = 0
-  }
-
-  if (typeof step === 'undefined') {
-    step = 1
   }
 
   if ((step > 0 && start >= stop) || (step < 0 && start <= stop)) {
@@ -168,8 +169,8 @@ watch(() => props.tracks, () => {
 <style scoped lang="scss">
 table {
   /* Display */
-  width: 100%;
   height: 100%;
+  width: 100%;
 
   /* Table */
   border-collapse: collapse;
@@ -179,11 +180,11 @@ table {
 }
 
 thead tr,
-tr:nth-child(even) {
-    background: #1b1b1b;
+thead th {
+  background: var(--dm-card-bg-color);
 }
-thead tr {
-    border: 1px solid #777;
+tr:nth-child(even) {
+    background: var(--dm-input-bg-color);;
 }
 
 td, th {
@@ -197,9 +198,7 @@ th:first-child {
 }
 th {
     color: #BBB;
-}
-tbody tr:hover td {
-    background-color: black;
+    padding: 10px;
 }
 
 table thead,

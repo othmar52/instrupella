@@ -84,5 +84,11 @@ defineExpose({
 </script>
 
 <style lang="scss">
-
+input[type=range][orient=vertical]
+{
+    -webkit-appearance: slider-vertical; /* Chromium */
+    width: 8px;
+    height: 175px;
+    padding: 0 5px;
+}
 </style>

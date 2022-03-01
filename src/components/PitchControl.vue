@@ -1,14 +1,16 @@
 <template>
     <div class="pitch-control">
-        <div class="dropdown with-arrow">
-            <button class="btn" data-toggle="dropdown" type="button" id="..." aria-haspopup="true" aria-expanded="false">
+        <div class="dropdown dropright with-arrow" id="pitch-control-items">
+            <button class="btn" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
                 {{pitchLabel}} <i class="fa fa-angle-down ml-5" aria-hidden="true"></i> <!-- ml-5 = margin-left: 0.5rem (5px) -->
             </button>
-        <div class="dropdown-menu" aria-labelledby="dropdown-toggle-btn-1">
+        <div class="dropdown-menu dropdown-menu-center" aria-labelledby="dropdown-toggle-btn-1">
             <div class="dropdown-content">
-              <div class="dropdown-item" @click="changeRange(0.5)" data-dismiss="dropdown-menu">+/- 50%</div>
-              <div class="dropdown-item" @click="changeRange(0.2)">+/- 20%</div>
-              <div class="dropdown-item" @click="changeRange(0.1)">+/- 10%</div>
+              <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.5, 'pitch-control-items')">+/- 50 %</div>
+              <div class="dropdown-divider"></div>
+              <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.2, 'pitch-control-items')">+/- 20 %</div>
+              <div class="dropdown-divider"></div>
+              <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.1, 'pitch-control-items')">+/- 10 %</div>
             </div>
         </div>
         </div>
@@ -51,10 +53,16 @@ const props = defineProps({
   }
 })
 
-const changeRange = (newRange) => {
+const changeRange = (newRange, id) => {
   range.value = newRange
   min.value = props.center - newRange
   max.value = props.center + newRange
+
+  // TODO: how to properly close halfmoon dropdown on lick?
+  setTimeout(() => {
+    document.getElementById(id).classList.remove("show")
+  }, 10)
+
 }
 
 const sliderChange = (newPitchValue) => {
@@ -70,7 +78,7 @@ const emit = defineEmits([
 ])
 
 onMounted(() => {
-
+  halfmoon.onDOMContentLoaded();
 })
 </script>
 
