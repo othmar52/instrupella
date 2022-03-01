@@ -196,8 +196,8 @@ const wavesurferOptions = () => {
     // backend: 'MediaElement',  // change tempo and keep pitch
     backend: (props.timestretch) ? 'MediaElement' : 'WebAudio',
     mediaControls: false,
-    waveColor: '#7460cd',
-    progressColor: '#13111f',
+    waveColor: '#1890ff',
+    progressColor: '#05121e',
     loaderColor: 'purple',
     cursorColor: '#903d5c',
     cursorWidth: 3,
@@ -356,6 +356,9 @@ const doDrag = (event) => {
 }
 
 watch(() => props.playbackRate, () => {
+  if (!player.value) {
+    return
+  }
   player.value.setPlaybackRate(props.playbackRate)
 })
 onMounted(() => {
@@ -374,11 +377,11 @@ defineExpose({
 <style lang="scss">
 #wave-timeline {
   position: absolute;
-  z-index:100;
-  width: 80%;
+  z-index:5;
+  width: 100%;
 }
 wave {
-  z-index: 101;
+  z-index: 6;
   position: relative;
 }
 </style>

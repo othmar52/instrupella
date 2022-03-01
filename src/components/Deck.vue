@@ -1,81 +1,92 @@
 <template>
-  <div :class="`card p-0 deck deck-${index}`">
-    <div class="zoom-control">
-      <Button
-        label="&#x2796;"
-        :permaClasses="`btn btn-square btn-default m-5`"
-        :activeClass="(pixelPerSecond === 50) ? 'disabled' : ''"
-        @click="zoomOut"
-      />
-      <Button
-        label="&#x2795;"
-        :permaClasses="`btn btn-square btn-default m-5`"
-        :activeClass="(pixelPerSecond === 700) ? 'disabled' : ''"
-        @click="zoomIn"
-      />
-    </div>
-    <!--playbackRate: {{ playbackRate }} -->
-    <div class="wave-big-wrap">
-      <Transition name="slide-fade">
-        <div class="load-track" v-if="loadProgress >0 && loadProgress < 100">
-          <h3>Loading</h3>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" :style="`width: ${loadProgress}%`" :aria-valuenow="loadProgress" aria-valuemin="0" aria-valuemax="100"></div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-10">
+      <div :class="`card p-0 deck deck-${index}`">
+        <div class="zoom-control">
+          <Button
+            label="&#x2796;"
+            :permaClasses="`btn btn-square btn-default m-5`"
+            :activeClass="(pixelPerSecond === 50) ? 'disabled' : ''"
+            @click="zoomOut"
+          />
+          <Button
+            label="&#x2795;"
+            :permaClasses="`btn btn-square btn-default m-5`"
+            :activeClass="(pixelPerSecond === 700) ? 'disabled' : ''"
+            @click="zoomIn"
+          />
+        </div>
+        <!--playbackRate: {{ playbackRate }} -->
+        <div class="wave-big-wrap">
+          <Transition name="slide-fade">
+            <div class="load-track" v-if="loadProgress >0 && loadProgress < 100">
+              <h3>Loading</h3>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar" :style="`width: ${loadProgress}%`" :aria-valuenow="loadProgress" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          </Transition>
+          <WaveBig
+            :track="track"
+            :play="play"
+            :mute="mute"
+            :playbackRate="playbackRate"
+            :pixelPerSecond="pixelPerSecond"
+            @trackEnd="trackEnd"
+            @trackLoad="trackLoad"
+            @waveformReady="waveformReady"
+            @trackReady="trackReady"
+            ref="player"
+            class="wave-big"
+          />
+        </div>
+        <div class="d-flex">
+          <div class="track-info">
+            <div v-if="track">
+              {{track.artist}}<br>
+              {{track.title}}
+            </div>
           </div>
+          <Button
+            label="|&lt;"
+            :permaClasses="`${buttonClasses}`"
+            @click="$refs.player.seekZero()"
+          />
+          <div id="deck-minimap" class="deck-minimap m-10"></div>
+          <Button
+            :label="play ? '&#9611;&#9611;' : '&#x25B6;'"
+            :permaClasses="`${buttonClasses}`"
+            :activeClass="play ? 'btn-primary' : ''"
+            @click="togglePlay"
+          />
+          <Button
+            label="&#x2796;"
+            :permaClasses="`rounded-circle ${buttonClasses}`"
+            @click="$refs.player.nudgeBehind()"
+          />
+          <Button
+            label="&#x2795;"
+            :permaClasses="`rounded-circle ${buttonClasses}`"
+            @click="$refs.player.nudgeAhead()"
+          />
+          <Button
+            label="&#x1f507;"
+            :permaClasses="`${buttonClasses}`"
+            :activeClass="mute ? 'btn-danger' : ''"
+            @click="toggleMute"
+          />
         </div>
-      </Transition>
-      <WaveBig
-        :track="track"
-        :play="play"
-        :mute="mute"
-        :playbackRate="playbackRate"
-        :pixelPerSecond="pixelPerSecond"
-        @trackEnd="trackEnd"
-        @trackLoad="trackLoad"
-        @waveformReady="waveformReady"
-        @trackReady="trackReady"
-        ref="player"
-        class="wave-big"
-      />
-    </div>
-    <div class="d-flex">
-      <div class="track-info">
-        <div v-if="track">
-          {{track.artist}}<br>
-          {{track.title}}
-        </div>
+        <br />
+        
       </div>
-      <Button
-        label="|&lt;"
-        :permaClasses="`${buttonClasses}`"
-        @click="$refs.player.seekZero()"
-      />
-      <div id="deck-minimap" class="deck-minimap m-10"></div>
-      <Button
-        :label="play ? '&#9611;&#9611;' : '&#x25B6;'"
-        :permaClasses="`${buttonClasses}`"
-        :activeClass="play ? 'btn-primary' : ''"
-        @click="togglePlay"
-      />
-      <Button
-        label="&#x2796;"
-        :permaClasses="`rounded-circle ${buttonClasses}`"
-        @click="$refs.player.nudgeBehind()"
-      />
-      <Button
-        label="&#x2795;"
-        :permaClasses="`rounded-circle ${buttonClasses}`"
-        @click="$refs.player.nudgeAhead()"
-      />
-      <Button
-        label="&#x1f507;"
-        :permaClasses="`${buttonClasses}`"
-        :activeClass="mute ? 'btn-danger' : ''"
-        @click="toggleMute"
-      />
     </div>
-    <br />
-    <PitchControl @pitchChange="setPitch" />
+    <div class="col-2">
+      <div class="card">
+      <PitchControl @pitchChange="setPitch" />
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -121,6 +132,8 @@ const trackEnd = () => {
 const trackLoad = (percent) => {
   // console.log('percent', percent)
   loadProgress.value = percent
+  play.value = false
+  mute.value = false
 }
 const trackReady = () => {
   // console.log('trackReady')
@@ -170,23 +183,23 @@ const zoomInButton = computed(() => {
     height: 150px;
   }
   .wave-dragger {
-    z-index: 102;
+    z-index: 7;
   }
   .wave-big {
-    width: 80%;
+    width: 100%;
     display: inline-block;
   }
   .wave-timeline {
-    width: 80%;
+    width: 100%;
     display: inline-block;
   }
   .zoom-control {
     position: absolute;
-    z-index: 103;
+    z-index: 8;
   }
 }
 .deck-minimap {
-  width: 50vw;
+  width: 50%;
   height: var(--large-button-height);
   background: $waveFormBackground;
 }

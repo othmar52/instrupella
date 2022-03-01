@@ -12,3 +12,4 @@
   - [ ] switchable wavesurfer backend
   - [ ] navbar
   - [ ] optional huge pitch slider
+  - [ ] multitouch on iPad

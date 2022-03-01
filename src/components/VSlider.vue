@@ -1,15 +1,20 @@
 <template>
+  <div>
     <div class="vslider slider" ref="sliderWrapper">
       <input
         type="range"
         orient="vertical"
+        @touchstart="disableScroll"
+        @touchend="enableScroll"
         :min="props.minSliderValue"
         :step="props.step"
         :max="props.maxSliderValue"
         v-model="localSliderValue"
       />
-      <span>{{factor}}</span>
+      
     </div>
+    <div>{{factor}}</div>
+  </div>
 </template>
 
 <script setup>
@@ -36,28 +41,45 @@ const props = defineProps({
   }
 })
 const factor = computed(() => {
-  return parseFloat(localSliderValue.value).toFixed(3)
+  return localSliderValue.value.toFixed(3)
 })
+
 const emit = defineEmits([
   'sliderChange'
 ])
 
+// https://markus.oberlehner.net/blog/simple-solution-to-prevent-body-scrolling-on-ios/
+const disableScroll = () => {
+  document.querySelector('body').style.overflow = 'hidden'
+  document.querySelector('body').style.position = 'fixed'
+  document.querySelector('body').style.top = '0px'
+}
+const enableScroll = () => {
+  document.querySelector('body').style.removeProperty('overflow')
+  document.querySelector('body').style.removeProperty('position')
+  document.querySelector('body').style.removeProperty('top')
+}
 const increment = () => {
   if (localSliderValue.value + props.nudge <= props.maxSliderValue) {
     localSliderValue.value += props.nudge
+    return
   }
+  localSliderValue.value = props.maxSliderValue
 }
 const decrement = () => {
   if (localSliderValue.value - props.nudge >= props.minSliderValue) {
     localSliderValue.value -= props.nudge
+    return
   }
+  localSliderValue.value = props.minSliderValue
 }
 const reset = () => {
-  localSliderValue.value = 1
+  localSliderValue.value = 1.0
 }
 
 watch(localSliderValue, (newValue) => {
-  emit('sliderChange', parseFloat(newValue))
+  localSliderValue.value = parseFloat(newValue)
+  emit('sliderChange', localSliderValue.value)
 })
 
 watch(() => props.maxSliderValue, () => {
@@ -84,11 +106,66 @@ defineExpose({
 </script>
 
 <style lang="scss">
-input[type=range][orient=vertical]
-{
-    -webkit-appearance: slider-vertical; /* Chromium */
-    width: 8px;
-    height: 175px;
-    padding: 0 5px;
+$track-w: 12.5em;
+$track-h: .25em;
+$thumb-d: 1.5em;
+
+@mixin track() {
+  box-sizing: border-box;
+  border: none;
+  width: $track-w; height: $track-h;
+  background: #ccc;
+}
+
+@mixin thumb() {
+  box-sizing: border-box;
+  border: none;
+  width: $thumb-d/3;
+  height: $thumb-d;
+  background-color: var(--dm-button-primary-bg-color);
+}
+
+.vslider {
+  float: left;
+  position: relative;
+  margin: 0 .5em .5em;
+  padding: .5em;
+  height: $track-w;
+  width: $thumb-d;
+}
+
+input[type=range][orient=vertical] {
+  &, &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+  }
+  
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  padding: 0;
+  width: $track-w; height: $thumb-d;
+  transform: translate(-50%, -50%) 
+    rotate(-90deg);
+  background: transparent;
+  font: 1em/1 arial, sans-serif;
+  
+  &::-webkit-slider-runnable-track {
+    @include track
+  }
+  &::-moz-range-track { @include track }
+  &::-ms-track { @include track }
+  
+  &::-webkit-slider-thumb {
+    margin-top: .5*($track-h - $thumb-d);
+    @include thumb
+  }
+  &::-moz-range-thumb { @include thumb }
+  &::-ms-thumb {
+    margin-top: 0;
+    @include thumb
+  }
+  
+  &::-ms-tooltip { display: none }
 }
 </style>

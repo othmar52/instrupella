@@ -1,41 +1,46 @@
 <template>
-    <div class="pitch-control">
-        <div class="dropdown dropright with-arrow" id="pitch-control-items">
-            <button class="btn" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
-                {{pitchLabel}} <i class="fa fa-angle-down ml-5" aria-hidden="true"></i> <!-- ml-5 = margin-left: 0.5rem (5px) -->
-            </button>
-        <div class="dropdown-menu dropdown-menu-center" aria-labelledby="dropdown-toggle-btn-1">
-            <div class="dropdown-content">
-              <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.5, 'pitch-control-items')">+/- 50 %</div>
-              <div class="dropdown-divider"></div>
-              <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.2, 'pitch-control-items')">+/- 20 %</div>
-              <div class="dropdown-divider"></div>
-              <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.1, 'pitch-control-items')">+/- 10 %</div>
-            </div>
-        </div>
-        </div>
-        <VSlider
+  <div class="pitch-control">
+    <div class="">
+      <VSlider
           :minSliderValue="min"
           :maxSliderValue="max"
           @sliderChange="sliderChange"
           ref="slider"
         />
-        <Button
-          label="&#x2796;"
-          :permaClasses="buttonClasses"
-          @click="$refs.slider.decrement()"
-        />
-        <Button
-          label="0"
-          :permaClasses="buttonClasses"
-          @click="$refs.slider.reset()"
-        />
-        <Button
-          label="&#x2795;"
-          :permaClasses="buttonClasses"
-          @click="$refs.slider.increment()"
-        />
     </div>
+    <div class="">
+      <div class="dropdown dropleft with-arrow" id="pitch-control-items">
+        <button class="btn" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
+          {{pitchLabel}} <i class="fa fa-angle-down ml-5" aria-hidden="true"></i> <!-- ml-5 = margin-left: 0.5rem (5px) -->
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdown-toggle-btn-1">
+          <h6 class="dropdown-header">Pitch range</h6>
+          <div class="dropdown-content">
+            <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.5, 'pitch-control-items')">+/- 50 %</div>
+            <div class="dropdown-divider"></div>
+            <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.2, 'pitch-control-items')">+/- 20 %</div>
+            <div class="dropdown-divider"></div>
+            <div data-toggle="dropdown" class="dropdown-item" @click="changeRange(0.1, 'pitch-control-items')">+/- 10 %</div>
+          </div>
+        </div>
+      </div>
+      <Button
+        label="&#x2795;"
+        :permaClasses="buttonClasses"
+        @click="$refs.slider.increment()"
+      />
+      <Button
+        label="0"
+        :permaClasses="buttonClasses"
+        @click="$refs.slider.reset()"
+      />
+      <Button
+        label="&#x2796;"
+        :permaClasses="buttonClasses"
+        @click="$refs.slider.decrement()"
+      />
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -58,11 +63,10 @@ const changeRange = (newRange, id) => {
   min.value = props.center - newRange
   max.value = props.center + newRange
 
-  // TODO: how to properly close halfmoon dropdown on lick?
+  // TODO: how to properly close halfmoon dropdown on click?
   setTimeout(() => {
-    document.getElementById(id).classList.remove("show")
+    document.getElementById(id).classList.remove('show')
   }, 10)
-
 }
 
 const sliderChange = (newPitchValue) => {
@@ -70,7 +74,7 @@ const sliderChange = (newPitchValue) => {
 }
 
 const pitchLabel = computed(() => {
-  return `+/- ${range.value * 100} %`
+  return `${range.value * 100}%`
 })
 
 const emit = defineEmits([
@@ -83,5 +87,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-
+.pitch-control {
+  display: flex;
+}
 </style>
