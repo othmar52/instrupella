@@ -1,7 +1,7 @@
 <template>
-<div class="container-fluid">
+<div class="container-fluid noselect">
   <div class="row">
-    <div class="col-10">
+    <div class="col-9">
       <div :class="`card p-0 deck deck-${index}`">
         <div class="zoom-control">
           <Button
@@ -81,7 +81,7 @@
         
       </div>
     </div>
-    <div class="col-2">
+    <div class="col-3">
       <div class="card">
       <PitchControl @pitchChange="setPitch" />
       </div>

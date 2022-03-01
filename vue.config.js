@@ -53,11 +53,15 @@ module.exports = defineConfig({
       },
     },
     */
+  },
+  chainWebpack: config => {
+    config
+    .plugin('html')
+    .tap(args => {
+      args[0].title = 'instru☻pella'
+      return args
+    })
+    // TODO: how to exclude symlink from public dir for production build?
+    // config.resolve.symlinks(false)
   }
-  /*
-  // TODO: how to exclude symlink from public dir for production build?
-  chainWebpack: (config) => {
-    config.resolve.symlinks(false)
-  }
-  */
 })

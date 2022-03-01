@@ -106,9 +106,9 @@ defineExpose({
 </script>
 
 <style lang="scss">
-$track-w: 12.5em;
+$track-w: 15em;
 $track-h: .25em;
-$thumb-d: 1.5em;
+$thumb-d: 2.5em;
 
 @mixin track() {
   box-sizing: border-box;
@@ -128,8 +128,8 @@ $thumb-d: 1.5em;
 .vslider {
   float: left;
   position: relative;
-  margin: 0 .5em .5em;
-  padding: .5em;
+  margin: 0;
+  padding: 0;
   height: $track-w;
   width: $thumb-d;
 }
@@ -144,7 +144,8 @@ input[type=range][orient=vertical] {
   left: 50%;
   margin: 0;
   padding: 0;
-  width: $track-w; height: $thumb-d;
+  width: $track-w;
+  height: 3em;
   transform: translate(-50%, -50%) 
     rotate(-90deg);
   background: transparent;

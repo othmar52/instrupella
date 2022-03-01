@@ -8,7 +8,7 @@
           ref="slider"
         />
     </div>
-    <div class="">
+    <div class="pitch-control-button-group">
       <div class="dropdown dropleft with-arrow" id="pitch-control-items">
         <button class="btn" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
           {{pitchLabel}} <i class="fa fa-angle-down ml-5" aria-hidden="true"></i> <!-- ml-5 = margin-left: 0.5rem (5px) -->
@@ -89,5 +89,9 @@ onMounted(() => {
 <style lang="scss">
 .pitch-control {
   display: flex;
+  .pitch-control-button-group {
+    display: flex;
+    flex-direction: column;
+  }
 }
 </style>
