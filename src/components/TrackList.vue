@@ -1,10 +1,14 @@
 <template>
   <p></p>
-  <form class=" form-inline d-none d-md-flex ml-auto" action="..." method="..."> <!-- d-none = display: none, d-md-flex = display: flex on medium screens and up (width > 768px), ml-auto = margin-left: auto -->
-    <input type="text" class="form-control" placeholder="Search" v-model="searchInput" @keyup="searchEntries">
-  </form>
-  <table class="">
+  <table class="track-list">
     <thead>
+      <tr colspan="5">
+        <th>
+          <form class=" form-inline d-none d-md-flex ml-auto" action="..." method="..."> <!-- d-none = display: none, d-md-flex = display: flex on medium screens and up (width > 768px), ml-auto = margin-left: auto -->
+            <input type="text" class="form-control" placeholder="Search" v-model="searchInput" @keyup="searchEntries">
+          </form>
+        </th>
+      </tr>
       <tr>
         <th>
             Artist - Title
@@ -47,18 +51,34 @@ const emit = defineEmits([
 ])
 
 const loadTrack = (trackIndex) => {
-  console.log('loadTrack(trackIndex)', trackIndex)
+  // console.log('loadTrack(trackIndex)', trackIndex)
   emit('selectTrack', trackIndex)
+  const element = document.querySelector('.deck-0')
+  if (!element) {
+    return
+  }
+  element.scrollIntoView({
+    behavior: 'smooth',
+    block: 'end'
+  })
 }
 const searchEntries = () => {
   if (searchInput.value !== '') {
-    console.log('searchInput', searchInput.value)
+    // console.log('searchInput', searchInput.value)
     filteredEntries.value = props.tracks.filter(track => {
       if (!track.artist || !track.title || !track.path) {
         return false
       }
       return (
-        track.artist.toLowerCase().includes(searchInput.value.toLowerCase()) || track.title.toLowerCase().includes(searchInput.value.toLowerCase()) || track.path.toLowerCase().includes(searchInput.value.toLowerCase())
+        track.artist.toLowerCase().includes(
+          searchInput.value.toLowerCase()
+        ) ||
+        track.title.toLowerCase().includes(
+          searchInput.value.toLowerCase()
+        ) ||
+        track.path.toLowerCase().includes(
+          searchInput.value.toLowerCase()
+        )
       )
     })
   }
@@ -125,5 +145,16 @@ th {
 }
 tbody tr:hover td {
     background-color: black;
+}
+
+table thead,
+table tfoot {
+  position: sticky;
+}
+table thead {
+  inset-block-start: 0; /* "top" */
+}
+table tfoot {
+  inset-block-end: 0; /* "bottom" */
 }
 </style>

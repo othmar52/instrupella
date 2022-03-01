@@ -97,10 +97,11 @@ watch(() => props.pixelPerSecond, () => {
   // this.player.seekAndCenter(targetSeekPercent)
 })
 
-
-
 const emit = defineEmits([
-  'trackEnd'
+  'waveformReady',
+  'trackReady',
+  'trackEnd',
+  'trackLoad'
 ])
 
 const initPlayer = () => {
@@ -112,8 +113,17 @@ const initPlayer = () => {
     wavesurferOptions()
   )
   player.value.load(props.track.path)
+  player.value.on('loading', (percent) => {
+    emit('trackLoad', percent)
+  })
   player.value.on('finish', () => {
     emit('trackEnd')
+  })
+  player.value.on('ready', () => {
+    emit('trackReady')
+  })
+  player.value.on('waveform-ready', () => {
+    emit('waveformReady')
   })
   /*
   if (props.track.bpmdetect > 0) {
@@ -154,7 +164,7 @@ const wavesurferOptions = () => {
       MinimapPlugin.create({
         // plugin options ...
         container: '#deck-minimap',
-        height: 60
+        height: 50
       }),
       TimelinePlugin.create({
         // plugin options ...
@@ -164,7 +174,7 @@ const wavesurferOptions = () => {
         primaryFontColor: '#565455',
         secondaryFontColor: '#565455',
         unlabeledNotchColor: '#232323',
-        height: 100,
+        height: 150,
         offset: -3,
         secondaryLabelInterval: 16,
         primaryLabelInterval: 4,
@@ -195,7 +205,7 @@ const wavesurferOptions = () => {
     barWidth: 0,
     audioRate: props.playbackRate,
     // forceDecode: true,
-    height: 100,
+    height: 150,
     minPxPerSec: 400,
     fillParent: false,
     scrollParent: true,
@@ -319,7 +329,7 @@ const doDrag = (event) => {
   }
 
   let targetSeekPercent = targetSecond / (player.value.getDuration())
-  if(targetSeekPercent >= 1) {
+  if (targetSeekPercent >= 1) {
     targetSeekPercent = 0.999
   }
   player.value.seekAndCenter(targetSeekPercent)

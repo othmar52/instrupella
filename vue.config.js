@@ -3,10 +3,10 @@ const path = require('path')
 
 const musicFilesSymlinkSource = process.env.VUE_APP_MUSIC_ABSPATH
 let musicFilesSymlinkTarget = ''
-if (process.env.NODE_ENV == 'development') {
+if (process.env.NODE_ENV === 'development') {
   musicFilesSymlinkTarget = `public/${musicFilesSymlinkSource.split(/\//).pop()}`
 }
-if (process.env.NODE_ENV == 'production') {
+if (process.env.NODE_ENV === 'production') {
   musicFilesSymlinkTarget = `dist/${musicFilesSymlinkSource.split(/\//).pop()}`
 }
 const symlinkList = []

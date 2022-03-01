@@ -66,6 +66,6 @@ window.halfmoon = require('halfmoon')
 @import "halfmoon/css/halfmoon-variables.min.css";
 
 :root {
-  --large-button-height: 6rem;
+  --large-button-height: 5rem;
 }
 </style>

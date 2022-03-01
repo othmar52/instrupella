@@ -1,6 +1,6 @@
 <template>
   <div class="instrupella">
-    <div v-if="track">
+    <div v-if="tracks">
       <Deck :track="track" :index="0" />
       <TrackList :tracks="tracks" @selectTrack="selectTrack" />
     </div>
@@ -42,8 +42,8 @@ onMounted(() => {
     .then(response => response.json())
     .then(json => {
       tracks.value = json.map((track, idx) => ({ ...track, id: idx }))
-      track.value = tracks.value[0]
-      console.log(track.value.artist)
+      // track.value = tracks.value[0]
+      // console.log(track.value.artist)
       // console.log(this.tracks[0].path)
     })
 })

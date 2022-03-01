@@ -15,17 +15,36 @@
       />
     </div>
     <!--playbackRate: {{ playbackRate }} -->
-    <WaveBig
-      :track="track"
-      :play="play"
-      :mute="mute"
-      :playbackRate="playbackRate"
-      :pixelPerSecond="pixelPerSecond"
-      @trackEnd="trackEnd"
-      ref="player"
-      class="wave-big"
-    />
+    <div class="wave-big-wrap">
+      <Transition name="slide-fade">
+        <div class="load-track" v-if="loadProgress >0 && loadProgress < 100">
+          <h3>Loading</h3>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" :style="`width: ${loadProgress}%`" :aria-valuenow="loadProgress" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+      </Transition>
+      <WaveBig
+        :track="track"
+        :play="play"
+        :mute="mute"
+        :playbackRate="playbackRate"
+        :pixelPerSecond="pixelPerSecond"
+        @trackEnd="trackEnd"
+        @trackLoad="trackLoad"
+        @waveformReady="waveformReady"
+        @trackReady="trackReady"
+        ref="player"
+        class="wave-big"
+      />
+    </div>
     <div class="d-flex">
+      <div class="track-info">
+        <div v-if="track">
+          {{track.artist}}<br>
+          {{track.title}}
+        </div>
+      </div>
       <Button
         label="|&lt;"
         :permaClasses="`${buttonClasses}`"
@@ -70,6 +89,7 @@ const play = ref(false)
 const mute = ref(false)
 const pixelPerSecond = ref(400)
 const playbackRate = ref(1)
+const loadProgress = ref(0)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
 
 // const muteState = computed(() => false )
@@ -97,6 +117,16 @@ const setPitch = (newPitchValue) => {
 const trackEnd = () => {
   play.value = false
   mute.value = false
+}
+const trackLoad = (percent) => {
+  // console.log('percent', percent)
+  loadProgress.value = percent
+}
+const trackReady = () => {
+  // console.log('trackReady')
+}
+const waveformReady = () => {
+  // console.log('waveformReady')
 }
 const zoomIn = () => {
   if (pixelPerSecond.value >= 700) {
@@ -136,6 +166,9 @@ const zoomInButton = computed(() => {
 <style lang="scss">
 @import "../scss/_variables.scss";
 .deck {
+  .wave-big-wrap {
+    height: 150px;
+  }
   .wave-dragger {
     z-index: 102;
   }
@@ -157,4 +190,25 @@ const zoomInButton = computed(() => {
   height: var(--large-button-height);
   background: $waveFormBackground;
 }
+
+/* we will explain what these classes do next! */
+
+.load-track {
+  position: absolute;
+  margin: 10px auto;
+  width: 50%;
+}
+.slide-fade-enter-active {
+  transition: all 0.1s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+}
+
 </style>
