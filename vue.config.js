@@ -1,22 +1,22 @@
 const { defineConfig } = require('@vue/cli-service')
-const path = require("path");
+const path = require('path')
 
-const musicFilesSymlinkSource = process.env.VUE_APP_MUSIC_ABSPATH;
-let musicFilesSymlinkTarget = "";
-if(process.env.NODE_ENV == "development") {
-  musicFilesSymlinkTarget = `public/${musicFilesSymlinkSource.split(/\//).pop()}`;
+const musicFilesSymlinkSource = process.env.VUE_APP_MUSIC_ABSPATH
+let musicFilesSymlinkTarget = ''
+if (process.env.NODE_ENV == 'development') {
+  musicFilesSymlinkTarget = `public/${musicFilesSymlinkSource.split(/\//).pop()}`
 }
-if(process.env.NODE_ENV == "production") {
-  musicFilesSymlinkTarget = `dist/${musicFilesSymlinkSource.split(/\//).pop()}`;
+if (process.env.NODE_ENV == 'production') {
+  musicFilesSymlinkTarget = `dist/${musicFilesSymlinkSource.split(/\//).pop()}`
 }
 const symlinkList = []
-if(musicFilesSymlinkTarget !== "") {
+if (musicFilesSymlinkTarget !== '') {
   symlinkList.push({
     src: musicFilesSymlinkSource,
     dest: musicFilesSymlinkTarget
   })
 }
-const WebpackSymlinkPlugin = require("webpack-symlink-plugin");
+const WebpackSymlinkPlugin = require('webpack-symlink-plugin')
 module.exports = defineConfig({
   publicPath: './',
   transpileDependencies: true,

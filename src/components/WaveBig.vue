@@ -2,7 +2,7 @@
   <div class="wave">
     <div id="wave-timeline">
     </div>
-    <div
+    <div class="wave-dragger"
       @click="ignoreEvent"
       @dblclick="ignoreEvent"
       @mouseenter="ignoreEvent"
@@ -30,7 +30,6 @@ import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline/index.js'
 import { ref, watch, onMounted } from 'vue'
 
 const player = ref(null)
-const pixelPerSecond = ref(400)
 
 // some helpers for dragging waveform
 const dragging = ref(false)
@@ -58,6 +57,10 @@ const props = defineProps({
   playbackRate: {
     type: Number,
     default: 1
+  },
+  pixelPerSecond: {
+    type: Number,
+    default: 400
   }
 })
 
@@ -80,9 +83,25 @@ watch(() => props.mute, () => {
 })
 
 watch(() => props.track, () => {
-  console.log('watch track WaveBig', props.track)
   initPlayer()
 })
+
+watch(() => props.pixelPerSecond, () => {
+  player.value.zoom(props.pixelPerSecond)
+
+  // TODO: this approach for zoom seem to be faster!?
+  //    but it does not zoom at the very beginning of the track
+  // this.player.params.minpixelPerSecond = pixelPerSecond.value
+  // const targetSeekPercent = this.player.getCurrentTime() /this.player.getDuration()
+  // console.log('percent', targetSeekPercent)
+  // this.player.seekAndCenter(targetSeekPercent)
+})
+
+
+
+const emit = defineEmits([
+  'trackEnd'
+])
 
 const initPlayer = () => {
   // console.log("initPlayer()")
@@ -93,6 +112,9 @@ const initPlayer = () => {
     wavesurferOptions()
   )
   player.value.load(props.track.path)
+  player.value.on('finish', () => {
+    emit('trackEnd')
+  })
   /*
   if (props.track.bpmdetect > 0) {
     this.referenceTempo = props.track.bpmdetect
@@ -142,7 +164,7 @@ const wavesurferOptions = () => {
         primaryFontColor: '#565455',
         secondaryFontColor: '#565455',
         unlabeledNotchColor: '#232323',
-        height: 200,
+        height: 100,
         offset: -3,
         secondaryLabelInterval: 16,
         primaryLabelInterval: 4,
@@ -173,7 +195,7 @@ const wavesurferOptions = () => {
     barWidth: 0,
     audioRate: props.playbackRate,
     // forceDecode: true,
-    height: 200,
+    height: 100,
     minPxPerSec: 400,
     fillParent: false,
     scrollParent: true,
@@ -206,10 +228,10 @@ const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
 
   // let econdsPerQuarterNote = 60 / this.tracks[0].bpm
   // const secondsPerQuarterNote = 60 / props.track.bpm
-  // const pixelPerQuarterNote = secondsPerQuarterNote * pixelPerSecond.value
+  // const pixelPerQuarterNote = secondsPerQuarterNote * props.pixelPerSecond
   // const pixelPer4Bars = pixelPerQuarterNote * 16
   // const pixelPer16Bars = pixelPer4Bars * 16
-  // console.log("pixelPerSecond.value", pixelPerSecond.value)
+  // console.log("props.pixelPerSecond", props.pixelPerSecond)
   // console.log("secondsPerQuarterNote", secondsPerQuarterNote)
   // console.log("pixelPerQuarterNote", pixelPerQuarterNote)
   // console.log("pixelPer4Bars", pixelPer4Bars)
@@ -219,13 +241,10 @@ const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
   return 5
 }
 const togglePlay = () => {
-  if (player.value.isPlaying() === true) {
-    player.value.pause()
-    // this.requestedPlayState = false
+  if (player.value.isPlaying() === props.play) {
     return
   }
-  // this.requestedPlayState = true
-  player.value.play()
+  player.value[(props.play) ? 'play' : 'pause']()
 }
 const seekZero = () => {
   player.value.seekAndCenter(0)
@@ -294,12 +313,15 @@ const doDrag = (event) => {
     clientX = event.touches[0].pageX
   }
   const pixelDelta = clientX - dragX.value
-  let targetSecond = lastSetSongPosition.value - pixelDelta / pixelPerSecond.value
+  let targetSecond = lastSetSongPosition.value - pixelDelta / props.pixelPerSecond
   if (targetSecond < 0) {
     targetSecond = 0
   }
 
-  const targetSeekPercent = targetSecond / (player.value.getDuration())
+  let targetSeekPercent = targetSecond / (player.value.getDuration())
+  if(targetSeekPercent >= 1) {
+    targetSeekPercent = 0.999
+  }
   player.value.seekAndCenter(targetSeekPercent)
 
   const targetSecond2 = targetSecond + 0.001

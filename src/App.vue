@@ -59,7 +59,7 @@
 
 <script setup>
 import InstruPella from './components/InstruPella.vue'
-require('halfmoon/js/halfmoon.min.js')
+window.halfmoon = require('halfmoon')
 </script>
 
 <style lang="scss">

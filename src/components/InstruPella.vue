@@ -2,7 +2,7 @@
   <div class="instrupella">
     <div v-if="track">
       <Deck :track="track" :index="0" />
-      <TrackList :tracks="tracks" @selectTrack="selectTrack"/>
+      <TrackList :tracks="tracks" @selectTrack="selectTrack" />
     </div>
     <div v-else>
       loading...
@@ -20,6 +20,7 @@ const tracks = ref([])
 const selectTrack = (trackIndex) => {
   track.value = tracks.value[trackIndex]
 }
+
 onMounted(() => {
   /*
   track.value = {
@@ -40,7 +41,7 @@ onMounted(() => {
   fetch(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/00-acajam.json`)
     .then(response => response.json())
     .then(json => {
-      tracks.value = json.map((track,idx)=> ({ ...track, id: idx }))
+      tracks.value = json.map((track, idx) => ({ ...track, id: idx }))
       track.value = tracks.value[0]
       console.log(track.value.artist)
       // console.log(this.tracks[0].path)
