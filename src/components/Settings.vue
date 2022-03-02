@@ -17,6 +17,7 @@
                     <li>nudge in-/deincrement duration</li>
                     <li>amount of decks</li>
                     <li>midi control</li>
+                    <li>reload instrupella or at least re-init player if it stucks</li>
                 </ul>
             </p>
             <div class="text-center mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->

@@ -1,4 +1,7 @@
 # instrupella
+DJ-like web application for playing acapellas to synth jam sessions  
+
+![image](https://user-images.githubusercontent.com/7056051/156348316-63c6df06-a430-4ae7-bb95-c812d8ff35ee.png)  
 
 ## Project setup
 ```
