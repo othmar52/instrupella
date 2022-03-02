@@ -20,10 +20,15 @@
         <!--playbackRate: {{ playbackRate }} -->
         <div class="wave-big-wrap">
           <Transition name="slide-fade">
-            <div class="load-track" v-if="loadProgress >0 && loadProgress < 100">
-              <h3>Loading</h3>
-              <div class="progress">
-                <div class="progress-bar" role="progressbar" :style="`width: ${loadProgress}%`" :aria-valuenow="loadProgress" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="text-center align-middle">
+              <div class="loXad-track" v-if="loadProgress >0 && loadProgress < 100">
+                <h3>Loading</h3>
+                <div class="progress">
+                  <div class="progress-bar" role="progressbar" :style="`width: ${loadProgress}%`" :aria-valuenow="loadProgress" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <div class="analyze-track" v-if="loadProgress === 100 && trackAnalyzed === false">
+                <h3>Analyzing Track...</h3>
               </div>
             </div>
           </Transition>
@@ -102,6 +107,7 @@ const mute = ref(false)
 const pixelPerSecond = ref(400)
 const playbackRate = ref(1)
 const loadProgress = ref(0)
+const trackAnalyzed = ref(false)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
 
 // const muteState = computed(() => false )
@@ -135,12 +141,15 @@ const trackLoad = (percent) => {
   loadProgress.value = percent
   play.value = false
   mute.value = false
+  trackAnalyzed.value = false
 }
 const trackReady = () => {
   // console.log('trackReady')
+  trackAnalyzed.value = true
 }
 const waveformReady = () => {
   // console.log('waveformReady')
+  trackAnalyzed.value = true
 }
 const zoomIn = () => {
   if (pixelPerSecond.value >= 700) {
@@ -208,10 +217,12 @@ const zoomInButton = computed(() => {
 
 /* we will explain what these classes do next! */
 
-.load-track {
+.load-track,
+.analyze-track {
   position: absolute;
-  margin: 10px auto;
-  width: 50%;
+  padding: 3rem auto 0;
+  text-align: center;
+  width: 100%;
 }
 .slide-fade-enter-active {
   transition: all 0.1s ease-out;
