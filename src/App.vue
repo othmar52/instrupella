@@ -3,7 +3,7 @@
   <div class="page-wrapper with-navbar">
     <nav class="navbar justify-content-between">
       <div class="navbar-content">
-        <a href="#settings" role="button"><IconCog /></a>
+        <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
       </div>
       <div class="navbar-content">
         <h4 class="navbar-text text-monoXspace m-5">INSTRU
@@ -12,7 +12,7 @@
         </h4>
       </div>
       <div class="navbar-content">
-        <a href="https://github.com/othmar52/instrupella" target="_blank" role="button"><IconGithub /></a>
+        <a href="https://github.com/othmar52/instrupella" class="btn-lg" target="_blank" role="button"><IconGithub /></a>
       </div>
     </nav>
     <div class="content-wrapper">
@@ -48,12 +48,22 @@ window.halfmoon = require('halfmoon')
                                   supported by Chrome, Opera and Firefox */
 }
 .icon {
-  width: 2rem;
-  height: 2rem;
+  width: 1rem;
+  height: 1rem;
   path,
   polygon,
   rect {
     fill: var(--dm-button-text-color);
   }
 }
+.btn-lg .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  path,
+  polygon,
+  rect {
+    fill: var(--dm-muted-text-color);
+  }
+}
+
 </style>

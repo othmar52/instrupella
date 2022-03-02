@@ -101,7 +101,8 @@ const emit = defineEmits([
   'waveformReady',
   'trackReady',
   'trackEnd',
-  'trackLoad'
+  'trackLoad',
+  'audioprocess'
 ])
 
 const initPlayer = () => {
@@ -124,6 +125,9 @@ const initPlayer = () => {
   })
   player.value.on('waveform-ready', () => {
     emit('waveformReady')
+  })
+  player.value.on('audioprocess', (sec) => {
+    emit('audioprocess', sec)
   })
   /*
   if (props.track.bpmdetect > 0) {

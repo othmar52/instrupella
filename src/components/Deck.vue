@@ -3,31 +3,23 @@
   <div class="row">
     <div class="col-10">
       <div :class="`card p-0 deck deck-${index}`">
-        <div class="zoom-control">
-          <Button
-            label="&#x2796;"
-            :permaClasses="`btn btn-square btn-default m-5`"
-            :activeClass="(pixelPerSecond === 50) ? 'disabled' : ''"
-            @click="zoomOut"
-          />
-          <Button
-            label="&#x2795;"
-            :permaClasses="`btn btn-square btn-default m-5`"
-            :activeClass="(pixelPerSecond === 700) ? 'disabled' : ''"
-            @click="zoomIn"
-          />
-        </div>
+        <TrackMeta
+          :track="track"
+          :currentSecond="currentSecond"
+          :playbackRate="playbackRate"
+        />
+        <ZoomControl :pixelPerSecond="pixelPerSecond" @zoomTo="zoomTo" />
         <div class="wave-big-wrap">
           <Transition name="slide-fade">
             <div class="text-center align-middle" v-if="loadProgress <= 100 && trackAnalyzed === false">
-              <div class="loXad-track" v-if="loadProgress >0 && loadProgress < 100">
+              <div class="load-track" v-if="loadProgress >0 && loadProgress < 100">
                 <h3>Loading</h3>
                 <div class="progress">
                   <div class="progress-bar" role="progressbar" :style="`width: ${loadProgress}%`" :aria-valuenow="loadProgress" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
               </div>
               <div class="analyze-track" v-if="loadProgress === 100 && trackAnalyzed === false">
-                <h3>Analyzing Track...</h3>
+                <h3><br class="todo-remove-me" />Analyzing Track...</h3>
               </div>
             </div>
           </Transition>
@@ -41,17 +33,12 @@
             @trackLoad="trackLoad"
             @waveformReady="waveformReady"
             @trackReady="trackReady"
+            @audioprocess="audioprocess"
             ref="player"
             class="wave-big"
           />
         </div>
         <div class="d-flex">
-          <div class="track-info">
-            <div v-if="track">
-              {{track.artist}}<br>
-              {{track.title}}
-            </div>
-          </div>
           <ButtonIcon
             componentName="IconArrowToFirst"
             :permaClasses="`${buttonClasses} mr-0`"
@@ -103,6 +90,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import TrackMeta from '@/components/TrackMeta.vue'
+import ZoomControl from '@/components/Deck/ZoomControl.vue'
 import WaveBig from '@/components/WaveBig.vue'
 import Button from '@/components/Button.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
@@ -115,6 +104,7 @@ const pixelPerSecond = ref(400)
 const playbackRate = ref(1)
 const loadProgress = ref(0)
 const trackAnalyzed = ref(false)
+const currentSecond = ref(0)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
 
 defineProps({
@@ -153,30 +143,11 @@ const trackReady = () => {
 const waveformReady = () => {
   trackAnalyzed.value = true
 }
-const zoomIn = () => {
-  if (pixelPerSecond.value >= 700) {
-    return
-  }
-  if (pixelPerSecond.value === 50) {
-    zoomTo(100)
-    return
-  }
-  zoomTo(pixelPerSecond.value + 100)
-}
-
-const zoomOut = () => {
-  if (pixelPerSecond.value <= 50) {
-    return
-  }
-  if (pixelPerSecond.value <= 100) {
-    zoomTo(50)
-    return
-  }
-  zoomTo(pixelPerSecond.value - 100)
-}
-
 const zoomTo = (pxPerSec) => {
   pixelPerSecond.value = pxPerSec
+}
+const audioprocess = (sec) => {
+  currentSecond.value = sec
 }
 </script>
 

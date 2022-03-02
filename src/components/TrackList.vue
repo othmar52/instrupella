@@ -119,6 +119,7 @@ const tempoMatches = (track, tempo) => {
   return false
 }
 
+// TODO move to util (code duplication in TrackMeta.vue)
 const formatDuration = (duration) => {
   // thanks to https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds#answer-11486026
   // Hours, minutes and seconds

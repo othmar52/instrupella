@@ -121,6 +121,7 @@ $thumb-d: 3.5em;
 @mixin thumb() {
   box-sizing: border-box;
   border: none;
+  border-radius: var(--button-border-radius);
   width: $thumb-d/3;
   height: $thumb-d;
   background-color: var(--dm-button-primary-bg-color);
