@@ -5,7 +5,7 @@
       <TrackList :tracks="tracks" @selectTrack="selectTrack" />
     </div>
     <div v-else>
-      loading...
+      loading tracklist...
     </div>
   </div>
 </template>
@@ -37,7 +37,7 @@ onMounted(() => {
     hotcues: []
   }
   */
-  console.log(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/00-acajam.json`)
+  // console.log(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/00-acajam.json`)
   fetch(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/00-acajam.json`)
     .then(response => response.json())
     .then(json => {

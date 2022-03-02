@@ -17,10 +17,9 @@
             @click="zoomIn"
           />
         </div>
-        <!--playbackRate: {{ playbackRate }} -->
         <div class="wave-big-wrap">
           <Transition name="slide-fade">
-            <div class="text-center align-middle">
+            <div class="text-center align-middle" v-if="loadProgress <= 100 && trackAnalyzed === false">
               <div class="loXad-track" v-if="loadProgress >0 && loadProgress < 100">
                 <h3>Loading</h3>
                 <div class="progress">
@@ -88,11 +87,18 @@
     </div>
     <div class="col-2">
       <div class="card">
-      <PitchControl @pitchChange="setPitch" />
+        <PitchControl @pitchChange="setPitch" />
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-6">
+      <div class="card">
+        <HotCues :track="track" />
+      </div>
+    </div>
   </div>
+</div>
 </template>
 
 <script setup>
@@ -101,6 +107,7 @@ import WaveBig from '@/components/WaveBig.vue'
 import Button from '@/components/Button.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import PitchControl from '@/components/PitchControl.vue'
+import HotCues from '@/components/HotCues.vue'
 const player = ref(null)
 const play = ref(false)
 const mute = ref(false)
@@ -109,8 +116,6 @@ const playbackRate = ref(1)
 const loadProgress = ref(0)
 const trackAnalyzed = ref(false)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
-
-// const muteState = computed(() => false )
 
 defineProps({
   index: {
@@ -137,18 +142,15 @@ const trackEnd = () => {
   mute.value = false
 }
 const trackLoad = (percent) => {
-  // console.log('percent', percent)
   loadProgress.value = percent
   play.value = false
   mute.value = false
   trackAnalyzed.value = false
 }
 const trackReady = () => {
-  // console.log('trackReady')
   trackAnalyzed.value = true
 }
 const waveformReady = () => {
-  // console.log('waveformReady')
   trackAnalyzed.value = true
 }
 const zoomIn = () => {
@@ -176,16 +178,8 @@ const zoomOut = () => {
 const zoomTo = (pxPerSec) => {
   pixelPerSecond.value = pxPerSec
 }
-
-/*
-const zoomInButton = computed(() => {
-  return parseFloat(localSliderValue.value).toFixed(3)
-})
-*/
-
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
 @import "../scss/_variables.scss";
 .deck {
@@ -215,8 +209,6 @@ const zoomInButton = computed(() => {
   background: $waveFormBackground;
 }
 
-/* we will explain what these classes do next! */
-
 .load-track,
 .analyze-track {
   position: absolute;
@@ -236,5 +228,4 @@ const zoomInButton = computed(() => {
 .slide-fade-leave-to {
   opacity: 0;
 }
-
 </style>

@@ -223,11 +223,11 @@ const wavesurferOptions = () => {
 }
 const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
   if (this.track.downbeat < 0.001) {
-    console.log('parseInt(props.track.downbeat)', parseInt(this.track.downbeat))
+    // console.log('parseInt(props.track.downbeat)', parseInt(this.track.downbeat))
     return 0
   }
   if (this.track.bpmdetect === 0) {
-    console.log('parseInt(props.track.bpm)', parseInt(this.track.bpmdetect))
+    // console.log('parseInt(props.track.bpm)', parseInt(this.track.bpmdetect))
     return 0
   }
   // offset needs seconds and not pixel
@@ -246,7 +246,7 @@ const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
   // console.log("pixelPerQuarterNote", pixelPerQuarterNote)
   // console.log("pixelPer4Bars", pixelPer4Bars)
   // console.log("pixelPer16Bars", pixelPer16Bars)
-  console.log('offset', this.track.downbeat - secondsFor16Bars)
+  // console.log('offset', this.track.downbeat - secondsFor16Bars)
   // return this.track.downbeat - secondsFor16Bars
   return 5
 }
@@ -362,7 +362,7 @@ watch(() => props.playbackRate, () => {
   player.value.setPlaybackRate(props.playbackRate)
 })
 onMounted(() => {
-  console.log('props.track', props.track)
+  // console.log('props.track', props.track)
   window.addEventListener('mouseup', stopDrag)
 })
 
