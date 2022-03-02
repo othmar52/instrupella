@@ -1,14 +1,9 @@
 <template>
-<div class="page-wrapper with-navbar">
-    <!-- Navbar (immediate child of the page wrapper) -->
+  <Settings />
+  <div class="page-wrapper with-navbar">
     <nav class="navbar justify-content-between">
-      <!-- Navbar content (with toggle sidebar button) -->
       <div class="navbar-content">
-        <IconCog />
-        <button class="btn btn-action" type="button">
-          <i class="fa fa-bars" aria-hidden="true"></i>
-          <span class="sr-only">Toggle sidebar</span> <!-- sr-only = show only on screen readers -->
-        </button>
+        <a href="#settings" role="button"><IconCog /></a>
       </div>
       <div class="navbar-content">
         <h4 class="navbar-text text-monoXspace m-5">INSTRU
@@ -16,23 +11,10 @@
           PELLA
         </h4>
       </div>
-      <div class="custom-switch">
-        <input type="checkbox" id="switch-1" value="">
-        <label for="switch-1"><IconMusicNote /></label>
-      </div>
       <div class="navbar-content">
-        <ul class="navbar-nav d-none d-md-flex"> <!-- d-none = display: none, d-md-flex = display: flex on medium screens and up (width > 768px) -->
-          <li class="nav-item active">
-            <a href="#" class="nav-link">Link 1</a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">Link 2</a>
-          </li>
-        </ul>
+        <a href="https://github.com/othmar52/instrupella" target="_blank" role="button"><IconGithub /></a>
       </div>
     </nav>
-
-    <!-- Content wrapper -->
     <div class="content-wrapper">
       <InstruPella />
     </div>
@@ -41,8 +23,9 @@
 
 <script setup>
 import InstruPella from './components/InstruPella.vue'
+import Settings from './components/Settings.vue'
 import IconCog from './components/Icons/Cog.vue'
-import IconMusicNote from './components/Icons/MusicNote.vue'
+import IconGithub from './components/Icons/Github.vue'
 
 // window.halfmoon = require('halfmoon/js/halfmoon.min.js')
 window.halfmoon = require('halfmoon')
