@@ -20,6 +20,7 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue'
 const localSliderValue = ref(1)
+const bodyStyles = ref(document.querySelector('body').style)
 const props = defineProps({
   minSliderValue: {
     type: [Number, String],
@@ -50,14 +51,14 @@ const emit = defineEmits([
 
 // https://markus.oberlehner.net/blog/simple-solution-to-prevent-body-scrolling-on-ios/
 const disableScroll = () => {
-  document.querySelector('body').style.overflow = 'hidden'
-  document.querySelector('body').style.position = 'fixed'
-  document.querySelector('body').style.top = '0px'
+  bodyStyles.value.overflow = 'hidden'
+  bodyStyles.value.position = 'fixed'
+  bodyStyles.value.top = '0'
 }
 const enableScroll = () => {
-  document.querySelector('body').style.removeProperty('overflow')
-  document.querySelector('body').style.removeProperty('position')
-  document.querySelector('body').style.removeProperty('top')
+  bodyStyles.value.removeProperty('overflow')
+  bodyStyles.value.removeProperty('position')
+  bodyStyles.value.removeProperty('top')
 }
 const increment = () => {
   if (localSliderValue.value + props.nudge <= props.maxSliderValue) {
@@ -108,7 +109,7 @@ defineExpose({
 <style lang="scss">
 $track-w: 15em;
 $track-h: .25em;
-$thumb-d: 2.5em;
+$thumb-d: 3.5em;
 
 @mixin track() {
   box-sizing: border-box;

@@ -1,7 +1,7 @@
 <template>
 <div class="container-fluid noselect">
   <div class="row">
-    <div class="col-9">
+    <div class="col-10">
       <div :class="`card p-0 deck deck-${index}`">
         <div class="zoom-control">
           <Button
@@ -50,10 +50,10 @@
           </div>
           <Button
             label="|&lt;"
-            :permaClasses="`${buttonClasses}`"
+            :permaClasses="`${buttonClasses} mr-0`"
             @click="$refs.player.seekZero()"
           />
-          <div id="deck-minimap" class="deck-minimap m-10"></div>
+          <div id="deck-minimap" class="deck-minimap m-10 ml-0"></div>
           <Button
             :label="play ? '&#9611;&#9611;' : '&#x25B6;'"
             :permaClasses="`${buttonClasses}`"
@@ -81,7 +81,7 @@
         
       </div>
     </div>
-    <div class="col-3">
+    <div class="col-2">
       <div class="card">
       <PitchControl @pitchChange="setPitch" />
       </div>
@@ -181,6 +181,7 @@ const zoomInButton = computed(() => {
 .deck {
   .wave-big-wrap {
     height: 150px;
+    background: #111417;
   }
   .wave-dragger {
     z-index: 7;

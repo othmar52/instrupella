@@ -1,5 +1,6 @@
 
 ## TODO
+  - [ ] iPad BUG when added to home screen the keyboard dous not appear on search input (seems to work in chrome)
   - [ ] sortable tracklist
   - [ ] metronome (generic track on 2nd deck)
   - [ ] hotcues

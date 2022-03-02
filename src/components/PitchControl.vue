@@ -2,16 +2,16 @@
   <div class="pitch-control">
     <div class="">
       <VSlider
-          :minSliderValue="min"
-          :maxSliderValue="max"
-          @sliderChange="sliderChange"
-          ref="slider"
-        />
+        :minSliderValue="min"
+        :maxSliderValue="max"
+        @sliderChange="sliderChange"
+        ref="slider"
+      />
     </div>
     <div class="pitch-control-button-group">
       <div class="dropdown dropleft with-arrow" id="pitch-control-items">
-        <button class="btn" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
-          {{pitchLabel}} <i class="fa fa-angle-down ml-5" aria-hidden="true"></i> <!-- ml-5 = margin-left: 0.5rem (5px) -->
+        <button class="btn btn-sm ml-10" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
+          {{pitchLabel}} <i class="fa fa-angle-down ml-5 mr-0" aria-hidden="true"></i> <!-- ml-5 = margin-left: 0.5rem (5px) -->
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdown-toggle-btn-1">
           <h6 class="dropdown-header">Pitch range</h6>
@@ -47,7 +47,7 @@
 import { ref, onMounted, computed } from 'vue'
 import VSlider from '@/components/VSlider.vue'
 import Button from '@/components/Button.vue'
-const buttonClasses = ref('btn btn-square btn-lg m-10')
+const buttonClasses = ref('btn btn-square btn-lg m-10 mr-0')
 const range = ref(0.2)
 const min = ref(0.8)
 const max = ref(1.2)
