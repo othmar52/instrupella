@@ -48,30 +48,30 @@
               {{track.title}}
             </div>
           </div>
-          <Button
-            label="|&lt;"
+          <ButtonIcon
+            componentName="IconArrowToFirst"
             :permaClasses="`${buttonClasses} mr-0`"
             @click="$refs.player.seekZero()"
           />
           <div id="deck-minimap" class="deck-minimap m-10 ml-0"></div>
-          <Button
-            :label="play ? '&#9611;&#9611;' : '&#x25B6;'"
+          <ButtonIcon
+            :componentName="play ? 'IconPause' : 'IconPlay'"
             :permaClasses="`${buttonClasses}`"
             :activeClass="play ? 'btn-primary' : ''"
             @click="togglePlay"
           />
-          <Button
-            label="&#x2796;"
+          <ButtonIcon
+            componentName="IconMinus"
             :permaClasses="`rounded-circle ${buttonClasses}`"
             @click="$refs.player.nudgeBehind()"
           />
-          <Button
-            label="&#x2795;"
+          <ButtonIcon
+            componentName="IconPlus"
             :permaClasses="`rounded-circle ${buttonClasses}`"
             @click="$refs.player.nudgeAhead()"
           />
-          <Button
-            label="&#x1f507;"
+          <ButtonIcon
+            componentName="IconMute"
             :permaClasses="`${buttonClasses}`"
             :activeClass="mute ? 'btn-danger' : ''"
             @click="toggleMute"
@@ -94,6 +94,7 @@
 import { ref } from 'vue'
 import WaveBig from '@/components/WaveBig.vue'
 import Button from '@/components/Button.vue'
+import ButtonIcon from '@/components/ButtonIcon.vue'
 import PitchControl from '@/components/PitchControl.vue'
 const player = ref(null)
 const play = ref(false)

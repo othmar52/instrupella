@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted } from 'vue'
+import { watch } from 'vue'
 const props = defineProps({
   permaClasses: {
     type: String,
@@ -20,30 +20,7 @@ const props = defineProps({
     default: ''
   }
 })
-watch(() => props.activeClass, () => {
-})
-/**
-const factor = computed(() => {
-  return parseFloat(localSliderValue.value).toFixed(2)
-})
-
-watch(localSliderValue, (newValue) => {
-  emit('sliderChange', parseFloat(newValue))
-})
-
-watch(() => props.activeClass, () => {
-  if (localSliderValue.value > props.maxSliderValue) {
-    localSliderValue.value = props.maxSliderValue
-  }
-})
- */
-onMounted(() => {
-
-})
-
-defineExpose({
-
-})
+watch(() => props.activeClass, () => { })
 </script>
 
 <style lang="scss">

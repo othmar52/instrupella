@@ -24,18 +24,18 @@
           </div>
         </div>
       </div>
-      <Button
-        label="&#x2795;"
+      <ButtonIcon
+        componentName="IconPlus"
         :permaClasses="buttonClasses"
         @click="$refs.slider.increment()"
       />
-      <Button
-        label="0"
+      <ButtonIcon
+        componentName="IconArrowsToCenter"
         :permaClasses="buttonClasses"
         @click="$refs.slider.reset()"
       />
-      <Button
-        label="&#x2796;"
+      <ButtonIcon
+        componentName="IconMinus"
         :permaClasses="buttonClasses"
         @click="$refs.slider.decrement()"
       />
@@ -46,7 +46,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import VSlider from '@/components/VSlider.vue'
-import Button from '@/components/Button.vue'
+import ButtonIcon from '@/components/ButtonIcon.vue'
 const buttonClasses = ref('btn btn-square btn-lg m-10 mr-0')
 const range = ref(0.2)
 const min = ref(0.8)
