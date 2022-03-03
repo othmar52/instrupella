@@ -240,7 +240,6 @@ const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
   const secondsPerQuarterNote = 60 / getBpm(props.track)
   const secondsFor16Bars = secondsPerQuarterNote * 4 * 16
 
-  // const secondsPerQuarterNote = 60 / props.track.bpm
   // const pixelPerQuarterNote = secondsPerQuarterNote * props.pixelPerSecond
   // const pixelPer4Bars = pixelPerQuarterNote * 16
   // const pixelPer16Bars = pixelPer4Bars * 16
@@ -251,7 +250,7 @@ const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
   // console.log("pixelPer16Bars", pixelPer16Bars)
   // console.log('offset', props.track.downbeat - secondsFor16Bars)
   // return props.track.downbeat - secondsFor16Bars
-  return 5
+  return (props.track.downbeat) ? props.track.downbeat : 0
 }
 const togglePlay = () => {
   if (player.value.isPlaying() === props.play) {

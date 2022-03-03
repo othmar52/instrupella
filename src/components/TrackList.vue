@@ -41,7 +41,7 @@
     </thead>
     <tbody>
       <tr v-for="track in filteredEntries" :key="track.id">
-        <td>{{ track.artist }} - {{ track.title }}</td>
+        <td v-html="formatArtistTitle(track)"></td>
         <td>{{ track.key }}</td>
         <td :class="isManualBpm(track) ? 'text-success' : ''">{{ parseInt(getBpm(track))}}</td>
         <td>{{ formatDuration(track.length) }}</td>
@@ -58,6 +58,8 @@
 import { ref, onMounted, watch } from 'vue'
 import utils from "../mixins/utils";
 import formatDurationMixin from "../mixins/format/duration";
+import formatArtistTitleMixin from "../mixins/format/artisttitle";
+const { formatArtistTitle } = formatArtistTitleMixin();
 
 const { getBpm, isManualBpm } = utils();
 const { formatDuration } = formatDurationMixin();

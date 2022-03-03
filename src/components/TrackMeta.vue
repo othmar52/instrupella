@@ -1,6 +1,6 @@
 <template>
   <div class="track-meta p-5 d-flex justify-content-between" @click="toggleFormat">
-    <div v-html="formattedArtistTitle"></div>
+    <div v-html="formatArtistTitle(track)"></div>
     <div>
       <span :class="bpmClass">{{formattedTempo}}</span>
       <span class="text-muted"> BPM</span>
@@ -24,7 +24,10 @@
 // TODO: consider to have an optional 'time remaining' as format
 import { ref, watch, computed } from 'vue'
 import utils from "../mixins/utils.js";
+import formatArtistTitleMixin from "../mixins/format/artisttitle";
 const { getBpm, isManualBpm } = utils();
+const { formatArtistTitle } = formatArtistTitleMixin();
+
 const duration = ref(0)
 const format = ref(true)
 const props = defineProps({
@@ -56,35 +59,6 @@ const formattedTempo = computed(() => {
   }
   return (getBpm(props.track) * props.playbackRate).toFixed(1)
 })
-
-const formattedArtistTitle = computed(() => {
-  if (!props.track) {
-    return 'no track loaded...'
-  }
-  const a = (props.track.artist) ? props.track.artist.trim() : ''
-  const t = (props.track.title) ? props.track.title.trim() : ''
-  if (`${a}${t}` === '') {
-    return props.track.path.split('/').slice(-1).join('/').split('.').slice(0, -1).join('.')
-  }
-  if (a.toLowerCase() === t.toLowerCase() && a !== '') {
-    return a
-  }
-  if (a !== '' && t !== '') {
-    return `
-      <span class="text-white">${t}</span>
-      <span class="text-muted">by</span>
-      <span class="text-primary">${a}</span>
-    `
-  }
-  if (a === '') {
-    return t
-  }
-  if (t === '') {
-    return a
-  }
-  return `${a} bla ${t}`
-})
-
 
 // TODO move to util (code duplication in TrackList.vue)
 const formatDuration = (duration) => {

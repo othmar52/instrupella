@@ -1,6 +1,9 @@
 export default () => {
 
   const getBpm = (track) => {
+    if (track === null) {
+      return 0
+    }
     if (track.bpm > 0) {
         return track.bpm
     }

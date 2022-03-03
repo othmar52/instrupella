@@ -1,7 +1,4 @@
 <template>
-  <div class="metronome">
-   <button @click="play" tabindex="-1">{{ isPlaying? 'STOP' : 'START' }}<br>METRONOME</button>
-  </div>
 </template>
 
 <script setup>
