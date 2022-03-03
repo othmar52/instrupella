@@ -1,8 +1,8 @@
 <template>
   <Button
-    :label="`${index}`"
+    label=""
     :permaClasses="`${buttonClasses}`"
-    activeClass="btn-primary"
+    activeClass="btn-primXary"
   />
 </template>
 

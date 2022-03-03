@@ -40,6 +40,13 @@
         </div>
         <div class="d-flex">
           <ButtonIcon
+            title="xfg"
+            componentName="IconDownbeat"
+            :permaClasses="`${buttonClasses}`"
+            :activeClass="showEditTrack ? 'btn-primary' : ''"
+            @click="toggleEditTrack"
+          />
+          <ButtonIcon
             componentName="IconArrowToFirst"
             :permaClasses="`${buttonClasses} mr-0`"
             @click="$refs.player.seekZero()"
@@ -78,6 +85,13 @@
       </div>
     </div>
   </div>
+  <div class="row" v-if="showEditTrack">
+    <div class="col-12">
+      <div class="card">
+        <Edit :track="track" />
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-6">
       <div class="card">
@@ -96,6 +110,7 @@ import WaveBig from '@/components/WaveBig.vue'
 import Button from '@/components/Button.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import PitchControl from '@/components/PitchControl.vue'
+import Edit from '@/components/Deck/Edit.vue'
 import HotCues from '@/components/HotCues.vue'
 const player = ref(null)
 const play = ref(false)
@@ -105,6 +120,7 @@ const playbackRate = ref(1)
 const loadProgress = ref(0)
 const trackAnalyzed = ref(false)
 const currentSecond = ref(0)
+const showEditTrack = ref(false)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
 
 defineProps({
@@ -122,6 +138,9 @@ const togglePlay = () => {
 }
 const toggleMute = () => {
   mute.value = !mute.value
+}
+const toggleEditTrack = () => {
+  showEditTrack.value = !showEditTrack.value
 }
 const setPitch = (newPitchValue) => {
   playbackRate.value = newPitchValue

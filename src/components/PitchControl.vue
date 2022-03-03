@@ -89,6 +89,7 @@ onMounted(() => {
 <style lang="scss">
 .pitch-control {
   display: flex;
+  overflow: hidden;
   .pitch-control-button-group {
     display: flex;
     flex-direction: column;

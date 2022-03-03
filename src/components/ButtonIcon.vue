@@ -1,5 +1,5 @@
 <template>
-    <button :class="`btn ${permaClasses} ${activeClass}`" ref="btn" type="button">
+    <button :class="`btn ${permaClasses} ${activeClass}`" ref="btn" type="button" :title="title">
       <component :is="IconPlay" v-if="componentName === 'IconPlay'"></component>
       <component :is="IconPause" v-if="componentName === 'IconPause'"></component>
       <component :is="IconArrowToFirst" v-if="componentName === 'IconArrowToFirst'"></component>
@@ -7,6 +7,8 @@
       <component :is="IconPlus" v-if="componentName === 'IconPlus'"></component>
       <component :is="IconMinus" v-if="componentName === 'IconMinus'"></component>
       <component :is="IconArrowsToCenter" v-if="componentName === 'IconArrowsToCenter'"></component>
+      <component :is="IconDownbeat" v-if="componentName === 'IconDownbeat'"></component>
+      <component :is="IconMetronome" v-if="componentName === 'IconMetronome'"></component>
     </button>
 </template>
 
@@ -21,6 +23,8 @@ import IconMute from '@/components/Icons/Mute.vue'
 import IconPlus from '@/components/Icons/Plus.vue'
 import IconMinus from '@/components/Icons/Minus.vue'
 import IconArrowsToCenter from '@/components/Icons/ArrowsToCenter.vue'
+import IconDownbeat from '@/components/Icons/Downbeat.vue'
+import IconMetronome from '@/components/Icons/Metronome.vue'
 const props = defineProps({
   permaClasses: {
     type: String,
@@ -31,6 +35,10 @@ const props = defineProps({
     default: ''
   },
   componentName: {
+    type: String,
+    default: ''
+  },
+  title: {
     type: String,
     default: ''
   }

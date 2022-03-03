@@ -9,7 +9,7 @@
   - [ ] archive.org sample list
   - [x] favicon
   - [ ] settings page (or modal)
-  - [ ] simplify bpm filter
+  - [ ] simplify bpm filter and incoming midi clock as value
   - [ ] switchable wavesurfer backend
   - [x] navbar
   - [ ] optional huge pitch slider
@@ -18,10 +18,11 @@
   - [ ] scroll to top button
   - [ ] compatibility for any amount of decks
   - [ ] show properties of loaded track
-  - [ ] vertical centering of icons in buttons
+  - [x] vertical centering of icons in buttons
   - [ ] volume control
   - [ ] optional sync to midi clock
   - [ ] midi mapping / learn
+  - [ ] fix `.pitch-control: { overflow:hidden; }` hack
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag

@@ -20,6 +20,7 @@
                     <li>reload instrupella or at least re-init player if it stucks</li>
                     <li>default time formatting MM:SS or SSS.123  elapsed/remaining </li>
                     <li>auto change bpm filter of track search on icoming midi clock </li>
+                    <li>show/hide volume control </li>
                 </ul>
             </p>
             <div class="text-center mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->

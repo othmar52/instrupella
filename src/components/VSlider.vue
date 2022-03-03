@@ -61,15 +61,15 @@ const enableScroll = () => {
   bodyStyles.value.removeProperty('top')
 }
 const increment = () => {
-  if (localSliderValue.value + props.nudge <= props.maxSliderValue) {
-    localSliderValue.value += props.nudge
+  if (localSliderValue.value + props.step <= props.maxSliderValue) {
+    localSliderValue.value += props.step
     return
   }
   localSliderValue.value = props.maxSliderValue
 }
 const decrement = () => {
-  if (localSliderValue.value - props.nudge >= props.minSliderValue) {
-    localSliderValue.value -= props.nudge
+  if (localSliderValue.value - props.step >= props.minSliderValue) {
+    localSliderValue.value -= props.step
     return
   }
   localSliderValue.value = props.minSliderValue
