@@ -43,7 +43,7 @@
       <tr v-for="track in filteredEntries" :key="track.id">
         <td>{{ track.artist }} - {{ track.title }}</td>
         <td>{{ track.key }}</td>
-        <td>{{ parseInt(track.bpmdetect) }}</td>
+        <td :class="isManualBpm(track) ? 'text-success' : ''">{{ parseInt(getBpm(track))}}</td>
         <td>{{ formatDuration(track.length) }}</td>
         <td @click="loadTrack(track.id)">
           <strong class="btn btn-default btn-primary">LOAD</strong>
@@ -56,6 +56,11 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import utils from "../mixins/utils";
+import formatDurationMixin from "../mixins/format/duration";
+
+const { getBpm, isManualBpm } = utils();
+const { formatDuration } = formatDurationMixin();
 const props = defineProps({
   tracks: {
     type: Array,
@@ -98,7 +103,7 @@ const searchEntries = () => {
   }
   if (bpmFilter.value !== null) {
     filteredEntries.value = filteredEntries.value.filter(track => {
-      return tempoMatches(track, bpmFilter.value)
+      return tempoMatches(getBpm(track), bpmFilter.value)
     })
   }
 }
@@ -112,31 +117,8 @@ const searchTermMatches = (track, searchTerm) => {
   return false
 }
 
-const tempoMatches = (track, tempo) => {
-  if (track.bpmdetect && track.bpmdetect >= tempo - 5 && track.bpmdetect <= tempo + 5) {
-    return true
-  }
-  return false
-}
-
-// TODO move to util (code duplication in TrackMeta.vue)
-const formatDuration = (duration) => {
-  // thanks to https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds#answer-11486026
-  // Hours, minutes and seconds
-  const hrs = ~~(duration / 3600)
-  const mins = ~~((duration % 3600) / 60)
-  const secs = ~~duration % 60
-
-  // Output like "1:01" or "4:03:59" or "123:03:59"
-  let ret = ''
-
-  if (hrs > 0) {
-    ret += '' + hrs + ':' + (mins < 10 ? '0' : '')
-  }
-
-  ret += '' + mins + ':' + (secs < 10 ? '0' : '')
-  ret += '' + secs
-  return ret
+const tempoMatches = (trackTempo, tempo) => {
+  return trackTempo && trackTempo >= tempo - 5 && trackTempo <= tempo + 5
 }
 
 // thanks to https://stackoverflow.com/questions/8273047/javascript-function-similar-to-python-range#8273091

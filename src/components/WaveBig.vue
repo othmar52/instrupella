@@ -26,9 +26,10 @@
 import WaveSurfer from 'wavesurfer.js'
 import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
 import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline/index.js'
-
+import utils from "../mixins/utils.js";
 import { ref, watch, onMounted } from 'vue'
 
+const { getBpm } = utils();
 const player = ref(null)
 
 // some helpers for dragging waveform
@@ -91,7 +92,7 @@ watch(() => props.pixelPerSecond, () => {
 
   // TODO: this approach for zoom seem to be faster!?
   //    but it does not zoom at the very beginning of the track
-  // this.player.params.minpixelPerSecond = pixelPerSecond.value
+  // this.player.params.minPxPerSec = pixelPerSecond.value
   // const targetSeekPercent = this.player.getCurrentTime() /this.player.getDuration()
   // console.log('percent', targetSeekPercent)
   // this.player.seekAndCenter(targetSeekPercent)
@@ -161,7 +162,7 @@ const initPlayer = () => {
   */
 }
 const wavesurferOptions = () => {
-  const secondsPerQuarterNote = 60 / props.track.bpmdetect
+  const secondsPerQuarterNote = 60 / getBpm(props.track)
   // const secondsPerQuarterNote = 2
   return {
     plugins: [
@@ -179,9 +180,9 @@ const wavesurferOptions = () => {
         secondaryFontColor: '#565455',
         unlabeledNotchColor: '#232323',
         height: 150,
-        offset: -3,
         secondaryLabelInterval: 16,
         primaryLabelInterval: 4,
+        offset: getBeatGridOffset(),
         timeInterval: function (pxPerSecond) { // eslint no-unused-vars: 0
           // console.log('pxPerSecond', pxPerSecond)
           // console.log('secondsPerQuarterNote', secondsPerQuarterNote)
@@ -190,7 +191,6 @@ const wavesurferOptions = () => {
         // primaryLabelInterval: 4,
         // secondaryLabelInterval: 16,
         // formatTimeCallback: function () { return '' },
-        // offset: this.getBeatGridOffset()
         // duration: 59 // this messes up the resolution
       })
     ],
@@ -226,21 +226,20 @@ const wavesurferOptions = () => {
   }
 }
 const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
-  if (this.track.downbeat < 0.001) {
-    // console.log('parseInt(props.track.downbeat)', parseInt(this.track.downbeat))
+  if (props.track.downbeat < 0.001) {
+    // console.log('parseInt(props.track.downbeat)', parseInt(props.track.downbeat))
     return 0
   }
-  if (this.track.bpmdetect === 0) {
-    // console.log('parseInt(props.track.bpm)', parseInt(this.track.bpmdetect))
+  if (getBpm(props.track) === 0) {
+    // console.log('parseInt(props.track.bpm)', parseInt(props.track.bpmdetect))
     return 0
   }
   // offset needs seconds and not pixel
 
   // for now make a quick & dirty subtraction of 16 bars
-  const secondsPerQuarterNote = 60 / this.track.bpmdetect
+  const secondsPerQuarterNote = 60 / getBpm(props.track)
   const secondsFor16Bars = secondsPerQuarterNote * 4 * 16
 
-  // let econdsPerQuarterNote = 60 / this.tracks[0].bpm
   // const secondsPerQuarterNote = 60 / props.track.bpm
   // const pixelPerQuarterNote = secondsPerQuarterNote * props.pixelPerSecond
   // const pixelPer4Bars = pixelPerQuarterNote * 16
@@ -250,8 +249,8 @@ const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
   // console.log("pixelPerQuarterNote", pixelPerQuarterNote)
   // console.log("pixelPer4Bars", pixelPer4Bars)
   // console.log("pixelPer16Bars", pixelPer16Bars)
-  // console.log('offset', this.track.downbeat - secondsFor16Bars)
-  // return this.track.downbeat - secondsFor16Bars
+  // console.log('offset', props.track.downbeat - secondsFor16Bars)
+  // return props.track.downbeat - secondsFor16Bars
   return 5
 }
 const togglePlay = () => {

@@ -13,7 +13,7 @@
         </button>
     </div>
     <div>
-        <span class="font-size-18">Metronome</span>
+        <span class="font-size-18">Metronome {{editTempo.toFixed(1)}}</span>
         <ButtonIcon
         componentName="IconMetronome"
         :permaClasses="`btn btn-square btn-default btn-lg m-5`"
@@ -23,46 +23,41 @@
         <Button
         label="&#x00D7;2"
         :permaClasses="`btn btn-square btn-default btn-lg m-5`"
-        :activeClass="(metronameActive) ? 'btn-primary' : ''"
-        @click="toggleMetronome"
+        @click="doubleTempo"
         />
         <Button
         label="&#247;2"
         :permaClasses="`btn btn-square btn-default btn-lg m-5`"
-        :activeClass="(metronameActive) ? 'btn-primary' : ''"
-        @click="toggleMetronome"
+        @click="halfTempo"
         />
 
-    <button class="btn btn-default btn-square btn-lg m-5 btn-bars">
-        <strong class="bars">TAP</strong><br><span class="text-muted font-size-12 label-bars">BPM</span>
-    </button>
+
+    <TapBpm
+      @tapTempo="setTapTempo"
+    />
     <ButtonIcon
       componentName="IconMinus"
       :permaClasses="`btn btn-square btn-default btn-lg m-5`"
-      :activeClass="(metronameActive) ? 'btn-primary' : ''"
-      @click="toggleMetronome"
+      @click="decreaseTempo"
     />
     <ButtonIcon
       componentName="IconPlus"
       :permaClasses="`btn btn-square btn-default btn-lg m-5`"
-      :activeClass="(metronameActive) ? 'btn-primary' : ''"
-      @click="toggleMetronome"
+      @click="increaseTempo"
     />
     </div>
     <div>
     <Button
       label="RESET"
       :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
-      :activeClass="(metronameActive) ? 'btn-primary' : ''"
-      @click="toggleMetronome"
+      @click="todo"
     />
     <Button
       label="APPLY"
       :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
-      :activeClass="(metronameActive) ? 'btn-primary' : ''"
-      @click="toggleMetronome"
+      @click="todo"
     />
-    <Metronome :tempo="123" />
+    <Metronome :tempo="editTempo" ref="metronome" />
     </div>
   </div>
 </template>
@@ -72,25 +67,90 @@ import { ref, watch, computed } from 'vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import Button from '@/components/Button.vue'
 import Metronome from '@/components/Metronome.vue'
+import TapBpm from '@/components/Deck/TapBpm.vue'
 const props = defineProps({
   track: {
     type: Object,
     default: null
+  },
+  play: {
+    type: Boolean,
+    default: false
+  },
+  playbackRate: {
+    type: Number,
+    default: 0
+  },
+  currentSecond: {
+    type: Number,
+    default: 0
+  },
+  step: {
+    type: Number,
+    default: 0.1
   }
 })
+const editTempo = ref(0)
 
+const metronome = ref(null)
 const metronameActive = ref(false)
 
 const toggleMetronome = () => {
   metronameActive.value = !metronameActive.value
 }
+const doubleTempo = () => {
+  editTempo.value *= 2
+}
+
+const halfTempo = () => {
+  editTempo.value /= 2
+}
+const increaseTempo = () => {
+  editTempo.value += parseFloat(props.step)
+}
+const decreaseTempo = () => {
+  editTempo.value -= parseFloat(props.step)
+}
+
+const setTapTempo = (tempo) => {
+  editTempo.value = parseFloat(tempo)
+}
 const emit = defineEmits([
-  'zoomTo'
+  'todo'
 ])
 
-const zoomOut = () => {
-  emit('zoomTo', props.pixelPerSecond - 100)
+const todo = () => {
+  emit('todo', 'todo')
 }
+
+watch(() => editTempo.value, (newValue) => {
+  if (newValue < props.step) {
+      newValue = 0
+  }
+  editTempo.value = parseFloat(newValue)
+})
+
+watch(() => props.play, (newPlayState) => {
+  if (metronameActive.value === false) {
+    return
+  }
+  metronome.value.play(newPlayState)
+})
+
+watch(() => metronameActive.value, (newMetronomeState) => {
+  console.log('newMetronomeState', newMetronomeState)
+  console.log('props.play', props.play)
+  console.log('metronome.value.isPlaying.value', metronome.value.isPlaying.value)
+  console.log('metronome.value.isPlaying', metronome.value.isPlaying)
+  if (metronameActive.value === false) {
+    // ensure metronome is not playing
+    metronome.value.play(false)
+    return
+  }
+  if (props.play && metronome.value.isPlaying === false) {
+    metronome.value.play(true)
+  }
+})
 
 </script>
 

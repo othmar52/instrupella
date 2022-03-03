@@ -23,6 +23,8 @@
   - [ ] optional sync to midi clock
   - [ ] midi mapping / learn
   - [ ] fix `.pitch-control: { overflow:hidden; }` hack
+  - [ ] optional choose local file for loading on deck
+  - [ ] optional enter url for loading on deck
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag

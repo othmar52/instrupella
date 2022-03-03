@@ -88,7 +88,12 @@
   <div class="row" v-if="showEditTrack">
     <div class="col-12">
       <div class="card">
-        <Edit :track="track" />
+        <Edit
+          :track="track"
+          :play="play"
+          :playbackRate="playbackRate"
+          :currentSecond="currentSecond"
+        />
       </div>
     </div>
   </div>

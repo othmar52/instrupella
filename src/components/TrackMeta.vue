@@ -1,7 +1,10 @@
 <template>
   <div class="track-meta p-5 d-flex justify-content-between" @click="toggleFormat">
     <div v-html="formattedArtistTitle"></div>
-    <div v-html="formattedTempo"></div>
+    <div>
+      <span :class="bpmClass">{{formattedTempo}}</span>
+      <span class="text-muted"> BPM</span>
+    </div>
     <div>
         <div v-if="format">
             {{formatDuration(currentSecond)}}
@@ -20,6 +23,8 @@
 <script setup>
 // TODO: consider to have an optional 'time remaining' as format
 import { ref, watch, computed } from 'vue'
+import utils from "../mixins/utils.js";
+const { getBpm, isManualBpm } = utils();
 const duration = ref(0)
 const format = ref(true)
 const props = defineProps({
@@ -41,14 +46,15 @@ const toggleFormat = () => {
   format.value = !format.value
 }
 
+const bpmClass = computed(() => {
+  return isManualBpm(props.track) ? 'text-success' : 'text-primary'
+})
+
 const formattedTempo = computed(() => {
   if (!props.track) {
-    return '0 BPM'
+    return '0'
   }
-    return `
-      <span class="text-primary">${(props.track.bpmdetect * props.playbackRate).toFixed(1)}</span>
-      <span class="text-muted">BPM</span>
-    `
+  return (getBpm(props.track) * props.playbackRate).toFixed(1)
 })
 
 const formattedArtistTitle = computed(() => {
