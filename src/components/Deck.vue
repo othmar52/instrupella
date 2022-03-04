@@ -93,6 +93,7 @@
           :play="play"
           :playbackRate="playbackRate"
           :currentSecond="currentSecond"
+          @updateTrack="$emit('updateTrack', $event)"
         />
       </div>
     </div>

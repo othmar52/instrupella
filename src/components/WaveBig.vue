@@ -27,7 +27,7 @@ import WaveSurfer from 'wavesurfer.js'
 import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
 import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline/index.js'
 import utils from "../mixins/utils.js";
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 
 const { getBpm } = utils();
 const player = ref(null)
@@ -37,6 +37,13 @@ const dragging = ref(false)
 const dragX = ref(false)
 const startDragPlayState = ref(false)
 const lastSetSongPosition = ref(false)
+
+const downbeat = computed(() => {
+  if (!props.track) {
+    return '0'
+  }
+  return props.track.downbeat
+})
 
 const props = defineProps({
   play: {
@@ -66,6 +73,7 @@ const props = defineProps({
 })
 
 watch(() => props.track, (newTrack) => {
+  console.log('WaveBig track watcher')
   if (!newTrack) {
     return
   }
@@ -358,11 +366,23 @@ const doDrag = (event) => {
 }
 
 watch(() => props.playbackRate, () => {
+  try {
+    player.value.setPlaybackRate(props.playbackRate)
+  } catch (e) { }
+})
+
+
+watch(() => downbeat.value, (newDownbeat) => {
   if (!player.value) {
     return
   }
-  player.value.setPlaybackRate(props.playbackRate)
+  try {
+    // console.log('downbeat has changed - updating beatgrid')
+    player.value.timeline.params.offset = newDownbeat
+    player.value.timeline.render()
+  } catch (e) { }
 })
+
 onMounted(() => {
   // console.log('props.track', props.track)
   window.addEventListener('mouseup', stopDrag)

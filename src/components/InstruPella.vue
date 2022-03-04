@@ -1,7 +1,7 @@
 <template>
   <div class="instrupella">
     <div v-if="tracks">
-      <Deck :track="track" :index="0" />
+      <Deck :track="track" :index="0" @updateTrack="persistUpdateTrack" />
       <TrackList :tracks="tracks" @selectTrack="selectTrack" />
     </div>
     <div v-else>
@@ -19,6 +19,19 @@ const tracks = ref([])
 
 const selectTrack = (trackIndex) => {
   track.value = tracks.value[trackIndex]
+}
+
+// how to persist edit's (tempo, downbeat, hotcues)?
+// maybe local storage?
+// or is it really necessary to use a database?
+//   case yes - does it make sense to use mpd?
+// for now simply set tracks.track prop without persisting...
+
+const persistUpdateTrack = (properties) => {
+  console.log('TODO: persist update track', properties)
+  for (const [key, value] of Object.entries(properties)) {
+    track.value[key] = value
+  }
 }
 
 onMounted(() => {

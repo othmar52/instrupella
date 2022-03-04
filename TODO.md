@@ -13,7 +13,6 @@
   - [ ] switchable wavesurfer backend
   - [x] navbar
   - [ ] optional huge pitch slider
-  - [ ] multitouch on iPad
   - [ ] project description in README
   - [ ] scroll to top button
   - [ ] compatibility for any amount of decks
@@ -22,9 +21,11 @@
   - [ ] volume control
   - [ ] optional sync to midi clock
   - [ ] midi mapping / learn
-  - [ ] fix `.pitch-control: { overflow:hidden; }` hack
-  - [ ] optional choose local file for loading on deck
-  - [ ] optional enter url for loading on deck
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag
+  - [ ] choose from several metronome sounds
+  - [ ] optional enter url for loading on deck
+  - [ ] fix `.pitch-control: { overflow:hidden; }` hack
+  - [ ] optional choose local file for loading on deck
+  - [ ] multitouch on iPad

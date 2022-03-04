@@ -46,7 +46,7 @@
         <span class="font-size-18">Set Downbeat</span>
       </div>
       <div class="col-10">
-        <button class="btn btn-default btn-square btn-lg m-5 btn-bars">
+        <button class="btn btn-default btn-square btn-lg m-5 btn-bars" @click="setDownbeat">
             <strong class="bars">1</strong><br><span class="text-muted font-size-12 label-bars">bar</span>
         </button>
         <button class="btn btn-default btn-square btn-lg m-5 btn-bars">
@@ -59,12 +59,10 @@
         <Button
         label="RESET"
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
-        @click="todo"
         />
         <Button
         label="APPLY"
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
-        @click="todo"
         />
         <Metronome :tempo="editTempo" ref="metronome" />
 
@@ -128,13 +126,20 @@ const decreaseTempo = () => {
 const setTapTempo = (tempo) => {
   editTempo.value = parseFloat(tempo)
 }
-const emit = defineEmits([
-  'todo'
-])
 
-const todo = () => {
-  emit('todo', 'todo')
+const setDownbeat = () => {
+  emit(
+    'updateTrack',
+    {
+      id: props.track.id,
+      downbeat: props.currentSecond
+    }
+  )
 }
+
+const emit = defineEmits([
+  'updateTrack'
+])
 
 watch(() => editTempo.value, (newValue) => {
   if (newValue < props.step) {
