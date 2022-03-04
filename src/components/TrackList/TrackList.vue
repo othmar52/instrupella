@@ -122,14 +122,23 @@ const searchTermMatches = (track, searchTerm) => {
 }
 
 const tempoMatches = (trackTempo, tempo) => {
-  return trackTempo && trackTempo >= tempo - 5 && trackTempo <= tempo + 5
+  return trackTempo !== null && trackTempo >= tempo - 5 && trackTempo <= tempo + 5
 }
 
 onMounted(() => {
-  bpmFilterValues.value = range(80, 180, 10)
+
 })
 
 watch(() => props.tracks, () => {
+  bpmFilterValues.value = []
+  for (const tempo of range(0, 180, 10)) {
+    const tracksWithTempo = props.tracks.filter(track => {
+      return tempoMatches(getBpm(track), tempo)
+    })
+    if (tracksWithTempo.length > 0) {
+      bpmFilterValues.value.push(tempo)
+    }
+  }
   searchEntries()
 })
 </script>

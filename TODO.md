@@ -12,7 +12,7 @@
   - [x] favicon
   - [ ] settings page (or modal)
   - [ ] simplify bpm filter GUI
-  - [ ] limit bpm filter values to existing tempo's
+  - [x] limit bpm filter values to existing tempo's
   - [ ] add incoming midi clock as BPM filter value
   - [ ] switchable wavesurfer backend for timestretch on/off
   - [x] navbar
