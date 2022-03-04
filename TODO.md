@@ -3,8 +3,8 @@
   - [ ] iPad BUG when added to home screen the keyboard does not appear on search input (seems to work in chrome) @see [issue #1](https://github.com/othmar52/instrupella/issues/1)
   - [ ] sortable tracklist
   - [ ] metronome (generic track on 2nd deck)
-  - [ ] hotcues
-  - [ ] editable hotcues, tempo, downbeat
+  - [x] hotcues
+  - [x] editable hotcues, tempo, downbeat
   - [ ] persist hotcues, tempo, downbeat
   - [ ] archive.org sample list
   - [x] favicon

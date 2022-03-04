@@ -13,7 +13,7 @@ https://www.svgrepo.com/download/335445/pause.svg
 https://www.svgrepo.com/download/327472/play.svg  
 https://www.svgrepo.com/download/348985/cog.svg  
 https://www.svgrepo.com/svg/361116/debug-line-by-line
-
+https://www.svgrepo.com/svg/352599/trash-alt
 
 
 ## What icon to use for edit beatgrid/tempo?

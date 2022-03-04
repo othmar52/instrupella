@@ -9,6 +9,7 @@
       <component :is="IconArrowsToCenter" v-if="componentName === 'IconArrowsToCenter'"></component>
       <component :is="IconDownbeat" v-if="componentName === 'IconDownbeat'"></component>
       <component :is="IconMetronome" v-if="componentName === 'IconMetronome'"></component>
+      <component :is="IconTrash" v-if="componentName === 'IconTrash'"></component>
     </button>
 </template>
 
@@ -25,6 +26,7 @@ import IconMinus from '@/components/Icons/Minus.vue'
 import IconArrowsToCenter from '@/components/Icons/ArrowsToCenter.vue'
 import IconDownbeat from '@/components/Icons/Downbeat.vue'
 import IconMetronome from '@/components/Icons/Metronome.vue'
+import IconTrash from '@/components/Icons/Trash.vue'
 const props = defineProps({
   permaClasses: {
     type: String,

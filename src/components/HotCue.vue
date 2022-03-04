@@ -1,6 +1,7 @@
 <template>
   <Button
-    label=""
+    v-if="!deleteMode || second === 0"
+    :label="`${index+1}`"
     :permaClasses="`${buttonClasses}`"
     :activeClass="activeClass"
     @mousedown="pressHotCueStart"
@@ -8,12 +9,19 @@
     @mouseup="pressHotCueEnd"
     @touchend="pressHotCueEnd"
   />
+  <Button
+    v-else
+    label="x"
+    activeClass="btn-danger"
+    @click="deleteHotCue"
+    :permaClasses="`${buttonClasses}`"
+  />
 </template>
 
 <script setup>
 import { ref, watch, computed } from 'vue'
 import Button from '@/components/Button.vue'
-const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
+const buttonClasses = ref('btn btn-square btn-default btn-lg m-10 btn-hotcue font-size-12 text-muted')
 
 const eventStartHandled = ref(false)
 const eventEndHandled = ref(false)
@@ -28,8 +36,17 @@ const props = defineProps({
   second: {
     type: Number,
     default: 0
+  },
+  deleteMode: {
+    type: Boolean,
+    default: false
   }
 })
+
+const deleteHotCue = () => {
+  emit('deleteHotCue', props.index)
+}
+
 
 const pressHotCueStart = () => {
   if (eventStartHandled.value === false) {
@@ -49,7 +66,8 @@ const pressHotCueEnd = () => {
 
 const emit = defineEmits([
   'pressHotCueStart',
-  'pressHotCueEnd'
+  'pressHotCueEnd',
+  'deleteHotCue'
 ])
 
 watch(() => props.track, () => { })
