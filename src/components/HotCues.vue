@@ -107,11 +107,17 @@ const emit = defineEmits([
   'hotCuesChange'
 ])
 
-onMounted(() => {
-  // TODO: read persisted cue items
+const createEmptyHotCues = () => {
+  cueItems.value = []
   for (const idx in range(0, props.amount)) {
     cueItems.value.push({ second: 0 })
   }
+
+}
+
+onMounted(() => {
+  // TODO: read persisted cue items
+  createEmptyHotCues()
 })
 
 // thanks to https://stackoverflow.com/questions/8273047/javascript-function-similar-to-python-range#8273091
@@ -133,7 +139,11 @@ const range = (start, stop, step = 1) => {
   return result
 }
 
-watch(() => props.track, () => { })
+watch(() => props.track, () => {
+  // TODO read persisted hot cues as soon as persistence is implemented
+  createEmptyHotCues()
+  emit('hotCuesChange', cueItems.value)
+})
 </script>
 
 <style lang="scss">
