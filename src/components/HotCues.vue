@@ -29,10 +29,12 @@
 
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue'
+import rangeMixin from '../mixins/utils/range'
 import HotCue from '@/components/HotCue.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import Button from '@/components/Button.vue'
 
+const { range } = rangeMixin()
 const cueItems = ref([])
 const playStateOnCueStart = ref(false)
 const ignoreNextEndEvent = ref(false)
@@ -126,25 +128,6 @@ onMounted(() => {
   // TODO: read persisted cue items
   createEmptyHotCues()
 })
-
-// thanks to https://stackoverflow.com/questions/8273047/javascript-function-similar-to-python-range#8273091
-const range = (start, stop, step = 1) => {
-  if (typeof stop === 'undefined') {
-    // one param defined
-    stop = start
-    start = 0
-  }
-
-  if ((step > 0 && start >= stop) || (step < 0 && start <= stop)) {
-    return []
-  }
-
-  const result = []
-  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
-    result.push(i)
-  }
-  return result
-}
 
 watch(() => props.track, () => {
   // TODO read persisted hot cues as soon as persistence is implemented

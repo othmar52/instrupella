@@ -13,7 +13,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import Deck from '@/components/Deck.vue'
-import TrackList from '@/components/TrackList.vue'
+import TrackList from '@/components/TrackList/TrackList.vue'
 const track = ref(null)
 const tracks = ref([])
 
