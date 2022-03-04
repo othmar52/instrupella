@@ -77,7 +77,6 @@ const props = defineProps({
 })
 
 watch(() => props.track, (newTrack) => {
-  console.log('WaveBig track watcher')
   if (!newTrack) {
     return
   }
@@ -198,7 +197,14 @@ const wavesurferOptions = () => {
   }
 }
 const getBeatGridOffset = (overrideDownbeat = null) => {
-  if (getBpm(props.track) === 0) {
+  let useTempo = 0
+  if (getBpm(props.track) > 0) {
+    useTempo = getBpm(props.track)
+  }
+  if (props.editTempo > 0) {
+    useTempo = props.editTempo
+  }
+  if (useTempo === 0) {
     return 0
   }
   const useDownbeat = (overrideDownbeat !== null)
@@ -207,7 +213,7 @@ const getBeatGridOffset = (overrideDownbeat = null) => {
 
   // ensure we have beatgrid rendering from start to finish
   // by pushing the offset in 4-bar-steps to a negative value
-  const seconds4Bars = 60 / getBpm(props.track) * 16
+  const seconds4Bars = 60 / useTempo * 16
   let newOffset = useDownbeat
   while(newOffset > 0) {
     newOffset -= seconds4Bars
@@ -227,6 +233,24 @@ const seekZero = () => {
 const nudgeAhead = () => {
   player.value.skipForward()
 }
+
+const seekToSecondAndCenter = (second) => {
+  // seekTo() needs a value between 0 and 1
+  const targetSeekValue = second / (player.value.getDuration())
+  player.value.seekAndCenter(targetSeekValue)
+}
+
+const forcePlay = () => {
+  // play audio but ignore props.play
+  // console.log('forcing play...')
+  player.value.play()
+}
+const forceStop = () => {
+  // play audio but ignore props.play
+  // console.log('forcing pause...')
+  player.value.pause()
+}
+
 const nudgeBehind = () => {
   player.value.setMute(true)
   player.value.skipBackward()
@@ -293,11 +317,12 @@ const doDrag = (event) => {
     targetSecond = 0
   }
 
-  let targetSeekPercent = targetSecond / (player.value.getDuration())
-  if (targetSeekPercent >= 1) {
-    targetSeekPercent = 0.999
+  // seekTo() needs a value between 0 and 1
+  let targetSeekValue = targetSecond / (player.value.getDuration())
+  if (targetSeekValue >= 1) {
+    targetSeekValue = 0.999
   }
-  player.value.seekAndCenter(targetSeekPercent)
+  player.value.seekAndCenter(targetSeekValue)
 
   const targetSecond2 = targetSecond + 0.001
   player.value.play(targetSecond, targetSecond2)
@@ -360,7 +385,10 @@ onMounted(() => {
 defineExpose({
   nudgeBehind,
   nudgeAhead,
-  seekZero
+  seekZero,
+  seekToSecondAndCenter,
+  forcePlay,
+  forceStop
 })
 </script>
 

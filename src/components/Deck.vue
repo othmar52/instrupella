@@ -41,7 +41,7 @@
         </div>
         <div class="d-flex">
           <ButtonIcon
-            title="xfg"
+            title="Edit tempo and downbeat of track"
             componentName="IconDownbeat"
             :permaClasses="`${buttonClasses}`"
             :activeClass="showEditTrack ? 'btn-primary' : ''"
@@ -103,7 +103,13 @@
   <div class="row">
     <div class="col-6">
       <div class="card">
-        <HotCues :track="track" />
+        <HotCues
+          :track="track"
+          :play="play"
+          :currentSecond="currentSecond"
+          @seekToAndPlay="seekToAndPlay"
+          @seekToAndStop="seekToAndStop"
+        />
       </div>
     </div>
   </div>
@@ -181,6 +187,15 @@ const newEditTempo = (newTempo) => {
   editTempo.value = newTempo
 }
 
+const seekToAndPlay = (second) => {
+  player.value.seekToSecondAndCenter(second)
+  player.value.forcePlay()
+}
+
+const seekToAndStop = (second) => {
+  player.value.seekToSecondAndCenter(second)
+  player.value.forceStop()
+}
 
 </script>
 

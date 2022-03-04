@@ -30,4 +30,4 @@
   - [ ] fix `.pitch-control: { overflow:hidden; }` hack
   - [ ] optional choose local file for loading on deck
   - [ ] multitouch on iPad
-  - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME
+  - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME & https://wavesurfer-js.org/faq/
