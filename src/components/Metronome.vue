@@ -20,41 +20,41 @@ const props = defineProps({
 })
 
 const play = (forcePlayState = null) => {
-  isPlaying.value = !isPlaying.value;
+  isPlaying.value = !isPlaying.value
   if (forcePlayState !== null) {
     isPlaying.value = forcePlayState
   }
   // this.$emit('onMetronomeStateChange', isPlaying.value)
 
   if (isPlaying.value) {
-    timerWorker.value.postMessage('start');
+    timerWorker.value.postMessage('start')
     clickHi.value.play()
     quarterNotes.value = 0
   } else {
-    timerWorker.value.postMessage('stop');
+    timerWorker.value.postMessage('stop')
   }
 }
 
 const createWorker = () => {
   if (!timerWorker.value) {
-    timerWorker.value = new Worker("js/worker.js");
+    timerWorker.value = new Worker('js/worker.js')
   }
   timerWorker.value.onmessage = (message) => {
-    if (message.data !== "tick") {
+    if (message.data !== 'tick') {
       // console.log("message: " + message.data);
       return
     }
     // console.log("tickmessage: " + message.data);
-    quarterNotes.value ++
+    quarterNotes.value++
     if (quarterNotes.value % 4 == 0) {
       clickHi.value.play()
       return
     }
     clickLo.value.play()
   }
-  let milliSecondsPerQuarterNote = 60000 / props.tempo
+  const milliSecondsPerQuarterNote = 60000 / props.tempo
 
-  timerWorker.value.postMessage({"interval":milliSecondsPerQuarterNote});
+  timerWorker.value.postMessage({ interval: milliSecondsPerQuarterNote })
 }
 
 /*
@@ -68,10 +68,10 @@ defineExpose({
 })
 
 watch(() => props.tempo, (newValue) => {
-  let milliSecondsPerQuarterNote = 60000 / newValue
+  const milliSecondsPerQuarterNote = 60000 / newValue
   timerWorker.value.postMessage({
-    "interval": milliSecondsPerQuarterNote
-  });
+    interval: milliSecondsPerQuarterNote
+  })
 })
 
 onMounted(() => {

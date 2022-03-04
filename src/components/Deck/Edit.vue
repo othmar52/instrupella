@@ -77,8 +77,8 @@ import ButtonIcon from '@/components/ButtonIcon.vue'
 import Button from '@/components/Button.vue'
 import Metronome from '@/components/Metronome.vue'
 import TapBpm from '@/components/Deck/TapBpm.vue'
-import utils from "../../mixins/utils";
-const { getBpm, isManualBpm } = utils();
+import utils from '../../mixins/utils'
+const { getBpm, isManualBpm } = utils()
 const props = defineProps({
   track: {
     type: Object,
@@ -144,7 +144,7 @@ const emit = defineEmits([
 
 watch(() => editTempo.value, (newValue) => {
   if (newValue < props.step) {
-      newValue = 0
+    newValue = 0
   }
   editTempo.value = parseFloat(newValue)
   emit('newEditTempo', editTempo.value)

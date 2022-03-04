@@ -82,7 +82,7 @@ const emit = defineEmits([
 ])
 
 onMounted(() => {
-  halfmoon.onDOMContentLoaded();
+  halfmoon.onDOMContentLoaded()
 })
 </script>
 

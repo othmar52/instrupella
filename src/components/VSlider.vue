@@ -11,7 +11,7 @@
         :max="props.maxSliderValue"
         v-model="localSliderValue"
       />
-      
+
     </div>
     <div>{{factor}}</div>
   </div>
@@ -140,7 +140,7 @@ input[type=range][orient=vertical] {
   &, &::-webkit-slider-thumb {
     -webkit-appearance: none;
   }
-  
+
   position: absolute;
   top: 50%;
   left: 50%;
@@ -148,17 +148,17 @@ input[type=range][orient=vertical] {
   padding: 0;
   width: $track-w;
   height: 3em;
-  transform: translate(-50%, -50%) 
+  transform: translate(-50%, -50%)
     rotate(-90deg);
   background: transparent;
   font: 1em/1 arial, sans-serif;
-  
+
   &::-webkit-slider-runnable-track {
     @include track
   }
   &::-moz-range-track { @include track }
   &::-ms-track { @include track }
-  
+
   &::-webkit-slider-thumb {
     margin-top: .5*($track-h - $thumb-d);
     @include thumb
@@ -168,7 +168,7 @@ input[type=range][orient=vertical] {
     margin-top: 0;
     @include thumb
   }
-  
+
   &::-ms-tooltip { display: none }
 }
 </style>

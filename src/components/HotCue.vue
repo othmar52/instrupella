@@ -47,11 +47,10 @@ const deleteHotCue = () => {
   emit('deleteHotCue', props.index)
 }
 
-
 const pressHotCueStart = () => {
   if (eventStartHandled.value === false) {
     eventStartHandled.value = true
-    setTimeout(function(){ eventStartHandled.value = false; }, 200);
+    setTimeout(function () { eventStartHandled.value = false }, 200)
     emit('pressHotCueStart', props.index)
   }
 }
@@ -59,7 +58,7 @@ const pressHotCueStart = () => {
 const pressHotCueEnd = () => {
   if (eventEndHandled.value === false) {
     eventEndHandled.value = true
-    setTimeout(function(){ eventEndHandled.value = false; }, 200);
+    setTimeout(function () { eventEndHandled.value = false }, 200)
     emit('pressHotCueEnd', props.index)
   }
 }

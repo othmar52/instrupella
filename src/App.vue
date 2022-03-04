@@ -32,7 +32,7 @@ window.halfmoon = require('halfmoon')
 
 // chrome mobile device emulator shows context menu on "touch hold event"
 // lets disable this:
-window.oncontextmenu = function() { return false }
+window.oncontextmenu = function () { return false }
 </script>
 
 <style lang="scss">

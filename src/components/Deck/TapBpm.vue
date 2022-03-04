@@ -21,14 +21,14 @@ const add = (a, b) => {
 const trigger = () => {
   const time = new Date().getTime()
   if (lastTap.value !== null && time - lastTap.value > resetAfterMilliseconds.value) {
-      resetTap()
+    resetTap()
   }
-  if(start.value == 0){
+  if (start.value == 0) {
     start.value = time
     return
   }
 
-  lastTap.value  = time
+  lastTap.value = time
   const diff = time - start.value
   bpm.value = 60000 / diff
   taps.value.push(bpm.value)
@@ -49,7 +49,6 @@ const resetTap = () => {
 const emit = defineEmits([
   'tapTempo'
 ])
-
 
 </script>
 

@@ -27,10 +27,10 @@ import WaveSurfer from 'wavesurfer.js'
 import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
 import MarkersPlugin from 'wavesurfer.js/src/plugin/markers/index.js'
 import BeatGridPlugin from '../js/BeatGridPlugin.js'
-import utils from "../mixins/utils.js";
+import utils from '../mixins/utils.js'
 import { ref, watch, onMounted, computed } from 'vue'
 
-const { getBpm } = utils();
+const { getBpm } = utils()
 const player = ref(null)
 
 // some helpers for dragging waveform
@@ -155,8 +155,8 @@ const wavesurferOptions = () => {
         container: '#wave-timeline',
         primaryColor: 'tomato',
         secondaryColor: 'tomato',
-        primaryFontColor: 'white',    // 1 bar
-        secondaryFontColor: '#ff4d4f',    // 4 bars
+        primaryFontColor: 'white', // 1 bar
+        secondaryFontColor: '#ff4d4f', // 4 bars
         unlabeledNotchColor: '#232323', // quarter note
         height: 150,
         secondaryLabelInterval: 16,
@@ -166,13 +166,13 @@ const wavesurferOptions = () => {
         timeInterval: function () { return secondsPerQuarterNote }
       }),
       MarkersPlugin.create({
-      }),
+      })
     ],
     container: '#wave-surfer',
     backgroundColor: '#111417',
     backend: (props.timestretch)
       ? 'MediaElement' // change tempo and keep pitch
-      : 'WebAudio',    // change tempo and pitch
+      : 'WebAudio', // change tempo and pitch
     mediaControls: false,
     waveColor: '#1890ff',
     progressColor: '#05121e',
@@ -218,7 +218,7 @@ const getBeatGridOffset = (overrideDownbeat = null) => {
   // by pushing the offset in 4-bar-steps to a negative value
   const seconds4Bars = 60 / useTempo * 16
   let newOffset = useDownbeat
-  while(newOffset > 0) {
+  while (newOffset > 0) {
     newOffset -= seconds4Bars
   }
   return newOffset
@@ -367,7 +367,6 @@ watch(() => props.playbackRate, () => {
     player.value.setPlaybackRate(props.playbackRate)
   } catch (e) { }
 })
-
 
 watch(() => downbeat.value, (newDownbeat) => {
   if (!player.value) {

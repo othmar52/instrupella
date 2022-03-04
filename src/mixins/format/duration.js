@@ -1,24 +1,24 @@
 export default () => {
-    const formatDuration = (duration) => {
-        // thanks to https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds#answer-11486026
-        // Hours, minutes and seconds
-        const hrs = ~~(duration / 3600)
-        const mins = ~~((duration % 3600) / 60)
-        const secs = ~~duration % 60
+  const formatDuration = (duration) => {
+    // thanks to https://stackoverflow.com/questions/3733227/javascript-seconds-to-minutes-and-seconds#answer-11486026
+    // Hours, minutes and seconds
+    const hrs = ~~(duration / 3600)
+    const mins = ~~((duration % 3600) / 60)
+    const secs = ~~duration % 60
 
-        // Output like "1:01" or "4:03:59" or "123:03:59"
-        let ret = ''
+    // Output like "1:01" or "4:03:59" or "123:03:59"
+    let ret = ''
 
-        if (hrs > 0) {
-            ret += '' + hrs + ':' + (mins < 10 ? '0' : '')
-        }
-
-        ret += '' + mins + ':' + (secs < 10 ? '0' : '')
-        ret += '' + secs
-        return ret
+    if (hrs > 0) {
+      ret += '' + hrs + ':' + (mins < 10 ? '0' : '')
     }
 
-    return {
-        formatDuration
-    }
+    ret += '' + mins + ':' + (secs < 10 ? '0' : '')
+    ret += '' + secs
+    return ret
+  }
+
+  return {
+    formatDuration
+  }
 }

@@ -23,10 +23,10 @@
 <script setup>
 // TODO: consider to have an optional 'time remaining' as format
 import { ref, watch, computed } from 'vue'
-import utils from "../mixins/utils.js";
-import formatArtistTitleMixin from "../mixins/format/artisttitle";
-const { getBpm, isManualBpm } = utils();
-const { formatArtistTitle } = formatArtistTitleMixin();
+import utils from '../mixins/utils.js'
+import formatArtistTitleMixin from '../mixins/format/artisttitle'
+const { getBpm, isManualBpm } = utils()
+const { formatArtistTitle } = formatArtistTitleMixin()
 
 const duration = ref(0)
 const format = ref(true)

@@ -56,13 +56,13 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import utils from "../mixins/utils";
-import formatDurationMixin from "../mixins/format/duration";
-import formatArtistTitleMixin from "../mixins/format/artisttitle";
-const { formatArtistTitle } = formatArtistTitleMixin();
+import utils from '../mixins/utils'
+import formatDurationMixin from '../mixins/format/duration'
+import formatArtistTitleMixin from '../mixins/format/artisttitle'
+const { formatArtistTitle } = formatArtistTitleMixin()
 
-const { getBpm, isManualBpm } = utils();
-const { formatDuration } = formatDurationMixin();
+const { getBpm, isManualBpm } = utils()
+const { formatDuration } = formatDurationMixin()
 const props = defineProps({
   tracks: {
     type: Array,
@@ -81,7 +81,7 @@ const emit = defineEmits([
 
 const loadTrack = (trackIndex) => {
   // console.log('loadTrack(trackIndex)', trackIndex)
-  
+
   const element = document.querySelector('.deck-0')
   if (!element) {
     return

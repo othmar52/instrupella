@@ -109,12 +109,10 @@ const emit = defineEmits([
 
 onMounted(() => {
   // TODO: read persisted cue items
-  for (let idx in range(0, props.amount)) {
-    cueItems.value.push({second: 0})
+  for (const idx in range(0, props.amount)) {
+    cueItems.value.push({ second: 0 })
   }
 })
-
-
 
 // thanks to https://stackoverflow.com/questions/8273047/javascript-function-similar-to-python-range#8273091
 const range = (start, stop, step = 1) => {

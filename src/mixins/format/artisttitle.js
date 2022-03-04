@@ -1,5 +1,4 @@
 export default () => {
-
   const formatArtistTitle = (track) => {
     if (track === null) {
       return ''
