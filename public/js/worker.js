@@ -2,6 +2,10 @@
  thanks to https://stackoverflow.com/questions/10576106/setintervalfunction-time-change-time-on-runtime#62927821
  instead of setInterval() we use setTimout()
  so we can change the tempo during runtime without getting out sync
+
+ TODO
+   send playbackRate, tempo, currentTime to worker as well
+   so we can ensure the tick matches the beatgrid instead of using metronome start as reference
 */
 
 const timer = {

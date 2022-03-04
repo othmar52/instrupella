@@ -28,8 +28,7 @@ const play = (forcePlayState = null) => {
 
   if (isPlaying.value) {
     timerWorker.value.postMessage('start')
-    clickHi.value.play()
-    quarterNotes.value = 0
+    quarterNotes.value = -1
   } else {
     timerWorker.value.postMessage('stop')
   }
