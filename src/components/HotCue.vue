@@ -12,7 +12,7 @@
   <Button
     v-else
     label="x"
-    activeClass="btn-danger"
+    activeClass="btn-danger alt-dm"
     @click="deleteHotCue"
     :permaClasses="`${buttonClasses}`"
   />

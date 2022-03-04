@@ -21,7 +21,7 @@
       v-if="haveAnyCues && deleteMode"
       label="DONE"
       permaClasses="btn btn-square btn-default btn-lg m-10 font-size-12"
-      activeClass="btn-danger"
+      activeClass="btn-danger alt-dm"
       @click="toggleDelete"
     />
     </div>

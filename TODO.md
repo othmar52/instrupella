@@ -28,6 +28,7 @@
   - [ ] metronome sound is very quiet when track is playing - do we need a separate audio context?
   - [ ] drop BeatGridPlugin as soon as new version of wavesurfer is released
   - [ ] add like / dislike to tracks with persisting
+  - [ ] move github link to "about" modal
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag

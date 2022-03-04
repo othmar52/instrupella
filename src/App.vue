@@ -42,6 +42,7 @@ window.oncontextmenu = function () { return false }
   --large-button-height: 5rem;
   --content-and-card-spacing: 1.5rem;
 }
+
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -51,6 +52,7 @@ window.oncontextmenu = function () { return false }
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Opera and Firefox */
 }
+
 .icon {
   width: 1rem;
   height: 1rem;
@@ -60,6 +62,7 @@ window.oncontextmenu = function () { return false }
     fill: var(--dm-button-text-color);
   }
 }
+
 .btn-lg .icon {
   width: 1.5rem;
   height: 1.5rem;
@@ -70,4 +73,14 @@ window.oncontextmenu = function () { return false }
   }
 }
 
+.dark-mode .btn.btn-danger.alt-dm,
+.dark-mode .btn.btn-danger.alt-dm:hover {
+  color: #ff4d4f !important;
+  background-color: #301923;
+  background-image: none;
+  border-color: #8c0e2e;
+  -moz-box-shadow: 0 .2rem 0 rgba(0,0,0,.025);
+  -webkit-box-shadow: 0 .2rem 0 rgba(0,0,0,.025);
+  box-shadow: 0 .2rem 0 rgba(0,0,0,.025);
+}
 </style>
