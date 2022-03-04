@@ -1,25 +1,50 @@
-var timerID=null;
-var interval=100;
+/*
+ thanks to https://stackoverflow.com/questions/10576106/setintervalfunction-time-change-time-on-runtime#62927821
+ instead of setInterval() we use setTimout()
+ so we can change the tempo during runtime without getting out sync
+*/
+
+const timer = {
+	time: 500,
+	_time: null,
+	_timeout: null,
+	onNextCycle: () => {
+		// console.log("sending tick");
+		postMessage("tick");
+	},
+	start() {
+	  if (this._timeout == null) {
+		const self = this;
+		this.onNextCycle();
+		this._timeout = setTimeout(function repeater() {
+		  self.onNextCycle();
+		  self._timeout = setTimeout(repeater, self.time);
+		}, this.time);
+	  }
+	},
+	stop() {
+	  const timeout = this._timeout;
+	  this._timeout = null;
+	  clearTimeout(timeout);
+	},
+	setIntervalTime(time) {
+	  if (this._time == null) this._time = this.time;
+  
+	  this.time = (time) ? time : this._time
+
+	},
+  };
 
 self.onmessage=function(e){
 	if (e.data=="start") {
-		console.log("starting");
-		timerID=setInterval(function(){postMessage("tick");},interval);
+		timer.setIntervalTime(interval)
+		timer.start()
 	}
 	else if (e.data.interval) {
-		console.log("setting interval");
 		interval=e.data.interval;
-		console.log("interval="+interval);
-		if (timerID) {
-			clearInterval(timerID);
-			timerID=setInterval(function(){postMessage("tick");},interval);
-		}
+		timer.setIntervalTime(interval)
 	}
 	else if (e.data=="stop") {
-		console.log("stopping");
-		clearInterval(timerID);
-		timerID=null;
+		timer.stop()
 	}
 };
-
-postMessage('hi there');
