@@ -98,7 +98,7 @@ const props = defineProps({
   },
   step: {
     type: Number,
-    default: 0.1
+    default: 0.05
   }
 })
 const editTempo = ref(0)
