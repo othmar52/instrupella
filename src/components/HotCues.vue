@@ -12,10 +12,16 @@
       @deleteHotCue="deleteHotCue"
     />
     <ButtonIcon
-      v-if="haveAnyCues"
+      v-if="haveAnyCues && !deleteMode"
       componentName="IconTrash"
       permaClasses="btn btn-square btn-default btn-lg m-10"
-      :activeClass="deleteMode ? 'btn-danger' : ''"
+      @click="toggleDelete"
+    />
+    <Button
+      v-if="haveAnyCues && deleteMode"
+      label="DONE"
+      permaClasses="btn btn-square btn-default btn-lg m-10 font-size-12"
+      activeClass="btn-danger"
       @click="toggleDelete"
     />
     </div>
@@ -25,6 +31,7 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import HotCue from '@/components/HotCue.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
+import Button from '@/components/Button.vue'
 
 const cueItems = ref([])
 const playStateOnCueStart = ref(false)

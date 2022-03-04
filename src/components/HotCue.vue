@@ -21,7 +21,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import Button from '@/components/Button.vue'
-const buttonClasses = ref('btn btn-square btn-default btn-lg m-10 btn-hotcue font-size-12 text-muted')
+const buttonClasses = ref('btn btn-square btn-default btn-lg m-10 btn-hotcue font-size-16 text-muted')
 
 const eventStartHandled = ref(false)
 const eventEndHandled = ref(false)
