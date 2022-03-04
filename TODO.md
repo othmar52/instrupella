@@ -5,12 +5,16 @@
   - [ ] metronome (generic track on 2nd deck)
   - [x] hotcues
   - [x] editable hotcues, tempo, downbeat
+  - [x] editable tempo by tap bpm
+  - [ ] editable tempo by input field
   - [ ] persist hotcues, tempo, downbeat
   - [ ] archive.org sample list
   - [x] favicon
   - [ ] settings page (or modal)
-  - [ ] simplify bpm filter and incoming midi clock as value
-  - [ ] switchable wavesurfer backend
+  - [ ] simplify bpm filter GUI
+  - [ ] limit bpm filter values to existing tempo's
+  - [ ] add incoming midi clock as BPM filter value
+  - [ ] switchable wavesurfer backend for timestretch on/off
   - [x] navbar
   - [ ] optional huge pitch slider
   - [ ] project description in README
@@ -22,6 +26,8 @@
   - [ ] optional sync to midi clock
   - [ ] midi mapping / learn
   - [ ] metronome sound is very quiet when track is playing - do we need a separate audio context?
+  - [ ] drop BeatGridPlugin as soon as new version of wavesurfer is released
+  - [ ] add like / dislike to tracks with persisting
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag

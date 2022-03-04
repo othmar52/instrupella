@@ -56,12 +56,14 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import utils from '../mixins/utils'
-import formatDurationMixin from '../mixins/format/duration'
-import formatArtistTitleMixin from '../mixins/format/artisttitle'
+import utils from '../../mixins/utils'
+import rangeMixin from '../../mixins/utils/range'
+import formatDurationMixin from '../../mixins/format/duration'
+import formatArtistTitleMixin from '../../mixins/format/artisttitle'
 const { formatArtistTitle } = formatArtistTitleMixin()
 
 const { getBpm, isManualBpm } = utils()
+const { range } = rangeMixin()
 const { formatDuration } = formatDurationMixin()
 const props = defineProps({
   tracks: {
@@ -121,25 +123,6 @@ const searchTermMatches = (track, searchTerm) => {
 
 const tempoMatches = (trackTempo, tempo) => {
   return trackTempo && trackTempo >= tempo - 5 && trackTempo <= tempo + 5
-}
-
-// thanks to https://stackoverflow.com/questions/8273047/javascript-function-similar-to-python-range#8273091
-const range = (start, stop, step = 1) => {
-  if (typeof stop === 'undefined') {
-    // one param defined
-    stop = start
-    start = 0
-  }
-
-  if ((step > 0 && start >= stop) || (step < 0 && start <= stop)) {
-    return []
-  }
-
-  const result = []
-  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
-    result.push(i)
-  }
-  return result
 }
 
 onMounted(() => {
