@@ -107,6 +107,7 @@
           :track="track"
           :play="play"
           :currentSecond="currentSecond"
+          @hotCuesChange="hotCuesChange"
           @seekToAndPlay="seekToAndPlay"
           @seekToAndStop="seekToAndStop"
         />
@@ -195,6 +196,10 @@ const seekToAndPlay = (second) => {
 const seekToAndStop = (second) => {
   player.value.seekToSecondAndCenter(second)
   player.value.forceStop()
+}
+
+const hotCuesChange = (allHotCues) => {
+  player.value.updateMarkers(allHotCues)
 }
 
 </script>

@@ -25,6 +25,7 @@
 <script setup>
 import WaveSurfer from 'wavesurfer.js'
 import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
+import MarkersPlugin from 'wavesurfer.js/src/plugin/markers/index.js'
 import BeatGridPlugin from '../js/BeatGridPlugin.js'
 import utils from "../mixins/utils.js";
 import { ref, watch, onMounted, computed } from 'vue'
@@ -163,7 +164,9 @@ const wavesurferOptions = () => {
         offset: getBeatGridOffset(),
         formatTimeCallback: function () { return '' },
         timeInterval: function () { return secondsPerQuarterNote }
-      })
+      }),
+      MarkersPlugin.create({
+      }),
     ],
     container: '#wave-surfer',
     backgroundColor: '#111417',
@@ -345,6 +348,20 @@ const doDrag = (event) => {
   */
 }
 
+const updateMarkers = (allHotCues) => {
+  player.value.clearMarkers()
+  for (const [idx, hotCue] of allHotCues.entries()) {
+    if (hotCue.second === 0) {
+      continue
+    }
+    player.value.addMarker({
+      time: hotCue.second,
+      label: idx + 1,
+      position: 'top'
+    })
+  }
+}
+
 watch(() => props.playbackRate, () => {
   try {
     player.value.setPlaybackRate(props.playbackRate)
@@ -388,7 +405,8 @@ defineExpose({
   seekZero,
   seekToSecondAndCenter,
   forcePlay,
-  forceStop
+  forceStop,
+  updateMarkers
 })
 </script>
 

@@ -51,6 +51,7 @@ const pressHotCueStart = (idx) => {
   if (cueItems.value[idx].second === 0) {
     // set new cue point
     cueItems.value[idx].second = props.currentSecond
+    emit('hotCuesChange', cueItems.value)
     ignoreNextEndEvent.value = true
     return
   }
@@ -75,7 +76,8 @@ const pressHotCueEnd = (idx) => {
 
 const emit = defineEmits([
   'seekToAndPlay',
-  'seekToAndStop'
+  'seekToAndStop',
+  'hotCuesChange'
 ])
 
 onMounted(() => {
