@@ -13,7 +13,7 @@
       />
 
     </div>
-    <div>{{factor}}</div>
+    <div v-if="showSliderValue">{{factor}}</div>
   </div>
 </template>
 
@@ -39,6 +39,10 @@ const props = defineProps({
   nudge: {
     type: Number,
     default: 0.005
+  },
+  showSliderValue: {
+    type: Boolean,
+    default: false
   }
 })
 const factor = computed(() => {

@@ -237,6 +237,10 @@ const nudgeAhead = () => {
   player.value.skipForward()
 }
 
+const setVolume = (newVolume) => {
+  player.value.setVolume(newVolume)
+}
+
 const seekToSecondAndCenter = (second) => {
   // seekTo() needs a value between 0 and 1
   const targetSeekValue = second / (player.value.getDuration())
@@ -405,7 +409,8 @@ defineExpose({
   seekToSecondAndCenter,
   forcePlay,
   forceStop,
-  updateMarkers
+  updateMarkers,
+  setVolume
 })
 </script>
 

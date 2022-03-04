@@ -1,7 +1,7 @@
 <template>
 <div class="container-fluid noselect">
   <div class="row">
-    <div class="col-10">
+    <div class="col-9">
       <div :class="`card p-0 deck deck-${index}`">
         <TrackMeta
           :track="track"
@@ -80,9 +80,10 @@
 
       </div>
     </div>
-    <div class="col-2">
-      <div class="card">
+    <div class="col-3">
+      <div class="card pitch-volume-card d-flex justify-content-between">
         <PitchControl @pitchChange="setPitch" />
+        <VolumeControl @volumeChange="setVolume" />
       </div>
     </div>
   </div>
@@ -125,6 +126,7 @@ import WaveBig from '@/components/WaveBig.vue'
 import Button from '@/components/Button.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import PitchControl from '@/components/PitchControl.vue'
+import VolumeControl from '@/components/VolumeControl.vue'
 import Edit from '@/components/Deck/Edit.vue'
 import HotCues from '@/components/HotCues.vue'
 const player = ref(null)
@@ -160,6 +162,11 @@ const toggleEditTrack = () => {
 }
 const setPitch = (newPitchValue) => {
   playbackRate.value = newPitchValue
+}
+
+const setVolume = (newVolumeValue) => {
+  // console.log('TODO: newVolumeValue', newVolumeValue)
+  player.value.setVolume(newVolumeValue)
 }
 
 const trackEnd = () => {

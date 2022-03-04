@@ -1,14 +1,15 @@
 <template>
-  <div class="pitch-control">
+  <div class="pitch-control d-flex">
     <div class="">
       <VSlider
         :minSliderValue="min"
         :maxSliderValue="max"
+        :showSliderValue="true"
         @sliderChange="sliderChange"
         ref="slider"
       />
     </div>
-    <div class="pitch-control-button-group">
+    <div class="pitch-control-button-group d-flex flex-column">
       <div class="dropdown dropleft with-arrow" id="pitch-control-items">
         <button class="btn btn-sm ml-10" data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false">
           {{pitchLabel}} <i class="fa fa-angle-down ml-5 mr-0" aria-hidden="true"></i> <!-- ml-5 = margin-left: 0.5rem (5px) -->
@@ -48,7 +49,7 @@ import { ref, onMounted, computed } from 'vue'
 import VSlider from '@/components/VSlider.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 const buttonClasses = ref('btn btn-square btn-lg m-10 mr-0')
-const range = ref(0.2)
+const range = ref(0.1)
 const min = ref(0.8)
 const max = ref(1.2)
 const props = defineProps({
@@ -87,12 +88,5 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-.pitch-control {
-  display: flex;
-  overflow: hidden;
-  .pitch-control-button-group {
-    display: flex;
-    flex-direction: column;
-  }
-}
+
 </style>

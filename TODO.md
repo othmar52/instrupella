@@ -22,19 +22,23 @@
   - [ ] compatibility for any amount of decks
   - [ ] show properties of loaded track
   - [x] vertical centering of icons in buttons
-  - [ ] volume control
+  - [x] volume control
   - [ ] optional sync to midi clock
   - [ ] midi mapping / learn
   - [ ] metronome sound is very quiet when track is playing - do we need a separate audio context?
   - [ ] drop BeatGridPlugin as soon as new version of wavesurfer is released
   - [ ] add like / dislike to tracks with persisting
   - [ ] move github link to "about" modal
+  - [ ] ensure player current time gets updated when seeking on wave-overview during stop
+  - [ ] ensure very long track titles does not breal layout
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag
+  - [ ] add some kind of delay when swiping **big wave** instead of quick stop
   - [ ] choose from several metronome sounds
   - [ ] optional enter url for loading on deck
-  - [ ] fix `.pitch-control: { overflow:hidden; }` hack
+  - [x] fix `.pitch-control: { overflow:hidden; }` hack
   - [ ] optional choose local file for loading on deck
   - [ ] multitouch on iPad
+  - [ ] add VU-meter
   - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME & https://wavesurfer-js.org/faq/
