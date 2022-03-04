@@ -29,6 +29,7 @@
             :mute="mute"
             :playbackRate="playbackRate"
             :pixelPerSecond="pixelPerSecond"
+            :editTempo="editTempo"
             @trackEnd="trackEnd"
             @trackLoad="trackLoad"
             @waveformReady="waveformReady"
@@ -94,6 +95,7 @@
           :playbackRate="playbackRate"
           :currentSecond="currentSecond"
           @updateTrack="$emit('updateTrack', $event)"
+          @newEditTempo="newEditTempo"
         />
       </div>
     </div>
@@ -127,6 +129,7 @@ const loadProgress = ref(0)
 const trackAnalyzed = ref(false)
 const currentSecond = ref(0)
 const showEditTrack = ref(false)
+const editTempo = ref(0)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
 
 defineProps({
@@ -174,6 +177,11 @@ const zoomTo = (pxPerSec) => {
 const audioprocess = (sec) => {
   currentSecond.value = sec
 }
+const newEditTempo = (newTempo) => {
+  editTempo.value = newTempo
+}
+
+
 </script>
 
 <style lang="scss">

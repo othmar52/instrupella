@@ -69,6 +69,10 @@ const props = defineProps({
   pixelPerSecond: {
     type: Number,
     default: 400
+  },
+  editTempo: {
+    type: Number,
+    default: 0
   }
 })
 
@@ -138,75 +142,38 @@ const initPlayer = () => {
   player.value.on('audioprocess', (sec) => {
     emit('audioprocess', sec)
   })
-  /*
-  if (props.track.bpmdetect > 0) {
-    this.referenceTempo = props.track.bpmdetect
-  }
-  if (props.track.bpm > 0) {
-    this.referenceTempo = props.track.bpm
-  }
-  this.acaBpm = this.referenceTempo * this.acaPitch
-  // console.log('this.acaBpm', this.acaBpm)
-  player.on('audioprocess', () => {
-    this.currentTrackTime = player.getCurrentTime()
-    if (this.metronome === false) {
-      return
-    }
-    if (this.metronomeRunning === true) {
-      return
-    }
-    // we do not know the downbeat - so start immediatly
-    if (props.track.downbeat === 0) {
-      // console.log("starting immediatly", props.track.downbeat)
-      this.$refs.metronome.play()
-      return
-    }
-    // let milliSecondsPerQuarterNote = 60000 / this.tracks[0].bpm
-    // console.log('audioprocess', this.metronome, this.metronomeRunning, milliSecondsPerQuarterNote)
-    if (player.getCurrentTime() >= props.track.downbeat) {
-      this.$refs.metronome.play()
-    }
-  })
-  */
 }
 const wavesurferOptions = () => {
   const secondsPerQuarterNote = 60 / getBpm(props.track)
-  // const secondsPerQuarterNote = 2
   return {
     plugins: [
       MinimapPlugin.create({
-        // plugin options ...
         container: '#deck-minimap',
         height: 50
       }),
       TimelinePlugin.create({
-        // plugin options ...
         container: '#wave-timeline',
-        primaryColor: '#565455',
-        secondaryColor: '#565455',
-        primaryFontColor: '#565455',
-        secondaryFontColor: '#565455',
-        unlabeledNotchColor: '#232323',
+        primaryColor: 'tomato',
+        secondaryColor: 'tomato',
+        primaryFontColor: 'white',    // 1 bar
+        secondaryFontColor: '#ff4d4f',    // 4 bars
+        unlabeledNotchColor: '#232323', // quarter note
         height: 150,
         secondaryLabelInterval: 16,
         primaryLabelInterval: 4,
         offset: getBeatGridOffset(),
-        timeInterval: function (pxPerSecond) { // eslint no-unused-vars: 0
-          // console.log('pxPerSecond', pxPerSecond)
-          // console.log('secondsPerQuarterNote', secondsPerQuarterNote)
+        formatTimeCallback: function () { return '' },
+        timeInterval: function () {
           return secondsPerQuarterNote
         }
-        // primaryLabelInterval: 4,
-        // secondaryLabelInterval: 16,
-        // formatTimeCallback: function () { return '' },
         // duration: 59 // this messes up the resolution
       })
     ],
     container: '#wave-surfer',
     backgroundColor: '#111417',
-    // backend: 'WebAudio', // change tempo and pitch
-    // backend: 'MediaElement',  // change tempo and keep pitch
-    backend: (props.timestretch) ? 'MediaElement' : 'WebAudio',
+    backend: (props.timestretch)
+      ? 'MediaElement' // change tempo and keep pitch
+      : 'WebAudio',    // change tempo and pitch
     mediaControls: false,
     waveColor: '#1890ff',
     progressColor: '#05121e',
@@ -233,31 +200,13 @@ const wavesurferOptions = () => {
     splitChannels: false
   }
 }
-const getBeatGridOffset = () => { /* eslint no-unused-vars: 0 */
-  if (props.track.downbeat < 0.001) {
-    // console.log('parseInt(props.track.downbeat)', parseInt(props.track.downbeat))
-    return 0
-  }
+const getBeatGridOffset = () => {
   if (getBpm(props.track) === 0) {
-    // console.log('parseInt(props.track.bpm)', parseInt(props.track.bpmdetect))
     return 0
   }
-  // offset needs seconds and not pixel
+  // TODO: ensure we have beatgrid rendering from start to finish
+  // @see https://github.com/katspaugh/wavesurfer.js/issues/2463
 
-  // for now make a quick & dirty subtraction of 16 bars
-  const secondsPerQuarterNote = 60 / getBpm(props.track)
-  const secondsFor16Bars = secondsPerQuarterNote * 4 * 16
-
-  // const pixelPerQuarterNote = secondsPerQuarterNote * props.pixelPerSecond
-  // const pixelPer4Bars = pixelPerQuarterNote * 16
-  // const pixelPer16Bars = pixelPer4Bars * 16
-  // console.log("props.pixelPerSecond", props.pixelPerSecond)
-  // console.log("secondsPerQuarterNote", secondsPerQuarterNote)
-  // console.log("pixelPerQuarterNote", pixelPerQuarterNote)
-  // console.log("pixelPer4Bars", pixelPer4Bars)
-  // console.log("pixelPer16Bars", pixelPer16Bars)
-  // console.log('offset', props.track.downbeat - secondsFor16Bars)
-  // return props.track.downbeat - secondsFor16Bars
   return (props.track.downbeat) ? props.track.downbeat : 0
 }
 const togglePlay = () => {
@@ -379,6 +328,20 @@ watch(() => downbeat.value, (newDownbeat) => {
   try {
     // console.log('downbeat has changed - updating beatgrid')
     player.value.timeline.params.offset = newDownbeat
+    player.value.timeline.render()
+  } catch (e) { }
+})
+
+watch(() => props.editTempo, (newTempo) => {
+  if (newTempo === 0) {
+    return
+  }
+  try {
+    // console.log('edit tempo has changed - updating beatgrid')
+    const secondsPerQuarterNote = 60 / newTempo
+    player.value.timeline.params.timeInterval = function () {
+      return secondsPerQuarterNote
+    }
     player.value.timeline.render()
   } catch (e) { }
 })

@@ -138,7 +138,8 @@ const setDownbeat = () => {
 }
 
 const emit = defineEmits([
-  'updateTrack'
+  'updateTrack',
+  'newEditTempo'
 ])
 
 watch(() => editTempo.value, (newValue) => {
@@ -146,6 +147,7 @@ watch(() => editTempo.value, (newValue) => {
       newValue = 0
   }
   editTempo.value = parseFloat(newValue)
+  emit('newEditTempo', editTempo.value)
 })
 
 watch(() => props.play, (newPlayState) => {

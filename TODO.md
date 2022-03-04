@@ -21,6 +21,7 @@
   - [ ] volume control
   - [ ] optional sync to midi clock
   - [ ] midi mapping / learn
+  - [ ] metronome sound is very quiet when track is playing - do we need a separate audio context?
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag
@@ -29,3 +30,4 @@
   - [ ] fix `.pitch-control: { overflow:hidden; }` hack
   - [ ] optional choose local file for loading on deck
   - [ ] multitouch on iPad
+  - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME
