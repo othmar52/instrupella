@@ -14,8 +14,8 @@ After trying dozens of dj apps i did not find any that met my requirements
  - no need for multiple decks because the syncing is against live performed music
  - managing collection with tempo and beatgrid / downbeat
 
-outdated screenshot:  
-![image](https://user-images.githubusercontent.com/7056051/156348316-63c6df06-a430-4ae7-bb95-c812d8ff35ee.png)  
+screenshot of current development status:  
+![image](https://user-images.githubusercontent.com/7056051/156877461-259bab79-31ac-49d5-a8a9-265d9e6011bb.png)  
 
 ## TODO
   - [ ] iPad BUG when added to home screen the keyboard does not appear on search input (seems to work in chrome) @see [issue #1](https://github.com/othmar52/instrupella/issues/1)
