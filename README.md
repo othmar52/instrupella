@@ -11,8 +11,8 @@ After trying dozens of dj apps i did not find any that met my requirements
  - managing collection with tempo and beatgrid
  - having another "instrument" next to dozens of synthesizers that can only play acapellas/vocal samples
 
-outdated screenshot:  
-![image](https://user-images.githubusercontent.com/7056051/156348316-63c6df06-a430-4ae7-bb95-c812d8ff35ee.png)  
+screenshot of current development status:  
+![image](https://user-images.githubusercontent.com/7056051/156877461-259bab79-31ac-49d5-a8a9-265d9e6011bb.png)  
 
 ## TODO
   - [ ] iPad BUG when added to home screen the keyboard does not appear on search input (seems to work in chrome) @see [issue #1](https://github.com/othmar52/instrupella/issues/1)
