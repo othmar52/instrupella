@@ -11,7 +11,7 @@
   - [ ] archive.org sample list
   - [x] favicon
   - [ ] settings page (or modal)
-  - [ ] simplify bpm filter GUI
+  - [x] simplify bpm filter GUI
   - [x] limit bpm filter values to existing tempo's
   - [ ] add incoming midi clock as BPM filter value
   - [ ] switchable wavesurfer backend for timestretch on/off
@@ -31,10 +31,13 @@
   - [ ] move github link to "about" modal
   - [ ] ensure player current time gets updated when seeking on wave-overview during stop
   - [ ] ensure very long track titles does not breal layout
+  - [ ] big wave form position is crazy during fast pitch
+  - [ ] BUG load new track with different wave zoom -> drag big wave is messed up
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag
   - [ ] add some kind of delay when swiping **big wave** instead of quick stop
+  - [ ] improve playback during wave swipe (change playbackRate and length according to swipe move to get vinyl like sound)
   - [ ] choose from several metronome sounds
   - [ ] optional enter url for loading on deck
   - [x] fix `.pitch-control: { overflow:hidden; }` hack

@@ -1,12 +1,12 @@
 <template>
   <div class="card">
-  <table class="track-list">
+  <table class="track-list table table-striped table-hover">
     <thead>
       <tr>
         <th colspan="5">
           <div class="container-fluid">
           <div class="row justify-content-center">
-            <div class="col-sm-6 col-md-5 col-lg-6">
+            <div class="col-4">
               <input
                 type="search"
                 class="form-control form-control-lg"
@@ -16,15 +16,14 @@
                 @search="searchEntries"
               >
             </div>
+            <div class="col-1"></div>
+            <div class="col-4 d-flex">
+              <BpmFilter
+                :filterValues="bpmFilterValues"
+                @setBpmFilter="setBpmFilter"
+              />
+            </div>
           </div>
-          </div>
-          <div>
-            <span
-              v-for="tempo in bpmFilterValues" :key="tempo"
-              @click="setBpmFilter(tempo)"
-              :class="`btn btn-default ${(bpmFilter === tempo) ? 'btn-primary' : ''} m-5`">
-              {{tempo}} BPM
-            </span>
           </div>
         </th>
       </tr>
@@ -60,6 +59,8 @@ import utils from '../../mixins/utils'
 import rangeMixin from '../../mixins/utils/range'
 import formatDurationMixin from '../../mixins/format/duration'
 import formatArtistTitleMixin from '../../mixins/format/artisttitle'
+
+import BpmFilter from '@/components/TrackList/BpmFilter.vue'
 const { formatArtistTitle } = formatArtistTitleMixin()
 
 const { getBpm, isManualBpm } = utils()
@@ -95,7 +96,7 @@ const loadTrack = (trackIndex) => {
   setTimeout(() => { emit('selectTrack', trackIndex) }, 200)
 }
 const setBpmFilter = (tempo) => {
-  bpmFilter.value = (bpmFilter.value === tempo) ? null : tempo
+  bpmFilter.value = tempo
   searchEntries()
 }
 const searchEntries = () => {
@@ -107,7 +108,7 @@ const searchEntries = () => {
   }
   if (bpmFilter.value !== null) {
     filteredEntries.value = filteredEntries.value.filter(track => {
-      return tempoMatches(getBpm(track), bpmFilter.value)
+      return tempoMatches(getBpm(track), parseInt(bpmFilter.value))
     })
   }
 }
@@ -159,9 +160,6 @@ table {
 thead tr,
 thead th {
   background: var(--dm-card-bg-color);
-}
-tr:nth-child(even) {
-    background: var(--dm-input-bg-color);;
 }
 
 td, th {
