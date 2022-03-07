@@ -1,8 +1,12 @@
 <template>
+  <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
   <div class="instrupella">
     <div v-if="tracks">
       <Deck :track="track" :index="0" @updateTrack="persistUpdateTrack" />
-      <TrackList :tracks="tracks" @selectTrack="selectTrack" />
+      <TrackList
+        :tracks="tracks"
+        @selectTrack="selectTrack"
+      />
     </div>
     <div v-else>
       loading tracklist...
@@ -15,10 +19,15 @@ import { ref, onMounted } from 'vue'
 import Deck from '@/components/Deck.vue'
 import TrackList from '@/components/TrackList/TrackList.vue'
 const track = ref(null)
+const top = ref(null)
 const tracks = ref([])
 
 const selectTrack = (trackIndex) => {
-  track.value = tracks.value[trackIndex]
+  top.value.scrollIntoView({
+    behavior: 'auto',
+    block: 'end'
+  })
+  setTimeout(() => { track.value = tracks.value[trackIndex] }, 200)
 }
 
 // how to persist edit's (tempo, downbeat, hotcues)?

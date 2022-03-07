@@ -1,5 +1,5 @@
 # instru☻pella
-DJ-like web application for playing acapellas to synth jam sessions  
+DJ-like web application (VueJs 3) for playing acapellas to synth jam sessions  
 It's similar to traktor or serato but with very limited functionality  
 
 ## GOAL
@@ -12,6 +12,7 @@ After trying dozens of dj apps i did not find any that met my requirements
  - precise control for pitching
  - precise control for nudging
  - no need for multiple decks because the syncing is against live performed music
+ - no need for FX because its all done by external hardware
  - managing collection with tempo and beatgrid / downbeat
 
 screenshot of current development status:  
@@ -27,6 +28,7 @@ screenshot of current development status:
   - [ ] editable tempo by input field
   - [ ] persist hotcues, tempo, downbeat
   - [ ] archive.org sample list
+  - [ ] add working demo to https://othmar52.github.io/
   - [x] favicon
   - [ ] settings page (or modal)
   - [x] simplify bpm filter GUI
@@ -41,17 +43,20 @@ screenshot of current development status:
   - [ ] show properties of loaded track
   - [x] vertical centering of icons in buttons
   - [x] volume control
-  - [ ] optional sync to midi clock
+  - [ ] optional sync to midi clock / CV-clock
   - [ ] midi mapping / learn
   - [ ] metronome sound is very quiet on iPad when track is playing - do we need a separate audio context? (not reproduceable in desktop browsers)
   - [ ] drop BeatGridPlugin as soon as new version of wavesurfer is released
   - [ ] add like / dislike to tracks with persisting
   - [ ] move github link to "about" modal to avoid leaving instrupella by accident
   - [ ] ensure player current time gets updated when seeking on wave-overview during stop
-  - [ ] ensure very long track titles does not breal layout
+  - [ ] ensure very long track titles does not break layout
   - [ ] big wave form position is crazy during play in combination with fast pitch changes
   - [ ] BUG volume slider position is not respected on new loaded tracks 
   - [ ] BUG load new track with different wave zoom -> drag big wave is messed up
+  - [x] BUG auto scroll to top after load track does not work during play
+  - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
+  - [ ] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag

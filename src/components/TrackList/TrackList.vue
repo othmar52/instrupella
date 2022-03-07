@@ -95,18 +95,9 @@ const loadRandom = () => {
 }
 
 const loadTrack = (trackIndex) => {
-  // console.log('loadTrack(trackIndex)', trackIndex)
-
-  const element = document.querySelector('.deck-0')
-  if (!element) {
-    return
-  }
-  element.scrollIntoView({
-    behavior: 'smooth',
-    block: 'end'
-  })
-  setTimeout(() => { emit('selectTrack', trackIndex) }, 200)
+  emit('selectTrack', trackIndex)
 }
+
 const setBpmFilter = (tempo) => {
   bpmFilter.value = tempo
   searchEntries()

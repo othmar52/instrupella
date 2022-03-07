@@ -81,7 +81,7 @@ watch(() => props.track, (newTrack) => {
   if (!newTrack) {
     return
   }
-  initPlayer()
+  player.value.load(props.track.path)
 })
 
 watch(() => props.play, () => {
@@ -93,10 +93,6 @@ watch(() => props.play, () => {
 
 watch(() => props.mute, () => {
   player.value.toggleMute()
-})
-
-watch(() => props.track, () => {
-  initPlayer()
 })
 
 watch(() => props.pixelPerSecond, () => {
@@ -118,15 +114,21 @@ const emit = defineEmits([
   'audioprocess'
 ])
 
-const initPlayer = () => {
-  // console.log("initPlayer()")
-  if (player.value !== null) {
-    player.value.destroy()
+const destroyPlayer = () => {
+  if (player.value === null) {
+    return
+  }
+  player.value.unAll()
+  player.value.destroy()
+}
+
+const initPlayer = (forceReInit = false) => {
+  if (forceReInit === true) {
+    destroyPlayer()
   }
   player.value = WaveSurfer.create(
     wavesurferOptions()
   )
-  player.value.load(props.track.path)
   player.value.on('loading', (percent) => {
     emit('trackLoad', percent)
   })
@@ -331,25 +333,10 @@ const doDrag = (event) => {
   }
   player.value.seekAndCenter(targetSeekValue)
 
+  // TODO: change playBackRate and lengthToPlay accoring to drag event
+  // for now keep it simple and repeat a millisecond in current pitch during drag
   const targetSecond2 = targetSecond + 0.001
   player.value.play(targetSecond, targetSecond2)
-  /*
-  const targetSecond2 =  targetSecond + 0.001
-  player.value.play(targetSecond,targetSecond2)
-  const playPromise = player.value.play(targetSecond,targetSecond2)
-  if (playPromise !== undefined) {
-    playPromise.then(_ => {
-      // Automatic playback started!
-      // Show playing UI.
-      console.log('catched error1', _)
-    })
-    .catch(error => {
-      // Auto-play was prevented
-      // Show paused UI.
-      console.log('catched error2', error)
-    });
-  }
-  */
 }
 
 const updateMarkers = (allHotCues) => {
@@ -398,7 +385,7 @@ watch(() => props.editTempo, (newTempo) => {
 })
 
 onMounted(() => {
-  // console.log('props.track', props.track)
+  initPlayer()
   window.addEventListener('mouseup', stopDrag)
 })
 
