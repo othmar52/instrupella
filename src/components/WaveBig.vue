@@ -81,8 +81,23 @@ watch(() => props.track, (newTrack) => {
   if (!newTrack) {
     return
   }
-  player.value.load(props.track.path)
+  // avoid rendering invalid beatgrid during load
+  player.value.beatgrid.params.timeInterval = 10000
+  player.value.load(newTrack.path)
 })
+
+const redrawBeatGrid = () => {
+  const bpm = getBpm(props.track)
+  if (bpm === 0) {
+    return
+  }
+  player.value.beatgrid.params.offset = getBeatGridOffset()
+  player.value.beatgrid.params.timeInterval = function () {
+      return 60 / bpm
+  }
+  player.value.beatgrid.render()
+}
+
 
 watch(() => props.play, () => {
   if (!props.track) {
@@ -136,9 +151,11 @@ const initPlayer = (forceReInit = false) => {
     emit('trackEnd')
   })
   player.value.on('ready', () => {
+    redrawBeatGrid()
     emit('trackReady')
   })
   player.value.on('waveform-ready', () => {
+    redrawBeatGrid()
     emit('waveformReady')
   })
   player.value.on('audioprocess', (sec) => {
