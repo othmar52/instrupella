@@ -83,4 +83,20 @@ window.oncontextmenu = function () { return false }
   -webkit-box-shadow: 0 .2rem 0 rgba(0,0,0,.025);
   box-shadow: 0 .2rem 0 rgba(0,0,0,.025);
 }
+.modal, .modal-dialog {
+    top: -10000%;
+}
+
+.break-word {
+    -ms-word-break: break-all;
+    word-break: break-all;
+
+ /* Non standard for webkit */
+     word-break: break-word;
+
+    -webkit-hyphens: auto;
+       -moz-hyphens: auto;
+        -ms-hyphens: auto;
+            hyphens: auto;
+}
 </style>

@@ -1,6 +1,52 @@
 <template>
+  <div class="modal  modal-full" id="track-details" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document" v-if="track">
+      <div class="modal-content">
+        <a href="#" class="btn btn-square btn-rounded btn-default position-absolute right-0 mr-10" role="button" aria-label="ClXose">
+          <span aria-hidden="true">&times;</span>
+        </a>
+        <h5 class="modal-title">Currently playing</h5>
+        <table class="table table-strXiped table-bordered">
+          <tbody>
+          <tr>
+            <th>Artist</th>
+            <td>{{track.artist}}</td>
+            <th>Year</th>
+            <td>{{track.year}}</td>
+            <th>BPMdetect</th>
+            <td>{{track.bpmdetect}}</td>
+          </tr>
+          <tr>
+            <th>Title</th>
+            <td>{{track.title}}</td>
+            <th>Length</th>
+            <td>{{formatDuration(duration)}}</td>
+            <th>BPM</th>
+            <td>{{track.bpm}}</td>
+          </tr>
+          <tr>
+            <th>Size</th>
+            <td>TODO: MB</td>
+            <th>Key</th>
+            <td>{{track.key}}</td>
+            <th>Downbeat</th>
+            <td>{{track.downbeat}}</td>
+          </tr>
+          <tr>
+            <th>
+              Path
+            </th>
+            <td colspan="5" class="break-word">
+              {{track.path}}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   <div class="track-meta p-5 d-flex justify-content-between" @click="toggleFormat">
-    <div v-html="formatArtistTitle(track)"></div>
+    <a href="#track-details" v-html="formatArtistTitle(track)"></a>
     <div>
       <span :class="bpmClass">{{formattedTempo}}</span>
       <span class="text-muted"> BPM</span>
