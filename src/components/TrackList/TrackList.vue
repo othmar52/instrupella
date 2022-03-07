@@ -6,6 +6,9 @@
         <th colspan="5">
           <div class="container-fluid">
           <div class="row justify-content-center">
+            <div class="col-2">
+              <span class="btn" @click="loadRandom">Random</span>
+            </div>
             <div class="col-4">
               <input
                 type="search"
@@ -81,6 +84,15 @@ const filteredEntries = ref([])
 const emit = defineEmits([
   'selectTrack'
 ])
+
+const loadRandom = () => {
+  // console.log('load random')
+  const randomItem = filteredEntries.value[Math.floor(Math.random()*filteredEntries.value.length)];
+  // console.log(randomItem.id)
+  if (randomItem) {
+   loadTrack(randomItem.id)
+  }
+}
 
 const loadTrack = (trackIndex) => {
   // console.log('loadTrack(trackIndex)', trackIndex)
