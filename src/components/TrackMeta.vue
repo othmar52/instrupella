@@ -132,5 +132,7 @@ watch(() => props.track, () => {
 </script>
 
 <style lang="scss">
-
+#track-details td {
+  word-wrap: break-word
+}
 </style>
