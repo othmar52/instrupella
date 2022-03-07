@@ -83,4 +83,7 @@ window.oncontextmenu = function () { return false }
   -webkit-box-shadow: 0 .2rem 0 rgba(0,0,0,.025);
   box-shadow: 0 .2rem 0 rgba(0,0,0,.025);
 }
+.modal, .modal-dialog {
+    top: -10000%;
+}
 </style>

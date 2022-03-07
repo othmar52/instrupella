@@ -40,7 +40,7 @@ screenshot of current development status:
   - [x] short project description in README
   - [ ] scroll to top button in tracklist
   - [ ] compatibility for any amount of decks
-  - [ ] show properties of loaded track
+  - [x] show properties of loaded track
   - [x] vertical centering of icons in buttons
   - [x] volume control
   - [ ] optional sync to midi clock / CV-clock
