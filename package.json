@@ -13,6 +13,7 @@
     "save": "^2.4.0",
     "vue": "^3.2.13",
     "wavesurfer.js": "^6.0.2",
+    "webmidi": "^3.0.15",
     "webpack-symlink-plugin": "^1.0.1"
   },
   "devDependencies": {

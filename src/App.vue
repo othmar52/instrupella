@@ -6,10 +6,19 @@
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
       </div>
       <div class="navbar-content">
+        <ButtonIcon
+          componentName="IconMidi"
+          permaClasses="btn btn-square btn-lg"
+        />
+      </div>
+      <div class="navbar-content">
         <h4 class="navbar-text text-monoXspace m-5">INSTRU
           <img alt="Vue logo" src="./assets/instrupella.svg" width="40">
           PELLA
         </h4>
+      </div>
+      <div class="navbar-content">
+
       </div>
       <div class="navbar-content">
         <a href="https://github.com/othmar52/instrupella" class="btn-lg" target="_blank" role="button"><IconGithub /></a>
@@ -22,9 +31,11 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import InstruPella from './components/InstruPella.vue'
 import Settings from './components/Settings.vue'
 import IconCog from './components/Icons/Cog.vue'
+import ButtonIcon from './components/ButtonIcon.vue'
 import IconGithub from './components/Icons/Github.vue'
 
 // window.halfmoon = require('halfmoon/js/halfmoon.min.js')
@@ -33,6 +44,29 @@ window.halfmoon = require('halfmoon')
 // chrome mobile device emulator shows context menu on "touch hold event"
 // lets disable this:
 window.oncontextmenu = function () { return false }
+
+const settings = ref({})
+const defaultSettings = () => {
+  return {
+    midi: {
+      enable: false,
+      device: null,
+      mapping: {
+        deck0: {
+          nudgeAhead: null
+        }
+      }
+    },
+    deck0: {
+      timestretch: false
+    }
+  }
+}
+
+onMounted(() => {
+  settings.value = defaultSettings()
+})
+
 </script>
 
 <style lang="scss">

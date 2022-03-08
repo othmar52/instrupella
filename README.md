@@ -19,8 +19,13 @@ screenshot of current development status:
 ![image](https://user-images.githubusercontent.com/7056051/156877461-259bab79-31ac-49d5-a8a9-265d9e6011bb.png)  
 
 ## TODO
+### tracklist
   - [ ] iPad BUG when added to home screen the keyboard does not appear on search input (seems to work in chrome) @see [issue #1](https://github.com/othmar52/instrupella/issues/1)
   - [ ] sortable tracklist
+  - [ ] scroll to top button in tracklist
+  - [ ] highlight loaded track in tracklist
+
+### general
   - [ ] metronome (generic track on 2nd deck)
   - [x] hotcues
   - [x] editable hotcues, tempo, downbeat
@@ -38,7 +43,6 @@ screenshot of current development status:
   - [x] navbar
   - [ ] optional huge pitch slider
   - [x] short project description in README
-  - [ ] scroll to top button in tracklist
   - [ ] compatibility for any amount of decks
   - [x] show properties of loaded track
   - [x] vertical centering of icons in buttons
@@ -49,7 +53,7 @@ screenshot of current development status:
   - [ ] drop BeatGridPlugin as soon as new version of wavesurfer is released
   - [ ] add like / dislike to tracks with persisting
   - [ ] move github link to "about" modal to avoid leaving instrupella by accident
-  - [ ] ensure player current time gets updated when seeking on wave-overview during stop
+  - [ ] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprecess()` is not fired)
   - [ ] ensure very long track titles does not break layout
   - [ ] big wave form position is crazy during play in combination with fast pitch changes
   - [ ] BUG volume slider position is not respected on new loaded tracks 

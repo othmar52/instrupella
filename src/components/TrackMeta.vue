@@ -30,7 +30,7 @@
             <th>Key</th>
             <td>{{track.key}}</td>
             <th>Downbeat</th>
-            <td>{{track.downbeat}}</td>
+            <td>{{track.downbeat ? track.downbeat.toFixed(3) : ''}}</td>
           </tr>
           <tr>
             <th>

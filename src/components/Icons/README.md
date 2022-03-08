@@ -14,7 +14,10 @@ https://www.svgrepo.com/download/327472/play.svg
 https://www.svgrepo.com/download/348985/cog.svg  
 https://www.svgrepo.com/svg/361116/debug-line-by-line
 https://www.svgrepo.com/svg/352599/trash-alt
+https://www.svgrepo.com/svg/354747/clock-14
 
+MIDI https://www.onlinewebfonts.com/icon/496521
+<div>Icon made from <a href="http://www.onlinewebfonts.com/icon">Icon Fonts</a> is licensed by CC BY 3.0</div>
 
 ## What icon to use for edit beatgrid/tempo?
 https://www.svgrepo.com/svg/361116/debug-line-by-line  

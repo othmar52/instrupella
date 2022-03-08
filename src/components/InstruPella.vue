@@ -15,13 +15,18 @@
 </template>
 
 <script setup>
+import { WebMidi } from "webmidi";
 import { ref, onMounted } from 'vue'
 import Deck from '@/components/Deck.vue'
 import TrackList from '@/components/TrackList/TrackList.vue'
+
+console.log('webmidi', WebMidi)
 const track = ref(null)
 const top = ref(null)
 const tracks = ref([])
 
+const webmidi = WebMidi
+const midiInput1 = ref(null)
 const selectTrack = (trackIndex) => {
   top.value.scrollIntoView({
     behavior: 'auto',
@@ -43,32 +48,54 @@ const persistUpdateTrack = (properties) => {
   }
 }
 
-onMounted(() => {
-  /*
-  track.value = {
-    // path: 'https://ia804502.us.archive.org/13/items/DontWatchTheDJ128BPMDry/Don%27t%20Watch%20The%20DJ%20128BPM%20Dry.mp3',
-    path: './sample.mp3',
-    artist: 'dont watch the DJ',
-    title: 'dont watch the DJ',
-    year: 1991,
-    length: 437.565,
-    bpmdetect: 141.019,
-    bpm: 0,
-    key: 'Bbm',
-    downbeat: 4.234,
-    hotcues: []
-  }
-  */
-  // console.log(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/00-acajam.json`)
+const loadTrackList = () => {
   fetch(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/00-acajam.json`)
     .then(response => response.json())
     .then(json => {
       tracks.value = json.map((track, idx) => ({ ...track, id: idx }))
-      // track.value = tracks.value[0]
-      // console.log(track.value.artist)
-      // console.log(this.tracks[0].path)
     })
+}
+
+const initMidi = () => {
+  webmidi.enable((err) => {
+    if (err) {
+      console.log("WebMidi could not be enabled.", err);
+      //todo return here?
+    } else {
+      console.log("WebMidi enabled!");
+    }
+    const devices = WebMidi.outputs;
+    console.log('WebMidi.outputs', WebMidi.outputs)
+    console.log('WebMidi.inputs', WebMidi.inputs)
+
+    midiInput1.value = WebMidi.getInputByName('Control Hub MIDI 1')
+    console.log('midiInput1', midiInput1)
+    /*
+    midiInput1.value.addListener('midimessage', e => {
+      console.log('midimessage', e);
+    })
+    midiInput1.value.removeListener()
+    midiInput1.value.addListener('clock', e => {
+      console.log('clock', e);
+    })
+    midiInput1.value.addListener('start', e => {
+      console.log('start', e);
+    })
+    midiInput1.value.addListener('stop', e => {
+      console.log('stop', e);
+    })
+    */
+    //this.outputDN = WebMidi.getOutputByName("Elektron Digitone");
+    // TODO add owner check
+    //this.localMidi = this.outputDN ? true : false;
+  })
+}
+
+onMounted(() => {
+  loadTrackList()
+  initMidi()
 })
+
 </script>
 
 <style lang="scss">
