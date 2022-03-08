@@ -1,4 +1,5 @@
 <template>
+  <BlazingBaton ref="baton" />
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
   <div class="instrupella">
     <div v-if="tracks">
@@ -19,11 +20,13 @@ import { WebMidi } from "webmidi";
 import { ref, onMounted } from 'vue'
 import Deck from '@/components/Deck.vue'
 import TrackList from '@/components/TrackList/TrackList.vue'
+import BlazingBaton from '@/components/BlazingBaton/BlazingBaton.vue'
 
 console.log('webmidi', WebMidi)
 const track = ref(null)
 const top = ref(null)
 const tracks = ref([])
+const baton = ref(null)
 
 const webmidi = WebMidi
 const midiInput1 = ref(null)
@@ -60,31 +63,38 @@ const initMidi = () => {
   webmidi.enable((err) => {
     if (err) {
       console.log("WebMidi could not be enabled.", err);
-      //todo return here?
-    } else {
-      console.log("WebMidi enabled!");
+      return
     }
     const devices = WebMidi.outputs;
     console.log('WebMidi.outputs', WebMidi.outputs)
     console.log('WebMidi.inputs', WebMidi.inputs)
 
     midiInput1.value = WebMidi.getInputByName('Control Hub MIDI 1')
+    if (!midiInput1.value) {
+      console.log("cant find Control Hub MIDI 1....")
+      return
+    }
     console.log('midiInput1', midiInput1)
+
     /*
     midiInput1.value.addListener('midimessage', e => {
       console.log('midimessage', e);
     })
+    */
     midiInput1.value.removeListener()
     midiInput1.value.addListener('clock', e => {
-      console.log('clock', e);
+      // console.log('clock', e);
+      baton.value.messageClock(e)
     })
     midiInput1.value.addListener('start', e => {
-      console.log('start', e);
+      // console.log('start', e);
+      baton.value.messageStart(e)
     })
     midiInput1.value.addListener('stop', e => {
-      console.log('stop', e);
+      // console.log('stop', e);
+      baton.value.messageStop(e)
     })
-    */
+
     //this.outputDN = WebMidi.getOutputByName("Elektron Digitone");
     // TODO add owner check
     //this.localMidi = this.outputDN ? true : false;
