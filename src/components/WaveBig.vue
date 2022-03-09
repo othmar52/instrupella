@@ -126,7 +126,8 @@ const emit = defineEmits([
   'trackReady',
   'trackEnd',
   'trackLoad',
-  'audioprocess'
+  'audioprocess',
+  'seek'
 ])
 
 const destroyPlayer = () => {
@@ -160,6 +161,9 @@ const initPlayer = (forceReInit = false) => {
   })
   player.value.on('audioprocess', (sec) => {
     emit('audioprocess', sec)
+  })
+  player.value.on('seek', (value) => {
+    emit('seek', value)
   })
 }
 const wavesurferOptions = () => {
@@ -258,6 +262,10 @@ const nudgeAhead = () => {
 
 const setVolume = (newVolume) => {
   player.value.setVolume(newVolume)
+}
+
+const getDuration = () => {
+  return player.value.getDuration()
 }
 
 const seekToSecondAndCenter = (second) => {
@@ -414,7 +422,8 @@ defineExpose({
   forcePlay,
   forceStop,
   updateMarkers,
-  setVolume
+  setVolume,
+  getDuration
 })
 </script>
 

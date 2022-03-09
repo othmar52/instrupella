@@ -53,7 +53,7 @@ screenshot of current development status:
   - [ ] drop BeatGridPlugin as soon as new version of wavesurfer is released
   - [ ] add like / dislike to tracks with persisting
   - [ ] move github link to "about" modal to avoid leaving instrupella by accident
-  - [ ] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprecess()` is not fired)
+  - [x] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprecess()` is not fired), maybe use wavesurfer.backend.getPlayedPercents());
   - [ ] ensure very long track titles does not break layout
   - [ ] big wave form position is crazy during play in combination with fast pitch changes
   - [ ] BUG volume slider position is not respected on new loaded tracks 
@@ -61,6 +61,7 @@ screenshot of current development status:
   - [x] BUG auto scroll to top after load track does not work during play
   - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
   - [ ] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload
+  - [ ] ensure track info modal closes when loading a new track
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag
@@ -73,6 +74,16 @@ screenshot of current development status:
   - [ ] multitouch on iPad
   - [ ] add VU-meter
   - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME & https://wavesurfer-js.org/faq/
+
+
+## Resources vor development
+ - https://vuejs.org/api/
+ - https://wavesurfer-js.org/api/index.html
+ - https://webmidijs.org/api
+ - https://www.gethalfmoon.com/docs/introduction/
+
+
+
 
 ## Project setup
 ```

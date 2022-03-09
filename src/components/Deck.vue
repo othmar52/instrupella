@@ -35,6 +35,7 @@
             @waveformReady="waveformReady"
             @trackReady="trackReady"
             @audioprocess="audioprocess"
+            @seek="seek"
             ref="player"
             class="wave-big"
           />
@@ -163,12 +164,9 @@ const toggleEditTrack = () => {
 const setPitch = (newPitchValue) => {
   playbackRate.value = newPitchValue
 }
-
 const setVolume = (newVolumeValue) => {
-  // console.log('TODO: newVolumeValue', newVolumeValue)
   player.value.setVolume(newVolumeValue)
 }
-
 const trackEnd = () => {
   play.value = false
   mute.value = false
@@ -191,6 +189,10 @@ const zoomTo = (pxPerSec) => {
 const audioprocess = (sec) => {
   currentSecond.value = sec
 }
+const seek = (value) => {
+  currentSecond.value = player.value.getDuration() * value
+}
+
 const newEditTempo = (newTempo) => {
   editTempo.value = newTempo
 }
