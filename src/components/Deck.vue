@@ -36,6 +36,7 @@
             @trackReady="trackReady"
             @audioprocess="audioprocess"
             @seek="seek"
+            @error="error"
             ref="player"
             class="wave-big"
           />
@@ -191,6 +192,9 @@ const audioprocess = (sec) => {
 }
 const seek = (value) => {
   currentSecond.value = player.value.getDuration() * value
+}
+const error = (errormsg) => {
+  console.log('TODO: handle player error', errormsg)
 }
 
 const newEditTempo = (newTempo) => {

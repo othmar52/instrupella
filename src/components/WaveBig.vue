@@ -83,6 +83,14 @@ watch(() => props.track, (newTrack) => {
   }
   // avoid rendering invalid beatgrid during load
   player.value.beatgrid.params.timeInterval = 10000
+
+  // TODO clear minimap
+  // approach with next 2 lines only work during pause and trackPosition 0
+  // @see https://github.com/katspaugh/wavesurfer.js/issues/2479
+  const len = player.value.minimap.drawer.getWidth();
+  player.value.minimap.drawer.progress(0)
+  player.value.minimap.drawer.drawPeaks([0], len, 0, len);
+
   player.value.load(newTrack.path)
 })
 
@@ -127,7 +135,8 @@ const emit = defineEmits([
   'trackEnd',
   'trackLoad',
   'audioprocess',
-  'seek'
+  'seek',
+  'error'
 ])
 
 const destroyPlayer = () => {
@@ -164,6 +173,9 @@ const initPlayer = (forceReInit = false) => {
   })
   player.value.on('seek', (value) => {
     emit('seek', value)
+  })
+  player.value.on('error', (error) => {
+    emit('error', error)
   })
 }
 const wavesurferOptions = () => {
