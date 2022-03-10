@@ -50,7 +50,7 @@ screenshot of current development status:
   - [ ] optional sync to midi clock / CV-clock
   - [ ] midi mapping / learn
   - [ ] metronome sound is very quiet on iPad when track is playing - do we need a separate audio context? (not reproduceable in desktop browsers)
-  - [ ] drop BeatGridPlugin as soon as new version of wavesurfer is released
+  - [x] drop BeatGridPlugin as soon as new version of wavesurfer is released
   - [ ] add like / dislike to tracks with persisting
   - [ ] move github link to "about" modal to avoid leaving instrupella by accident
   - [x] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprecess()` is not fired), maybe use wavesurfer.backend.getPlayedPercents());

@@ -26,7 +26,7 @@
 import WaveSurfer from 'wavesurfer.js'
 import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
 import MarkersPlugin from 'wavesurfer.js/src/plugin/markers/index.js'
-import BeatGridPlugin from '../js/BeatGridPlugin.js'
+import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline/index.js'
 import utils from '../mixins/utils.js'
 import { ref, watch, onMounted, computed } from 'vue'
 
@@ -82,7 +82,7 @@ watch(() => props.track, (newTrack) => {
     return
   }
   // avoid rendering invalid beatgrid during load
-  player.value.beatgrid.params.timeInterval = 10000
+  player.value.timeline.params.timeInterval = 10000
 
   // TODO clear minimap
   // approach with next 2 lines only work during pause and trackPosition 0
@@ -99,11 +99,11 @@ const redrawBeatGrid = () => {
   if (bpm === 0) {
     return
   }
-  player.value.beatgrid.params.offset = getBeatGridOffset()
-  player.value.beatgrid.params.timeInterval = function () {
+  player.value.timeline.params.offset = getBeatGridOffset()
+  player.value.timeline.params.timeInterval = function () {
       return 60 / bpm
   }
-  player.value.beatgrid.render()
+  player.value.timeline.render()
 }
 
 
@@ -186,7 +186,7 @@ const wavesurferOptions = () => {
         container: '#deck-minimap',
         height: 50
       }),
-      BeatGridPlugin.create({
+      TimelinePlugin.create({
         container: '#wave-timeline',
         primaryColor: 'tomato',
         secondaryColor: 'tomato',
@@ -249,7 +249,7 @@ const getBeatGridOffset = (overrideDownbeat = null) => {
     ? overrideDownbeat
     : props.track.downbeat
 
-  // ensure we have beatgrid rendering from start to finish
+  // ensure we have timeline rendering from start to finish
   // by pushing the offset in 4-bar-steps to a negative value
   const seconds4Bars = 60 / useTempo * 16
   let newOffset = useDownbeat
@@ -401,9 +401,9 @@ watch(() => downbeat.value, (newDownbeat) => {
     return
   }
   try {
-    // console.log('downbeat has changed - updating beatgrid')
-    player.value.beatgrid.params.offset = getBeatGridOffset(newDownbeat)
-    player.value.beatgrid.render()
+    // console.log('downbeat has changed - updating timeline')
+    player.value.timeline.params.offset = getBeatGridOffset(newDownbeat)
+    player.value.timeline.render()
   } catch (e) { }
 })
 
@@ -412,12 +412,12 @@ watch(() => props.editTempo, (newTempo) => {
     return
   }
   try {
-    // console.log('edit tempo has changed - updating beatgrid')
+    // console.log('edit tempo has changed - updating timeline')
     const secondsPerQuarterNote = 60 / newTempo
-    player.value.beatgrid.params.timeInterval = function () {
+    player.value.timeline.params.timeInterval = function () {
       return secondsPerQuarterNote
     }
-    player.value.beatgrid.render()
+    player.value.timeline.render()
   } catch (e) { }
 })
 
