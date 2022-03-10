@@ -62,6 +62,7 @@ screenshot of current development status:
   - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
   - [ ] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload
   - [ ] ensure track info modal closes when loading a new track
+  - [ ] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag

@@ -95,7 +95,6 @@ const setLedClasses = () => {
     return
   }
 
-
   // set quarter note classes
   const fillQuarterRange = (quarterNoteCounter % 16 === 0)
     ? 16

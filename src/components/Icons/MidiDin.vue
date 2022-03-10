@@ -1,5 +1,5 @@
 <template>
-  <svg class="icon icon-midi" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
+  <svg class="icon icon-mididin" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
     <metadata> Svg Vector Icons : http://www.onlinewebfonts.com/icon </metadata>
     <g>
       <g transform="translate(0.000000,502.000000) scale(0.100000,-0.100000)">

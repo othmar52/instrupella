@@ -10,7 +10,8 @@
       <component :is="IconDownbeat" v-if="componentName === 'IconDownbeat'"></component>
       <component :is="IconMetronome" v-if="componentName === 'IconMetronome'"></component>
       <component :is="IconTrash" v-if="componentName === 'IconTrash'"></component>
-      <component :is="IconMidi" v-if="componentName === 'IconMidi'"></component>
+      <component :is="IconMidi" v-if="componentName === 'IconMidiDin'"></component>
+      <component :is="IconMidi" v-if="componentName === 'IconMidiLearn'"></component>
       <component :is="IconClock" v-if="componentName === 'IconClock'"></component>
     </button>
 </template>
@@ -29,7 +30,8 @@ import IconArrowsToCenter from '@/components/Icons/ArrowsToCenter.vue'
 import IconDownbeat from '@/components/Icons/Downbeat.vue'
 import IconMetronome from '@/components/Icons/Metronome.vue'
 import IconTrash from '@/components/Icons/Trash.vue'
-import IconMidi from '@/components/Icons/Midi.vue'
+import IconMidiDin from '@/components/Icons/MidiDin.vue'
+import IconMidiLearn from '@/components/Icons/MidiLearn.vue'
 import IconClock from '@/components/Icons/Clock.vue'
 const props = defineProps({
   permaClasses: {

@@ -11,20 +11,7 @@
    height="100%"
    viewBox="0 0 14 14"
    id="svg2">
-  <metadata
-     id="metadata8">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs6" />
+  <metadata>https://www.svgrepo.com/svg/354747/clock-14</metadata>
   <rect
      width="14"
      height="14"
@@ -35,7 +22,7 @@
   <path
      d="M 7,0 C 3.1458514,0 0,3.1458514 0,7 c 0,3.854149 3.1458514,7 7,7 3.854149,0 7,-3.145851 7,-7 C 14,3.1458514 10.854149,0 7,0 z m 0,2 c 2.7732686,0 5,2.2267316 5,5 0,2.7732686 -2.2267314,5 -5,5 C 4.2267316,12 2,9.7732686 2,7 2,4.2267316 4.2267316,2 7,2 z M 6.75,3.21875 A 0.750075,0.750075 0 0 0 6.59375,3.25 0.750075,0.750075 0 0 0 6,4 l 0,3 0,0.375 0.3125,0.21875 2,1.5 a 0.750075,0.750075 0 1 0 0.875,-1.1875 L 7.5,6.625 7.5,4 A 0.750075,0.750075 0 0 0 6.75,3.21875 z"
      id="clock"
-     style="fill:#000000;fill-opacity:1" />
+     />
 </svg>
 </template>
 

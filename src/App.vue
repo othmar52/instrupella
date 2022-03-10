@@ -4,21 +4,15 @@
     <nav class="navbar justify-content-between">
       <div class="navbar-content">
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
-      </div>
-      <div class="navbar-content">
-        <ButtonIcon
-          componentName="IconMidi"
-          permaClasses="btn btn-square btn-lg"
-        />
+        <a href="#settings" class="btn-lg" role="button"><IconMidiDin /></a>
+        <a href="#settings" class="btn-lg" role="button"><IconClock /></a>
+        <a href="#settings" class="btn-lg" role="button"><IconMidiLearn /></a>
       </div>
       <div class="navbar-content">
         <h4 class="navbar-text text-monoXspace m-5">INSTRU
           <img alt="Vue logo" src="./assets/instrupella.svg" width="40">
           PELLA
         </h4>
-      </div>
-      <div class="navbar-content">
-
       </div>
       <div class="navbar-content">
         <a href="https://github.com/othmar52/instrupella" class="btn-lg" target="_blank" role="button"><IconGithub /></a>
@@ -35,7 +29,11 @@ import { ref, onMounted } from 'vue'
 import InstruPella from './components/InstruPella.vue'
 import Settings from './components/Settings.vue'
 import IconCog from './components/Icons/Cog.vue'
+import IconMidiLearn from './components/Icons/MidiLearn.vue'
+import IconMidiDin from './components/Icons/MidiDin.vue'
+import IconClock from './components/Icons/Clock.vue'
 import ButtonIcon from './components/ButtonIcon.vue'
+import Button from './components/Button.vue'
 import IconGithub from './components/Icons/Github.vue'
 
 // window.halfmoon = require('halfmoon/js/halfmoon.min.js')
@@ -92,7 +90,8 @@ onMounted(() => {
   height: 1rem;
   path,
   polygon,
-  rect {
+  rect,
+  text {
     fill: var(--dm-button-text-color);
   }
 }
@@ -102,7 +101,8 @@ onMounted(() => {
   height: 1.5rem;
   path,
   polygon,
-  rect {
+  rect,
+  text {
     fill: var(--dm-muted-text-color);
   }
 }
