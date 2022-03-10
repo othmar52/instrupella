@@ -3,7 +3,12 @@
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
   <div class="instrupella">
     <div v-if="tracks">
-      <Deck :track="track" :index="0" @updateTrack="persistUpdateTrack" />
+      <Deck
+        :track="track"
+        :index="0"
+        @updateTrack="persistUpdateTrack"
+        :midiLearn="midiLearn"
+      />
       <TrackList
         :tracks="tracks"
         @selectTrack="selectTrack"
@@ -18,16 +23,23 @@
 <script setup>
 import { WebMidi } from "webmidi";
 import { ref, onMounted } from 'vue'
+import { useMainStore } from "@/store.js";
 import Deck from '@/components/Deck.vue'
 import TrackList from '@/components/TrackList/TrackList.vue'
 import BlazingBaton from '@/components/BlazingBaton/BlazingBaton.vue'
-
+const props = defineProps({
+  midiLearn: {
+    type: Boolean,
+    default: false
+  }
+})
 console.log('webmidi', WebMidi)
 const track = ref(null)
 const top = ref(null)
 const tracks = ref([])
 const baton = ref(null)
 
+const storage = useMainStore()
 const webmidi = WebMidi
 const midiInput1 = ref(null)
 const selectTrack = (trackIndex) => {

@@ -47,11 +47,13 @@
             componentName="IconDownbeat"
             :permaClasses="`${buttonClasses}`"
             :activeClass="showEditTrack ? 'btn-primary' : ''"
+            :midiLearn="midiLearn"
             @click="toggleEditTrack"
           />
           <ButtonIcon
             componentName="IconArrowToFirst"
             :permaClasses="`${buttonClasses} mr-0`"
+            :midiLearn="midiLearn"
             @click="$refs.player.seekZero()"
           />
           <div id="deck-minimap" class="deck-minimap m-10 ml-0"></div>
@@ -59,22 +61,26 @@
             :componentName="play ? 'IconPause' : 'IconPlay'"
             :permaClasses="`${buttonClasses}`"
             :activeClass="play ? 'btn-primary' : ''"
+            :midiLearn="midiLearn"
             @click="togglePlay"
           />
           <ButtonIcon
             componentName="IconMinus"
             :permaClasses="`rounded-circle ${buttonClasses}`"
+            :midiLearn="midiLearn"
             @click="$refs.player.nudgeBehind()"
           />
           <ButtonIcon
             componentName="IconPlus"
             :permaClasses="`rounded-circle ${buttonClasses}`"
+            :midiLearn="midiLearn"
             @click="$refs.player.nudgeAhead()"
           />
           <ButtonIcon
             componentName="IconMute"
             :permaClasses="`${buttonClasses}`"
             :activeClass="mute ? 'btn-danger' : ''"
+            :midiLearn="midiLearn"
             @click="toggleMute"
           />
         </div>
@@ -84,8 +90,14 @@
     </div>
     <div class="col-3">
       <div class="card pitch-volume-card d-flex justify-content-between">
-        <PitchControl @pitchChange="setPitch" />
-        <VolumeControl @volumeChange="setVolume" />
+        <PitchControl
+          @pitchChange="setPitch"
+          :midiLearn="midiLearn"
+        />
+        <VolumeControl
+          @volumeChange="setVolume"
+          :midiLearn="midiLearn"
+        />
       </div>
     </div>
   </div>
@@ -110,6 +122,7 @@
           :track="track"
           :play="play"
           :currentSecond="currentSecond"
+          :midiLearn="midiLearn"
           @hotCuesChange="hotCuesChange"
           @seekToAndPlay="seekToAndPlay"
           @seekToAndStop="seekToAndStop"
@@ -151,6 +164,10 @@ defineProps({
   track: {
     type: Object,
     default: null
+  },
+  midiLearn: {
+    type: Boolean,
+    default: false
   }
 })
 const togglePlay = () => {

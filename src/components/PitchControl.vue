@@ -5,6 +5,7 @@
         :minSliderValue="min"
         :maxSliderValue="max"
         :showSliderValue="true"
+        :midiLearn="midiLearn"
         @sliderChange="sliderChange"
         ref="slider"
       />
@@ -28,16 +29,19 @@
       <ButtonIcon
         componentName="IconPlus"
         :permaClasses="buttonClasses"
+        :midiLearn="midiLearn"
         @click="$refs.slider.increment()"
       />
       <ButtonIcon
         componentName="IconArrowsToCenter"
         :permaClasses="buttonClasses"
+        :midiLearn="midiLearn"
         @click="$refs.slider.reset()"
       />
       <ButtonIcon
         componentName="IconMinus"
         :permaClasses="buttonClasses"
+        :midiLearn="midiLearn"
         @click="$refs.slider.decrement()"
       />
     </div>
@@ -56,6 +60,10 @@ const props = defineProps({
   center: {
     type: Number,
     default: 1
+  },
+  midiLearn: {
+    type: Boolean,
+    default: false
   }
 })
 

@@ -5,6 +5,7 @@
       v-for="idx in range(0,amount)"
       :key="idx"
       :index="idx"
+      :midiLearn="midiLearn"
       :second="getSecondForIndex(idx)"
       :deleteMode="deleteMode"
       @pressHotCueStart="pressHotCueStart"
@@ -24,6 +25,7 @@
       activeClass="btn-danger alt-dm"
       @click="toggleDelete"
     />
+    <span>L: {{midiLearn}}</span>
     </div>
 </template>
 
@@ -33,12 +35,14 @@ import rangeMixin from '../mixins/utils/range'
 import HotCue from '@/components/HotCue.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import Button from '@/components/Button.vue'
+import { useMainStore } from "@/store.js";
 
 const { range } = rangeMixin()
 const cueItems = ref([])
 const playStateOnCueStart = ref(false)
 const ignoreNextEndEvent = ref(false)
 const deleteMode = ref(false)
+const storage = useMainStore()
 
 const props = defineProps({
   track: {
@@ -54,6 +58,10 @@ const props = defineProps({
     default: 0
   },
   play: {
+    type: Boolean,
+    default: false
+  },
+  midiLearn: {
     type: Boolean,
     default: false
   }
@@ -134,6 +142,13 @@ watch(() => props.track, () => {
   createEmptyHotCues()
   emit('hotCuesChange', cueItems.value)
 })
+
+
+/*
+watch(() => storage.getMidiLearn, (newState) => {
+  console.log('HotCues watcher to storage.getMidiLearn', newState)
+})
+*/
 </script>
 
 <style lang="scss">

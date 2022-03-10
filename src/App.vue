@@ -6,7 +6,7 @@
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
         <a href="#settings" class="btn-lg" role="button"><IconMidiDin /></a>
         <a href="#settings" class="btn-lg" role="button"><IconClock /></a>
-        <a href="#settings" class="btn-lg" role="button"><IconMidiLearn /></a>
+        <a href="#" :class="`btn-lg ${midiLearn ? 'text-danger' : ''}`" role="button" @click="toggleMidiLearn"><IconMidiLearn /></a>
       </div>
       <div class="navbar-content">
         <h4 class="navbar-text text-monoXspace m-5">INSTRU
@@ -19,13 +19,16 @@
       </div>
     </nav>
     <div class="content-wrapper">
-      <InstruPella />
+      <InstruPella
+        :midiLearn="midiLearn"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useMainStore } from "@/store.js";
 import InstruPella from './components/InstruPella.vue'
 import Settings from './components/Settings.vue'
 import IconCog from './components/Icons/Cog.vue'
@@ -44,6 +47,7 @@ window.halfmoon = require('halfmoon')
 window.oncontextmenu = function () { return false }
 
 const settings = ref({})
+const storage = useMainStore()
 const defaultSettings = () => {
   return {
     midi: {
@@ -60,6 +64,12 @@ const defaultSettings = () => {
     }
   }
 }
+
+const toggleMidiLearn = () => {
+  storage.toggleMidiLearn()
+}
+
+const midiLearn = computed(() => storage.midiLearn)
 
 onMounted(() => {
   settings.value = defaultSettings()
@@ -106,6 +116,37 @@ onMounted(() => {
     fill: var(--dm-muted-text-color);
   }
 }
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+  path,
+  polygon,
+  rect,
+  text {
+    fill: var(--dm-button-text-color);
+  }
+}
+
+.text-primary .icon {
+  path,
+  polygon,
+  rect,
+  text {
+    fill: var(--dm-button-primary-bg-color);
+  }
+}
+
+
+.text-danger .icon {
+  path,
+  polygon,
+  rect,
+  text {
+    fill: var(--dm-button-danger-bg-color);
+  }
+}
+
 
 .dark-mode .btn.btn-danger.alt-dm,
 .dark-mode .btn.btn-danger.alt-dm:hover {

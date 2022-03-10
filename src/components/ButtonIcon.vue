@@ -1,5 +1,5 @@
 <template>
-    <button :class="`btn ${permaClasses} ${activeClass}`" ref="btn" type="button" :title="title">
+    <button :class="buttonClasses" ref="btn" type="button" :title="title">
       <component :is="IconPlay" v-if="componentName === 'IconPlay'"></component>
       <component :is="IconPause" v-if="componentName === 'IconPause'"></component>
       <component :is="IconArrowToFirst" v-if="componentName === 'IconArrowToFirst'"></component>
@@ -19,7 +19,7 @@
 <script setup>
 // ugly workaround for passing component to a component...
 // but <component :is="props.componentName"></component> did not work
-import { watch, onMounted } from 'vue'
+import { watch, onMounted, computed } from 'vue'
 import IconPlay from '@/components/Icons/Play.vue'
 import IconPause from '@/components/Icons/Pause.vue'
 import IconArrowToFirst from '@/components/Icons/ArrowToFirst.vue'
@@ -49,9 +49,19 @@ const props = defineProps({
   title: {
     type: String,
     default: ''
+  },
+  midiLearn: {
+    type: Boolean,
+    default: false
   }
 })
 watch(() => props.activeClass, () => {
+})
+
+const buttonClasses = computed(() => {
+  return (props.midiLearn)
+    ? `btn btn-danger alt-dm ${props.permaClasses}`
+    : `btn ${props.permaClasses} ${props.activeClass}`
 })
 
 onMounted(() => {

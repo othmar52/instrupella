@@ -1,4 +1,12 @@
 <template>
+  <span v-if="midiLearn">
+  <Button
+    :label="`${index+1}`"
+    activeClass="btn-danger alt-dm"
+    :permaClasses="`${buttonClasses}`"
+  />
+  </span>
+  <span v-else>
   <Button
     v-if="!deleteMode || second === 0"
     :label="`${index+1}`"
@@ -16,6 +24,7 @@
     @click="deleteHotCue"
     :permaClasses="`${buttonClasses}`"
   />
+  </span>
 </template>
 
 <script setup>
@@ -38,6 +47,10 @@ const props = defineProps({
     default: 0
   },
   deleteMode: {
+    type: Boolean,
+    default: false
+  },
+  midiLearn: {
     type: Boolean,
     default: false
   }

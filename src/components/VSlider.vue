@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div v-if="midiLearn" class="btn btn-danger alt-dm"
+    style="position: absolute; width: 22.5%; height: 80%; z-index: 200; opacity: 0.7;">
+    
+    </div>
     <div class="vslider slider" ref="sliderWrapper">
       <input
         type="range"
@@ -41,6 +45,10 @@ const props = defineProps({
     default: 0.005
   },
   showSliderValue: {
+    type: Boolean,
+    default: false
+  },
+  midiLearn: {
     type: Boolean,
     default: false
   }

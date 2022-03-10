@@ -4,6 +4,7 @@
       <VSlider
         :minSliderValue="min"
         :maxSliderValue="max"
+        :midiLearn="midiLearn"
         @sliderChange="sliderChange"
         ref="slider"
       />
@@ -20,6 +21,10 @@ const props = defineProps({
   center: {
     type: Number,
     default: 1
+  },
+  midiLearn: {
+    type: Boolean,
+    default: false
   }
 })
 
