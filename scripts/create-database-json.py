@@ -88,6 +88,7 @@ def main():
         album = ""
         year = 0
         length = 0
+        size = 0
         if len(pathSearchReplace) == 2:
             path = path.replace(pathSearchReplace[0], pathSearchReplace[1])
         if audiofile.tag != None:
@@ -100,6 +101,11 @@ def main():
         if audiofile.info != None:
             length = float("{:.3f}".format(audiofile.info.time_secs))
 
+        try:
+            size = int(os.path.getsize(file))
+        except os.error:
+            size = 0
+
         jsonObject.append({
             "path": path,
             "artist": artist,
@@ -107,6 +113,7 @@ def main():
             #"album": album,
             "year": year,
             "length": length,
+            "size": size,
             "bpmdetect": float(detectBpm(file)),
             "bpm": 0,
             "key": str(detectKey(file)),

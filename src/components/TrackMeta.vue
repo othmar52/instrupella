@@ -26,7 +26,7 @@
           </tr>
           <tr>
             <th>Size</th>
-            <td>TODO: MB</td>
+            <td>{{formatBytes(track.size)}}</td>
             <th>Key</th>
             <td>{{track.key}}</td>
             <th>Downbeat</th>
@@ -105,6 +105,18 @@ const formattedTempo = computed(() => {
   }
   return (getBpm(props.track) * props.playbackRate).toFixed(1)
 })
+
+const formatBytes = (bytes, decimals = 1) => {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
 
 // TODO move to util (code duplication in TrackList.vue)
 const formatDuration = (duration) => {

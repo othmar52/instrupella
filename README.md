@@ -45,6 +45,7 @@ screenshot of current development status:
   - [x] short project description in README
   - [ ] compatibility for any amount of decks
   - [x] show properties of loaded track
+  - [x] add filesize as track property
   - [x] vertical centering of icons in buttons
   - [x] volume control
   - [ ] optional sync to midi clock / CV-clock
