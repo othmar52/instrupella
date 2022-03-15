@@ -58,6 +58,7 @@ const selectTrack = (trackIndex) => {
 
 const persistUpdateTrack = (properties) => {
   console.log('TODO: persist update track', properties)
+  storage.addTrackProp(properties)
   for (const [key, value] of Object.entries(properties)) {
     track.value[key] = value
   }
@@ -68,7 +69,20 @@ const loadTrackList = () => {
     .then(response => response.json())
     .then(json => {
       tracks.value = json.map((track, idx) => ({ ...track, id: idx }))
+      mergeLocalStorageTrackProperties()
     })
+}
+
+const mergeLocalStorageTrackProperties = () => {
+  for (const trackProps of storage.getAllTrackProps) {
+    const index = tracks.value.findIndex(item => item.path === trackProps.path)
+    if (index === -1) {
+      continue
+    }
+    for (const [key, value] of Object.entries(trackProps)) {
+      tracks.value[index][key] = value
+    }
+  }
 }
 
 const initMidi = () => {
