@@ -45,7 +45,9 @@
       <tr v-for="track in filteredEntries" :key="track.id">
         <td v-html="formatArtistTitle(track)"></td>
         <td>{{ track.key }}</td>
-        <td :class="isManualBpm(track) ? 'text-success' : ''">{{ parseInt(getBpm(track))}}</td>
+        <td :class="isManualBpm(track) ? 'text-success' : ''">
+          {{ parseInt(getBpm(track))}}<span v-if="track.downbeat" class="text-success">*</span>
+        </td>
         <td>{{ formatDuration(track.length) }}</td>
         <td @click="loadTrack(track.id)">
           <strong class="btn btn-default btn-primary">LOAD</strong>
@@ -165,14 +167,13 @@ thead th {
   background: var(--dm-card-bg-color);
 }
 
-td, th {
+.table td,
+.table th {
     padding: 0.6em;
     text-align: center;
-}
-td:first-child,
-th:first-child {
-
-    text-align: left;
+    &:first-child {
+      text-align: left;
+    }
 }
 th {
     color: #BBB;

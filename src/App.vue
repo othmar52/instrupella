@@ -117,6 +117,10 @@ onMounted(() => {
   }
 }
 
+.btn-square.btn-rect.btn-lg {
+    width: calc(var(--large-button-height)*4);
+}
+
 .icon {
   width: 1rem;
   height: 1rem;

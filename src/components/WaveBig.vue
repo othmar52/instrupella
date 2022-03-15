@@ -417,6 +417,7 @@ watch(() => props.editTempo, (newTempo) => {
     player.value.timeline.params.timeInterval = function () {
       return secondsPerQuarterNote
     }
+    player.value.timeline.params.offset = getBeatGridOffset()
     player.value.timeline.render()
   } catch (e) { }
 })

@@ -2,7 +2,7 @@
   <div class="edit-track">
     <div class="row">
       <div class="col-2 justify-content-between d-flex">
-        <div class="font-size-18">Tempo {{editTempo.toFixed(1)}}</div>
+        <div class="font-size-18">Tempo {{editTempo.toFixed(3)}}</div>
       </div>
       <div class="col-10">
           <ButtonIcon
@@ -31,12 +31,12 @@
           />
           <ButtonIcon
             componentName="IconMinus"
-            :permaClasses="`btn btn-square btn-default btn-lg m-5`"
+            :permaClasses="`btn btn-square btn-rect btn-default btn-lg m-5`"
             @click="decreaseTempo"
           />
           <ButtonIcon
             componentName="IconPlus"
-            :permaClasses="`btn btn-square btn-default btn-lg m-5`"
+            :permaClasses="`btn btn-square btn-rect btn-default btn-lg m-5`"
             @click="increaseTempo"
           />
       </div>
@@ -63,6 +63,7 @@
         <Button
         label="APPLY"
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
+        @click="applyTempo"
         />
         <Metronome :tempo="editTempo" ref="metronome" />
 
@@ -98,7 +99,7 @@ const props = defineProps({
   },
   step: {
     type: Number,
-    default: 0.05
+    default: 0.01
   }
 })
 const editTempo = ref(0)
@@ -116,11 +117,30 @@ const doubleTempo = () => {
 const halfTempo = () => {
   editTempo.value /= 2
 }
-const increaseTempo = () => {
-  editTempo.value += parseFloat(props.step)
+const increaseTempo = (event) => {
+  editTempo.value += getStepFactor(event)
 }
-const decreaseTempo = () => {
-  editTempo.value -= parseFloat(props.step)
+const decreaseTempo = (event) => {
+  editTempo.value -= getStepFactor(event)
+}
+
+// very left 15% -> minimum (= props.step bpm) 
+// very right 15% -> maxIncrease (= 0.5 bpm)
+// everything in between will be calculated
+const getStepFactor = (event) => {
+  const boundryPercent = 15
+  const maxIncrease = 0.5
+  const x = event.clientX - event.target.getBoundingClientRect().left; //x position within the element.
+  const percentX = x / (event.target.getBoundingClientRect().width/100)
+  if (percentX < boundryPercent) {
+    return parseFloat(props.step)
+  }
+  if (percentX > 100 - boundryPercent) {
+    return maxIncrease
+  }
+  const inBetweenPercent = (percentX - boundryPercent) * 1/(100-2*boundryPercent)*100
+  const valueToIncrease = props.step + inBetweenPercent * (maxIncrease-props.step)/100
+  return valueToIncrease
 }
 
 const setTapTempo = (tempo) => {
@@ -131,8 +151,18 @@ const setDownbeat = () => {
   emit(
     'updateTrack',
     {
-      id: props.track.id,
+      path: props.track.path,
       downbeat: props.currentSecond
+    }
+  )
+}
+
+const applyTempo = () => {
+  emit(
+    'updateTrack',
+    {
+      path: props.track.path,
+      bpm: editTempo.value
     }
   )
 }

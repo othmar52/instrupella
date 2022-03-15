@@ -174,6 +174,7 @@ const togglePlay = () => {
   play.value = !play.value
 }
 const toggleMute = () => {
+  console.log('button click outer listener')
   mute.value = !mute.value
 }
 const toggleEditTrack = () => {
