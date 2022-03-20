@@ -119,6 +119,20 @@ const initMidi = () => {
       // console.log('stop', e);
       baton.value.messageStop(e)
     })
+    midiInput1.value.addListener('noteon', e => {
+      // console.log('noteon', e);
+      storage.fireControlElement(`d.0.hotCueDown`, 2)
+    }, {channels: [16]})
+    midiInput1.value.addListener('noteoff', e => {
+      // console.log('noteon', e);
+      storage.fireControlElement(`d.0.hotCueUp`, 2)
+    }, {channels: [16]})
+    midiInput1.value.addListener('controlchange', e => {
+      if(e.message.data[1] === 28) {
+        //console.log('controlchange', e.message.data[1], e.message.data[2]*(1/127));
+        storage.fireControlElement(`d.0.setVolume`, e.message.data[2]*(1/127))
+      }
+    }, {channels: [16]})
 
     //this.outputDN = WebMidi.getOutputByName("Elektron Digitone");
     // TODO add owner check

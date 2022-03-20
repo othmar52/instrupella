@@ -20,6 +20,7 @@ const ctrlKeyToFunc = (ctrlKey) => {
 const ctrlMap = {
   'toggleMute': 'toggleMute',
   'togglePlay': 'togglePlay',
+  'setVolume': 'setVolume',
   'nudgeAhead': 'nudgeAhead',
   'nudgeBehind': 'nudgeBehind',
   'seekToSecond': 'seekToSecond',

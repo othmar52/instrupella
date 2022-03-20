@@ -90,6 +90,10 @@ const reset = () => {
   localSliderValue.value = 1.0
 }
 
+const setSliderValueFromMidi = (newValue) => {
+  localSliderValue.value = parseFloat(newValue)
+}
+
 watch(localSliderValue, (newValue) => {
   localSliderValue.value = parseFloat(newValue)
   emit('sliderChange', localSliderValue.value)
@@ -114,7 +118,8 @@ onMounted(() => {
 defineExpose({
   decrement,
   increment,
-  reset
+  reset,
+  setSliderValueFromMidi
 })
 </script>
 
