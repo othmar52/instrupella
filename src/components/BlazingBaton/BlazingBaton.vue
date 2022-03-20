@@ -1,6 +1,6 @@
 <template>
   <div class="blazing-baton">
-    <h4 class="text-muted">{{numericBaton4Bars}}-{{numericBaton1Bar}}-{{numericBatonQuarter}}
+    <h4 class="text-muted">{{numericBaton4Bars}}<span :class="classHyphen1">-</span>{{numericBaton1Bar}}<span :class="classHyphen2">-</span>{{numericBatonQuarter}}
     <span
       v-for="idx in range(0,16)"
       :key="idx"
@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import rangeMixin from '../../mixins/utils/range'
 
 const { range } = rangeMixin()
@@ -21,7 +21,7 @@ const ppqn = 24
 const ledClasses = ref([])
 
 let tickCounterQuarterLoop = 0
-let quarterNoteCounter = 1
+let quarterNoteCounter = ref(1)
 
 const numericBatonQuarter = ref(1)
 const numericBaton1Bar = ref(1)
@@ -32,9 +32,20 @@ const classQuarter = 'btn-primary'
 const class4Bar = 'btn-danger'
 const classCountDown = 'btn-success'
 
+const classHyphen1 = computed(() => {
+  return (isRunning.value === false && quarterNoteCounter.value % 2 === 1 )
+    ? 'text-primary'
+    : ''
+})
+const classHyphen2 = computed(() => {
+  return (isRunning.value === false && quarterNoteCounter.value % 2 === 0 )
+    ? 'text-primary'
+    : ''
+})
+
 const nextQuarterNote = () => {
   numericBatonQuarter.value++
-  quarterNoteCounter++
+  quarterNoteCounter.value++
   if (numericBatonQuarter.value > 4) {
     numericBatonQuarter.value = 1
     numericBaton1Bar.value++
@@ -46,15 +57,20 @@ const nextQuarterNote = () => {
   if (numericBaton4Bars.value > 4) {
     numericBaton4Bars.value = 1
   }
-  if(quarterNoteCounter > 4 * 16) {
-    quarterNoteCounter = 1
+  if(quarterNoteCounter.value > 4 * 16) {
+    quarterNoteCounter.value = 1
+  }
+  if (isRunning.value === false) {
+    numericBatonQuarter.value = 1
+    numericBaton1Bar.value = 1
+    numericBaton4Bars.value = 1
   }
   setLedClasses()
 }
 
 const setLedClassesCountDown = () => {
   const indexRanges = []
-  switch (quarterNoteCounter) {
+  switch (quarterNoteCounter.value) {
     case 61:
       indexRanges.push([0,4])
       indexRanges.push([6,10])
@@ -90,22 +106,22 @@ const setLedClasses = () => {
       return
   }
 
-  if (quarterNoteCounter > 4 * 16 - 4) {
+  if (quarterNoteCounter.value > 4 * 16 - 4) {
     setLedClassesCountDown()
     return
   }
 
   // set quarter note classes
-  const fillQuarterRange = (quarterNoteCounter % 16 === 0)
+  const fillQuarterRange = (quarterNoteCounter.value % 16 === 0)
     ? 16
-    : quarterNoteCounter % 16
+    : quarterNoteCounter.value % 16
 
   for (const idx of range(0, fillQuarterRange)) {
     ledClasses.value[idx] = classQuarter
   }
 
   // set 4 bar classes
-  const withinBar = Math.ceil(quarterNoteCounter/16)
+  const withinBar = Math.ceil(quarterNoteCounter.value/16)
   const startBar = 12
   for (const idx of range(startBar, startBar + withinBar)) {
     ledClasses.value[idx] = class4Bar
@@ -135,7 +151,7 @@ const messageStop = (midiEvent) => {
 
 const resetBaton = () => {
   tickCounterQuarterLoop = 0
-  quarterNoteCounter = 1
+  quarterNoteCounter.value = 1
   numericBatonQuarter.value = 1
   numericBaton1Bar.value = 1
   numericBaton4Bars.value = 1
