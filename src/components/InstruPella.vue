@@ -2,16 +2,15 @@
   <BlazingBaton ref="baton" />
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
   <div class="instrupella">
+    <Deck
+      v-for="deck in decks"
+      :key="deck.index"
+      :deck="deck"
+      :midiLearn="midiLearn"
+    />
     <div v-if="tracks">
-      <Deck
-        :track="track"
-        :index="0"
-        @updateTrack="persistUpdateTrack"
-        :midiLearn="midiLearn"
-      />
       <TrackList
         :tracks="tracks"
-        @selectTrack="selectTrack"
       />
     </div>
     <div v-else>
@@ -22,9 +21,9 @@
 
 <script setup>
 import { WebMidi } from "webmidi";
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useMainStore } from "@/store.js";
-import Deck from '@/components/Deck.vue'
+import Deck from '@/components/Deck/Deck.vue'
 import TrackList from '@/components/TrackList/TrackList.vue'
 import BlazingBaton from '@/components/BlazingBaton/BlazingBaton.vue'
 const props = defineProps({
@@ -40,24 +39,23 @@ const tracks = ref([])
 const baton = ref(null)
 
 const storage = useMainStore()
-const webmidi = WebMidi
-const midiInput1 = ref(null)
-const selectTrack = (trackIndex) => {
+const decks = computed(() => storage.getDecks)
+
+watch(() => storage.scrollToTop, (value) => {
+  if (value === false) {
+    return
+  }
   top.value.scrollIntoView({
-    behavior: 'auto',
+    behavior: 'smooth',
     block: 'end'
   })
-  setTimeout(() => { track.value = tracks.value[trackIndex] }, 200)
-}
+  storage.setScrollToTop(false)
+})
 
-// how to persist edit's (tempo, downbeat, hotcues)?
-// maybe local storage?
-// or is it really necessary to use a database?
-//   case yes - does it make sense to use mpd?
-// for now simply set tracks.track prop without persisting...
+const webmidi = WebMidi
+const midiInput1 = ref(null)
 
 const persistUpdateTrack = (properties) => {
-  console.log('TODO: persist update track', properties)
   storage.addTrackProp(properties)
   for (const [key, value] of Object.entries(properties)) {
     track.value[key] = value
@@ -70,6 +68,7 @@ const loadTrackList = () => {
     .then(json => {
       tracks.value = json.map((track, idx) => ({ ...track, id: idx }))
       mergeLocalStorageTrackProperties()
+      storage.setTracks(tracks.value)
     })
 }
 
@@ -129,6 +128,8 @@ const initMidi = () => {
 
 onMounted(() => {
   loadTrackList()
+  storage.clearDecks()
+  storage.createDeck()
   initMidi()
 })
 

@@ -1,6 +1,6 @@
 <template>
   <div class="modal  modal-full" id="track-details" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document" v-if="track">
+    <div class="modal-dialog" role="document" v-if="deck.track">
       <div class="modal-content">
         <a href="#" class="btn btn-square btn-rounded btn-default position-absolute right-0 mr-10" role="button" aria-label="ClXose">
           <span aria-hidden="true">&times;</span>
@@ -10,34 +10,34 @@
           <tbody>
           <tr>
             <th>Artist</th>
-            <td>{{track.artist}}</td>
+            <td>{{deck.track.artist}}</td>
             <th>Year</th>
-            <td>{{track.year}}</td>
+            <td>{{deck.track.year}}</td>
             <th>BPMdetect</th>
-            <td>{{track.bpmdetect}}</td>
+            <td>{{deck.track.bpmdetect}}</td>
           </tr>
           <tr>
             <th>Title</th>
-            <td>{{track.title}}</td>
+            <td>{{deck.track.title}}</td>
             <th>Length</th>
             <td>{{formatDuration(duration)}}</td>
             <th>BPM</th>
-            <td>{{track.bpm}}</td>
+            <td>{{deck.track.bpm}}</td>
           </tr>
           <tr>
             <th>Size</th>
-            <td>{{formatBytes(track.size)}}</td>
+            <td>{{formatBytes(deck.track.size)}}</td>
             <th>Key</th>
-            <td>{{track.key}}</td>
+            <td>{{deck.track.key}}</td>
             <th>Downbeat</th>
-            <td>{{track.downbeat ? track.downbeat.toFixed(3) : ''}}</td>
+            <td>{{deck.track.downbeat ? deck.track.downbeat.toFixed(3) : ''}}</td>
           </tr>
           <tr>
             <th>
               Path
             </th>
             <td colspan="5" class="break-word">
-              {{track.path}}
+              {{deck.track.path}}
             </td>
           </tr>
           </tbody>
@@ -46,19 +46,19 @@
     </div>
   </div>
   <div class="track-meta p-5 d-flex justify-content-between" @click="toggleFormat">
-    <a href="#track-details" v-html="formatArtistTitle(track)"></a>
+    <a href="#track-details" v-html="formatArtistTitle(deck.track)"></a>
     <div>
       <span :class="bpmClass">{{formattedTempo}}</span>
       <span class="text-muted"> BPM</span>
     </div>
     <div>
         <div v-if="format">
-            {{formatDuration(currentSecond)}}
+            {{formatDuration(deck.currentSecond)}}
             <span class="text-primary"> | </span>
             <span class="text-muted">{{formatDuration(duration)}}</span>
         </div>
         <div v-else>
-            {{currentSecond.toFixed(2)}}
+            {{deck.currentSecond.toFixed(2)}}
             <span class="text-primary"> | </span>
             <span class="text-muted">{{duration.toFixed(2)}}</span>
         </div>
@@ -77,17 +77,9 @@ const { formatArtistTitle } = formatArtistTitleMixin()
 const duration = ref(0)
 const format = ref(true)
 const props = defineProps({
-  track: {
+  deck: {
     type: Object,
     default: null
-  },
-  currentSecond: {
-    type: Number,
-    default: 0
-  },
-  playbackRate: {
-    type: Number,
-    default: 1
   }
 })
 
@@ -96,14 +88,14 @@ const toggleFormat = () => {
 }
 
 const bpmClass = computed(() => {
-  return isManualBpm(props.track) ? 'text-success' : 'text-primary'
+  return isManualBpm(props.deck.track) ? 'text-success' : 'text-primary'
 })
 
 const formattedTempo = computed(() => {
-  if (!props.track) {
+  if (!props.deck.track) {
     return '0'
   }
-  return (getBpm(props.track) * props.playbackRate).toFixed(1)
+  return (getBpm(props.deck.track) * props.deck.playbackRate).toFixed(1)
 })
 
 const formatBytes = (bytes, decimals = 1) => {
@@ -138,8 +130,8 @@ const formatDuration = (duration) => {
   return ret
 }
 
-watch(() => props.track, () => {
-  duration.value = props.track.length
+watch(() => props.deck.track, () => {
+  duration.value = props.deck.track.length
 })
 </script>
 

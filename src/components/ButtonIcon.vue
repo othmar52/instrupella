@@ -4,7 +4,6 @@
       ref="btn"
       type="button"
       :title="title"
-      @click="clickButton"
     >
       <component :is="IconPlay" v-if="componentName === 'IconPlay'"></component>
       <component :is="IconPause" v-if="componentName === 'IconPause'"></component>
@@ -64,16 +63,6 @@ const props = defineProps({
 watch(() => props.activeClass, () => {
 })
 
-const clickButton = (event) => {
-  console.log('button click inner listener', event)
-  if (props.midiLearn === false) {
-    return
-  }
-  event.preventDefault()
-  event.stopPropagation()
-  console.log('button click midi learn', event)
-  return false
-}
 const buttonClasses = computed(() => {
   return (props.midiLearn)
     ? `btn btn-danger alt-dm ${props.permaClasses}`

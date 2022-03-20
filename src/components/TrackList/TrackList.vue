@@ -49,7 +49,7 @@
           {{ parseInt(getBpm(track))}}<span v-if="track.downbeat" class="text-success">*</span>
         </td>
         <td>{{ formatDuration(track.length) }}</td>
-        <td @click="loadTrack(track.id)">
+        <td @click="storage.loadTrack(0, track.id)">
           <strong class="btn btn-default btn-primary">LOAD</strong>
         </td>
       </tr>
@@ -66,8 +66,9 @@ import formatDurationMixin from '../../mixins/format/duration'
 import formatArtistTitleMixin from '../../mixins/format/artisttitle'
 
 import BpmFilter from '@/components/TrackList/BpmFilter.vue'
+import { useMainStore } from "@/store.js";
 const { formatArtistTitle } = formatArtistTitleMixin()
-
+const storage = useMainStore()
 const { getBpm, isManualBpm } = utils()
 const { range } = rangeMixin()
 const { formatDuration } = formatDurationMixin()
@@ -83,10 +84,6 @@ const length = ref(0)
 const searchInput = ref('')
 const filteredEntries = ref([])
 
-const emit = defineEmits([
-  'selectTrack'
-])
-
 const loadRandom = () => {
   // console.log('load random')
   const randomItem = filteredEntries.value[Math.floor(Math.random()*filteredEntries.value.length)];
@@ -97,7 +94,7 @@ const loadRandom = () => {
 }
 
 const loadTrack = (trackIndex) => {
-  emit('selectTrack', trackIndex)
+  storage.loadTrack(0, trackIndex)
 }
 
 const setBpmFilter = (tempo) => {

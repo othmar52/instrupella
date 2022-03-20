@@ -4,11 +4,15 @@
     :label="`${index+1}`"
     activeClass="btn-danger alt-dm"
     :permaClasses="`${buttonClasses}`"
+    @mousedown="pressHotCueStart"
+    @touchstart="pressHotCueStart"
+    @mouseup="pressHotCueEnd"
+    @touchend="pressHotCueEnd"
   />
   </span>
   <span v-else>
   <Button
-    v-if="!deleteMode || second === 0"
+    v-if="!hotCues.deleteMode || hotCues.cues[index].second === null"
     :label="`${index+1}`"
     :permaClasses="`${buttonClasses}`"
     :activeClass="activeClass"
@@ -21,7 +25,10 @@
     v-else
     label="x"
     activeClass="btn-danger alt-dm"
-    @click="deleteHotCue"
+    @mousedown="pressHotCueStart"
+    @touchstart="pressHotCueStart"
+    @mouseup="pressHotCueEnd"
+    @touchend="pressHotCueEnd"
     :permaClasses="`${buttonClasses}`"
   />
   </span>
@@ -35,30 +42,18 @@ const buttonClasses = ref('btn btn-square btn-default btn-lg m-10 btn-hotcue fon
 const eventStartHandled = ref(false)
 const eventEndHandled = ref(false)
 const props = defineProps({
-  track: {
+  hotCues: {
     type: Object,
-    default: null
+    default: {}
   },
   index: {
     type: Number
-  },
-  second: {
-    type: Number,
-    default: 0
-  },
-  deleteMode: {
-    type: Boolean,
-    default: false
   },
   midiLearn: {
     type: Boolean,
     default: false
   }
 })
-
-const deleteHotCue = () => {
-  emit('deleteHotCue', props.index)
-}
 
 const pressHotCueStart = () => {
   if (eventStartHandled.value === false) {
@@ -78,14 +73,11 @@ const pressHotCueEnd = () => {
 
 const emit = defineEmits([
   'pressHotCueStart',
-  'pressHotCueEnd',
-  'deleteHotCue'
+  'pressHotCueEnd'
 ])
 
-watch(() => props.track, () => { })
-
 const activeClass = computed(() => {
-  return props.second > 0 ? 'btn-primary' : ''
+  return props.hotCues.cues[props.index].second !== null ? 'btn-primary' : ''
 })
 
 </script>

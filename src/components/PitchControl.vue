@@ -52,6 +52,8 @@
 import { ref, onMounted, computed } from 'vue'
 import VSlider from '@/components/VSlider.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
+import { useMainStore } from "@/store.js";
+const storage = useMainStore()
 const buttonClasses = ref('btn btn-square btn-lg m-10 mr-0')
 const range = ref(0.1)
 const min = ref(0.8)
@@ -60,6 +62,10 @@ const props = defineProps({
   center: {
     type: Number,
     default: 1
+  },
+  deck: {
+    type: Object,
+    default: null
   },
   midiLearn: {
     type: Boolean,
@@ -79,16 +85,15 @@ const changeRange = (newRange, id) => {
 }
 
 const sliderChange = (newPitchValue) => {
-  emit('pitchChange', parseFloat(newPitchValue))
+  storage.setPlaybackRate(
+    props.deck.index,
+    parseFloat(newPitchValue)
+  )
 }
 
 const pitchLabel = computed(() => {
   return `${range.value * 100}%`
 })
-
-const emit = defineEmits([
-  'pitchChange'
-])
 
 onMounted(() => {
   halfmoon.onDOMContentLoaded()

@@ -2,13 +2,11 @@
 <div class="container-fluid noselect">
   <div class="row">
     <div class="col-9">
-      <div :class="`card p-0 deck deck-${index}`">
+      <div :class="`card p-0 deck deck-${deck.index}`">
         <TrackMeta
-          :track="track"
-          :currentSecond="currentSecond"
-          :playbackRate="playbackRate"
+          :deck="deck"
         />
-        <ZoomControl :pixelPerSecond="pixelPerSecond" @zoomTo="zoomTo" />
+        <ZoomControl :pixelPerSecond="deck.pixelPerSecond" @zoomTo="zoomTo" />
         <div class="wave-big-wrap">
           <Transition name="slide-fade">
             <div class="text-center align-middle" v-if="loadProgress <= 100 && trackAnalyzed === false">
@@ -24,21 +22,13 @@
             </div>
           </Transition>
           <WaveBig
-            :track="track"
-            :play="play"
-            :mute="mute"
-            :playbackRate="playbackRate"
-            :pixelPerSecond="pixelPerSecond"
-            :editTempo="editTempo"
-            @trackEnd="trackEnd"
+            :deck="deck"
+            ref="player"
+            class="wave-big"
             @trackLoad="trackLoad"
             @waveformReady="waveformReady"
             @trackReady="trackReady"
-            @audioprocess="audioprocess"
-            @seek="seek"
             @error="error"
-            ref="player"
-            class="wave-big"
           />
         </div>
         <div class="d-flex">
@@ -54,34 +44,34 @@
             componentName="IconArrowToFirst"
             :permaClasses="`${buttonClasses} mr-0`"
             :midiLearn="midiLearn"
-            @click="$refs.player.seekZero()"
+            @click="storage.fireControlElement(`d.${deck.index}.seekToSecond`, 0)"
           />
-          <div id="deck-minimap" class="deck-minimap m-10 ml-0"></div>
+          <div :id="`deck-minimap${deck.index}`" class="deck-minimap m-10 ml-0"></div>
           <ButtonIcon
-            :componentName="play ? 'IconPause' : 'IconPlay'"
+            :componentName="deck.play ? 'IconPause' : 'IconPlay'"
             :permaClasses="`${buttonClasses}`"
-            :activeClass="play ? 'btn-primary' : ''"
+            :activeClass="deck.play ? 'btn-primary' : ''"
             :midiLearn="midiLearn"
-            @click="togglePlay"
+            @click="storage.fireControlElement(`d.${deck.index}.togglePlay`)"
           />
           <ButtonIcon
             componentName="IconMinus"
             :permaClasses="`rounded-circle ${buttonClasses}`"
             :midiLearn="midiLearn"
-            @click="$refs.player.nudgeBehind()"
+            @click="storage.fireControlElement(`d.${deck.index}.nudgeBehind`)"
           />
           <ButtonIcon
             componentName="IconPlus"
             :permaClasses="`rounded-circle ${buttonClasses}`"
             :midiLearn="midiLearn"
-            @click="$refs.player.nudgeAhead()"
+            @click="storage.fireControlElement(`d.${deck.index}.nudgeAhead`)"
           />
           <ButtonIcon
             componentName="IconMute"
             :permaClasses="`${buttonClasses}`"
-            :activeClass="mute ? 'btn-danger' : ''"
+            :activeClass="deck.mute ? 'btn-danger' : ''"
             :midiLearn="midiLearn"
-            @click="toggleMute"
+            @click="storage.fireControlElement(`d.${deck.index}.toggleMute`)"
           />
         </div>
         <br />
@@ -93,10 +83,11 @@
         <PitchControl
           @pitchChange="setPitch"
           :midiLearn="midiLearn"
+          :deck="deck"
         />
         <VolumeControl
-          @volumeChange="setVolume"
           :midiLearn="midiLearn"
+          :deck="deck"
         />
       </div>
     </div>
@@ -105,10 +96,10 @@
     <div class="col-12">
       <div class="card">
         <Edit
-          :track="track"
-          :play="play"
-          :playbackRate="playbackRate"
-          :currentSecond="currentSecond"
+          :track="deck.track"
+          :play="deck.play"
+          :playbackRate="deck.playbackRate"
+          :currentSecond="deck.currentSecond"
           @updateTrack="$emit('updateTrack', $event)"
           @newEditTempo="newEditTempo"
         />
@@ -119,13 +110,11 @@
     <div class="col-6">
       <div class="card">
         <HotCues
-          :track="track"
-          :play="play"
-          :currentSecond="currentSecond"
+          :deck="deck"
+          :track="deck.track"
+          :play="deck.play"
+          :currentSecond="deck.currentSecond"
           :midiLearn="midiLearn"
-          @hotCuesChange="hotCuesChange"
-          @seekToAndPlay="seekToAndPlay"
-          @seekToAndStop="seekToAndStop"
         />
       </div>
     </div>
@@ -144,6 +133,7 @@ import PitchControl from '@/components/PitchControl.vue'
 import VolumeControl from '@/components/VolumeControl.vue'
 import Edit from '@/components/Deck/Edit.vue'
 import HotCues from '@/components/HotCues.vue'
+import { useMainStore } from "@/store.js";
 const player = ref(null)
 const play = ref(false)
 const mute = ref(false)
@@ -155,13 +145,9 @@ const currentSecond = ref(0)
 const showEditTrack = ref(false)
 const editTempo = ref(0)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
-
-defineProps({
-  index: {
-    type: Number,
-    default: 0
-  },
-  track: {
+const storage = useMainStore()
+const props = defineProps({
+  deck: {
     type: Object,
     default: null
   },
@@ -170,30 +156,17 @@ defineProps({
     default: false
   }
 })
-const togglePlay = () => {
-  play.value = !play.value
-}
-const toggleMute = () => {
-  console.log('button click outer listener')
-  mute.value = !mute.value
-}
+
 const toggleEditTrack = () => {
   showEditTrack.value = !showEditTrack.value
 }
 const setPitch = (newPitchValue) => {
   playbackRate.value = newPitchValue
 }
-const setVolume = (newVolumeValue) => {
-  player.value.setVolume(newVolumeValue)
-}
-const trackEnd = () => {
-  play.value = false
-  mute.value = false
-}
 const trackLoad = (percent) => {
   loadProgress.value = percent
-  play.value = false
-  mute.value = false
+  storage.togglePlay(props.deck.index, false)
+  storage.toggleMute(props.deck.index, false)
   trackAnalyzed.value = false
 }
 const trackReady = () => {
@@ -205,12 +178,6 @@ const waveformReady = () => {
 const zoomTo = (pxPerSec) => {
   pixelPerSecond.value = pxPerSec
 }
-const audioprocess = (sec) => {
-  currentSecond.value = sec
-}
-const seek = (value) => {
-  currentSecond.value = player.value.getDuration() * value
-}
 const error = (errormsg) => {
   console.log('TODO: handle player error', errormsg)
 }
@@ -219,24 +186,10 @@ const newEditTempo = (newTempo) => {
   editTempo.value = newTempo
 }
 
-const seekToAndPlay = (second) => {
-  player.value.seekToSecondAndCenter(second)
-  player.value.forcePlay()
-}
-
-const seekToAndStop = (second) => {
-  player.value.seekToSecondAndCenter(second)
-  player.value.forceStop()
-}
-
-const hotCuesChange = (allHotCues) => {
-  player.value.updateMarkers(allHotCues)
-}
-
 </script>
 
 <style lang="scss">
-@import "../scss/_variables.scss";
+@import "../../scss/_variables.scss";
 .deck {
   .wave-big-wrap {
     height: 150px;

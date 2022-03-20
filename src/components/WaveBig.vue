@@ -1,6 +1,6 @@
 <template>
   <div class="wave">
-    <div id="wave-timeline">
+    <div :id="`wave-timeline${deck.index}`" class="wave-timeline">
     </div>
     <div class="wave-dragger"
       @click="ignoreEvent"
@@ -16,7 +16,7 @@
       @mousemove="doDrag"
       @touchmove="doDrag"
     >
-      <div id="wave-surfer" ref="wavesurfer">
+      <div :id="`wave-surfer${deck.index}`" ref="wavesurfer">
     </div>
     </div>
   </div>
@@ -28,8 +28,10 @@ import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
 import MarkersPlugin from 'wavesurfer.js/src/plugin/markers/index.js'
 import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline/index.js'
 import utils from '../mixins/utils.js'
+import { useMainStore } from "@/store.js";
 import { ref, watch, onMounted, computed } from 'vue'
 
+const storage = useMainStore()
 const { getBpm } = utils()
 const player = ref(null)
 
@@ -40,36 +42,18 @@ const startDragPlayState = ref(false)
 const lastSetSongPosition = ref(false)
 
 const downbeat = computed(() => {
-  if (!props.track) {
+  if (!props.deck.track) {
     return '0'
   }
-  return props.track.downbeat
+  return props.deck.track.downbeat
 })
 
+const track = computed(() => props.deck.track)
+
 const props = defineProps({
-  play: {
-    type: Boolean,
-    default: false
-  },
-  mute: {
-    type: Boolean,
-    default: false
-  },
-  track: {
+  deck: {
     type: Object,
     default: null
-  },
-  timestretch: {
-    type: Boolean,
-    default: false
-  },
-  playbackRate: {
-    type: Number,
-    default: 1
-  },
-  pixelPerSecond: {
-    type: Number,
-    default: 400
   },
   editTempo: {
     type: Number,
@@ -77,7 +61,7 @@ const props = defineProps({
   }
 })
 
-watch(() => props.track, (newTrack) => {
+watch(() => props.deck.track, (newTrack) => {
   if (!newTrack) {
     return
   }
@@ -95,7 +79,7 @@ watch(() => props.track, (newTrack) => {
 })
 
 const redrawBeatGrid = () => {
-  const bpm = getBpm(props.track)
+  const bpm = getBpm(props.deck.track)
   if (bpm === 0) {
     return
   }
@@ -107,19 +91,77 @@ const redrawBeatGrid = () => {
 }
 
 
-watch(() => props.play, () => {
-  if (!props.track) {
+watch(() => props.deck.play, () => {
+  if (!props.deck.track) {
     return
   }
   togglePlay()
 })
 
-watch(() => props.mute, () => {
+watch(() => props.deck.mute, () => {
   player.value.toggleMute()
 })
+watch(() => props.deck.volume, (newVolume) => {
+  setVolume(newVolume)
+})
 
-watch(() => props.pixelPerSecond, () => {
-  player.value.zoom(props.pixelPerSecond)
+watch(() => props.deck.nudgeAhead, (nudgeValue) => {
+  if (nudgeValue === 0) {
+    return
+  }
+  player.value.skipForward()
+  storage.clearNudge(props.deck.index)
+})
+
+watch(() => props.deck.nudgeBehind, (nudgeValue) => {
+  if (nudgeValue === 0) {
+    return
+  }
+  player.value.setMute(true)
+  player.value.skipBackward()
+  storage.clearNudge(props.deck.index)
+  setTimeout(() => {
+    player.value.setMute(false)
+    player.value.setVolume(1)
+  }, player.value.params.skipLength * 1000)
+})
+
+watch(() => props.deck.seekToSecond, (sec) => {
+  if (sec < 0) {
+    return
+  }
+  seekToSecondAndCenter(sec)
+  storage.seekToSecond(props.deck.index, -1)
+})
+
+watch(() => props.deck.seekToSecondAndPlay, (sec) => {
+  if (sec < 0) {
+    return
+  }
+  seekToSecondAndCenter(sec)
+  forcePlay()
+  storage.seekToSecondAndPlay(props.deck.index, -1)
+})
+
+watch(() => props.deck.seekToSecondAndStop, (sec) => {
+  if (sec < 0) {
+    return
+  }
+  seekToSecondAndCenter(sec)
+  forceStop()
+  storage.seekToSecondAndStop(props.deck.index, -1)
+})
+
+watch(() => props.deck.hotCuesChange, (value) => {
+  if(value === false) {
+    return
+  }
+  updateMarkers()
+  storage.setHotCuesChange(props.deck.index, false)
+})
+
+watch(() => props.deck.pixelPerSecond, () => {
+  player.value.zoom(props.deck.pixelPerSecond)
 
   // TODO: this approach for zoom seem to be faster!?
   //    but it does not zoom at the very beginning of the track
@@ -132,10 +174,7 @@ watch(() => props.pixelPerSecond, () => {
 const emit = defineEmits([
   'waveformReady',
   'trackReady',
-  'trackEnd',
   'trackLoad',
-  'audioprocess',
-  'seek',
   'error'
 ])
 
@@ -158,7 +197,8 @@ const initPlayer = (forceReInit = false) => {
     emit('trackLoad', percent)
   })
   player.value.on('finish', () => {
-    emit('trackEnd')
+    storage.togglePlay(props.deck.index, false)
+    storage.toggleMute(props.deck.index, false)
   })
   player.value.on('ready', () => {
     redrawBeatGrid()
@@ -169,25 +209,28 @@ const initPlayer = (forceReInit = false) => {
     emit('waveformReady')
   })
   player.value.on('audioprocess', (sec) => {
-    emit('audioprocess', sec)
+    storage.setCurrentSecond(props.deck.index, sec)
   })
   player.value.on('seek', (value) => {
-    emit('seek', value)
+    const targetSecond = player.value.getDuration() * value
+    storage.setCurrentSecond(props.deck.index, targetSecond)
+    // console.log('seek listener', value, targetSecond)
+    // emit('seek', value)
   })
   player.value.on('error', (error) => {
     emit('error', error)
   })
 }
 const wavesurferOptions = () => {
-  const secondsPerQuarterNote = 60 / getBpm(props.track)
+  const secondsPerQuarterNote = 60 / getBpm(props.deck.track)
   return {
     plugins: [
       MinimapPlugin.create({
-        container: '#deck-minimap',
+        container: `#deck-minimap${props.deck.index}`,
         height: 50
       }),
       TimelinePlugin.create({
-        container: '#wave-timeline',
+        container: `#wave-timeline${props.deck.index}`,
         primaryColor: 'tomato',
         secondaryColor: 'tomato',
         primaryFontColor: 'white', // 1 bar
@@ -203,9 +246,9 @@ const wavesurferOptions = () => {
       MarkersPlugin.create({
       })
     ],
-    container: '#wave-surfer',
+    container: `#wave-surfer${props.deck.index}`,
     backgroundColor: '#111417',
-    backend: (props.timestretch)
+    backend: (props.deck.timestretch)
       ? 'MediaElement' // change tempo and keep pitch
       : 'WebAudio', // change tempo and pitch
     mediaControls: false,
@@ -216,7 +259,7 @@ const wavesurferOptions = () => {
     cursorWidth: 3,
     barGap: 0,
     barWidth: 0,
-    audioRate: props.playbackRate,
+    audioRate: props.deck.playbackRate,
     // forceDecode: true,
     height: 150,
     minPxPerSec: 400,
@@ -236,8 +279,8 @@ const wavesurferOptions = () => {
 }
 const getBeatGridOffset = (overrideDownbeat = null) => {
   let useTempo = 0
-  if (getBpm(props.track) > 0) {
-    useTempo = getBpm(props.track)
+  if (getBpm(props.deck.track) > 0) {
+    useTempo = getBpm(props.deck.track)
   }
   if (props.editTempo > 0) {
     useTempo = props.editTempo
@@ -247,7 +290,7 @@ const getBeatGridOffset = (overrideDownbeat = null) => {
   }
   const useDownbeat = (overrideDownbeat !== null)
     ? overrideDownbeat
-    : props.track.downbeat
+    : props.deck.track.downbeat
 
   // ensure we have timeline rendering from start to finish
   // by pushing the offset in 4-bar-steps to a negative value
@@ -260,16 +303,10 @@ const getBeatGridOffset = (overrideDownbeat = null) => {
 }
 
 const togglePlay = () => {
-  if (player.value.isPlaying() === props.play) {
+  if (player.value.isPlaying() === props.deck.play) {
     return
   }
-  player.value[(props.play) ? 'play' : 'pause']()
-}
-const seekZero = () => {
-  player.value.seekAndCenter(0)
-}
-const nudgeAhead = () => {
-  player.value.skipForward()
+  player.value[(props.deck.play) ? 'play' : 'pause']()
 }
 
 const setVolume = (newVolume) => {
@@ -283,27 +320,20 @@ const getDuration = () => {
 const seekToSecondAndCenter = (second) => {
   // seekTo() needs a value between 0 and 1
   const targetSeekValue = second / (player.value.getDuration())
-  player.value.seekAndCenter(targetSeekValue)
+  if (targetSeekValue >= 0 && targetSeekValue <= 1) {
+    player.value.seekAndCenter(targetSeekValue)
+  }
 }
 
 const forcePlay = () => {
-  // play audio but ignore props.play
+  // play audio but ignore props.deck.play
   // console.log('forcing play...')
   player.value.play()
 }
 const forceStop = () => {
-  // play audio but ignore props.play
+  // play audio but ignore props.deck.play
   // console.log('forcing pause...')
   player.value.pause()
-}
-
-const nudgeBehind = () => {
-  player.value.setMute(true)
-  player.value.skipBackward()
-  setTimeout(() => {
-    player.value.setMute(false)
-    player.value.setVolume(1)
-  }, player.value.params.skipLength * 1000)
 }
 
 const ignoreEvent = (event) => {
@@ -358,7 +388,7 @@ const doDrag = (event) => {
     clientX = event.touches[0].pageX
   }
   const pixelDelta = clientX - dragX.value
-  let targetSecond = lastSetSongPosition.value - pixelDelta / props.pixelPerSecond
+  let targetSecond = lastSetSongPosition.value - pixelDelta / props.deck.pixelPerSecond
   if (targetSecond < 0) {
     targetSecond = 0
   }
@@ -376,10 +406,10 @@ const doDrag = (event) => {
   player.value.play(targetSecond, targetSecond2)
 }
 
-const updateMarkers = (allHotCues) => {
+const updateMarkers = () => {
   player.value.clearMarkers()
-  for (const [idx, hotCue] of allHotCues.entries()) {
-    if (hotCue.second === 0) {
+  for (const [idx, hotCue] of props.deck.hotCues.cues.entries()) {
+    if (hotCue.second === null) {
       continue
     }
     player.value.addMarker({
@@ -390,9 +420,9 @@ const updateMarkers = (allHotCues) => {
   }
 }
 
-watch(() => props.playbackRate, () => {
+watch(() => props.deck.playbackRate, () => {
   try {
-    player.value.setPlaybackRate(props.playbackRate)
+    player.value.setPlaybackRate(props.deck.playbackRate)
   } catch (e) { }
 })
 
@@ -428,21 +458,13 @@ onMounted(() => {
 })
 
 defineExpose({
-  nudgeBehind,
-  nudgeAhead,
-  seekZero,
-  seekToSecondAndCenter,
-  forcePlay,
-  forceStop,
-  updateMarkers,
-  setVolume,
   getDuration
 })
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-#wave-timeline {
+.wave-timeline {
   position: absolute;
   z-index:5;
   width: 100%;
