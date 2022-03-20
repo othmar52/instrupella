@@ -21,21 +21,86 @@ from subprocess import Popen, PIPE, DEVNULL, STDOUT
 from pathlib import Path
 import eyed3
 
+import argparse
+
+
+
 # include trailing slash!
-musicDir = "/MUSIC/aca2/testaca/"
 targetJson = "00-acajam.json"
+mergePropsJson = "00-trackprops.json"
+musicDir = "/MUSIC/aca2/testaca/"
 pathSearchReplace = [
     "/MUSIC/aca2/testaca/",
     "./testaca/"
 ]
 '''
 musicDir = "/MUSIC/aca2/"
-targetJson = "00-acajam.json"
 pathSearchReplace = [
     "/MUSIC/aca2/",
     "./aca2/"
 ]
 '''
+
+
+mergeProps = {}
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('action', type=str, choices=['scan', 'merge'])
+res = parser.parse_args()
+
+def main():
+    if res.action == 'scan':
+        mergeProps = getPropsToMerge()
+        print('scanning files')
+
+    if res.action == 'merge':
+        mergeProps = getPropsToMerge()
+        # read json database instead of scanning files
+        dbJson = getDbJson()
+        enrichedDb = []
+        print('merging properties')
+        for entry in dbJson:
+            if not entry['path'] in mergeProps:
+                #print(f'no entry for path {entry["path"]}')
+                enrichedDb.append(entry)
+                continue
+
+            #print('found props to merge')
+            #print(mergeProps[entry['path']])
+            for propName in mergeProps[entry['path']]:
+                entry[propName] = mergeProps[entry['path']][propName]
+            
+            enrichedDb.append(entry)
+
+        writeTextFile(f'{musicDir}{targetJson}', json.dumps(enrichedDb, indent=2))
+        print('done')
+
+
+def getPropsToMerge():
+    propsToMerge = {}
+    try:
+        with open(f'{musicDir}{mergePropsJson}') as json_file:
+            bla = json.load(json_file)
+            for track in bla:
+                propsToMerge[track.pop('path', None)] = track
+    except FileNotFoundError:
+        print(f'file {musicDir}{mergePropsJson} does not exist')
+    except json.decoder.JSONDecodeError:
+        print(f'file {musicDir}{mergePropsJson} is not a valid json')
+    return propsToMerge
+
+
+def getDbJson():
+    dbJson = {}
+    try:
+        with open(f'{musicDir}{targetJson}') as json_file:
+            dbJson = json.load(json_file)
+    except FileNotFoundError:
+        print(f'file {musicDir}{targetJson} does not exist')
+    except json.decoder.JSONDecodeError:
+        print(f'file {musicDir}{targetJson} is not a valid json')
+    return dbJson
 
 # http://www.pogo.org.uk/~mark/bpm-tools/
 # /usr/bin/bpm-tag -f -n MUSICFILE 2>&1 | grep --color=never " BPM" | awk '{print $(NF-1)}'
@@ -70,7 +135,7 @@ def collectAllMusicFiles(startDirectory):
             continue
     return musicFiles
 
-def main():
+def createDatabaseJson():
     files = collectAllMusicFiles(musicDir)
     jsonObject = []
     #print(files)
