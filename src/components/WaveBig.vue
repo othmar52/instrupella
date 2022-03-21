@@ -91,6 +91,10 @@ const redrawBeatGrid = () => {
 }
 
 
+watch(() => props.deck.skipLength, (value) => {
+  player.value.params.skipLength = parseFolat(value)
+})
+
 watch(() => props.deck.play, () => {
   if (!props.deck.track) {
     return
@@ -273,7 +277,7 @@ const wavesurferOptions = () => {
     partialRender: true,
     responsive: true,
     interact: true,
-    skipLength: 0.05,
+    skipLength: props.deck.skipLength,
     splitChannels: false
   }
 }

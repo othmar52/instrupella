@@ -10,9 +10,10 @@
       @pressHotCueEnd="pressHotCueEnd"
     />
     <ButtonIcon
-      v-if="hotCues.haveAnyCues && !hotCues.deleteMode"
+      v-if="(hotCues.haveAnyCues && !hotCues.deleteMode) || midiLearn"
       componentName="IconTrash"
       permaClasses="btn btn-square btn-default btn-lg m-10"
+      :activeClass="midiLearn ? 'btn-danger alt-dm' : ''"
       @click="storage.fireControlElement(`d.${deck.index}.toggleHotCueDeleteMode`)"
     />
     <Button
@@ -22,7 +23,6 @@
       activeClass="btn-danger alt-dm"
       @click="storage.fireControlElement(`d.${deck.index}.toggleHotCueDeleteMode`)"
     />
-    <span>L: {{midiLearn}}</span>
     </div>
 </template>
 

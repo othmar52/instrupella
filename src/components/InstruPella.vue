@@ -101,26 +101,25 @@ const initMidi = () => {
     }
     console.log('midiInput1', midiInput1)
 
-    /*
-    midiInput1.value.addListener('midimessage', e => {
-      console.log('midimessage', e);
-    })
-    */
     midiInput1.value.removeListener()
-    midiInput1.value.addListener('clock', e => {
-      // console.log('clock', e);
-      baton.value.messageClock(e)
+    midiInput1.value.addListener('midimessage', e => {
+      switch(e.message.type) {
+        case 'clock':
+          baton.value.messageClock(e)
+          break
+        case 'start':
+          baton.value.messageStart(e)
+          break
+        case 'stop':
+          baton.value.messageStop(e)
+          break
+        default:
+          storage.handleIncomingMidiEvent(e)
+      }
     })
-    midiInput1.value.addListener('start', e => {
-      // console.log('start', e);
-      baton.value.messageStart(e)
-    })
-    midiInput1.value.addListener('stop', e => {
-      // console.log('stop', e);
-      baton.value.messageStop(e)
-    })
+    /*
     midiInput1.value.addListener('noteon', e => {
-      // console.log('noteon', e);
+      console.log('noteon', e);
       storage.fireControlElement(`d.0.hotCueDown`, 2)
     }, {channels: [16]})
     midiInput1.value.addListener('noteoff', e => {
@@ -133,6 +132,7 @@ const initMidi = () => {
         storage.fireControlElement(`d.0.setVolume`, e.message.data[2]*(1/127))
       }
     }, {channels: [16]})
+    */
 
     //this.outputDN = WebMidi.getOutputByName("Elektron Digitone");
     // TODO add owner check

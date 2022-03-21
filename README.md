@@ -44,7 +44,7 @@ screenshot of current development status:
   - [x] navbar
   - [ ] optional huge pitch slider
   - [x] short project description in README
-  - [ ] compatibility for any amount of decks
+  - [x] compatibility for any amount of decks
   - [x] show properties of loaded track
   - [x] add filesize as track property
   - [x] vertical centering of icons in buttons
@@ -58,7 +58,7 @@ screenshot of current development status:
   - [x] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprecess()` is not fired), maybe use wavesurfer.backend.getPlayedPercents());
   - [ ] ensure very long track titles does not break layout
   - [ ] big wave form position is crazy during play in combination with fast pitch changes
-  - [ ] BUG volume slider position is not respected on new loaded tracks 
+  - [x] BUG volume slider position is not respected on new loaded tracks
   - [ ] BUG load new track with different wave zoom -> drag big wave is messed up
   - [x] BUG auto scroll to top after load track does not work during play
   - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
@@ -82,13 +82,17 @@ screenshot of current development status:
   - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME & https://wavesurfer-js.org/faq/
 
 
-## Resources vor development
+## Resources for development
  - https://vuejs.org/api/
  - https://wavesurfer-js.org/api/index.html
  - https://webmidijs.org/api
  - https://www.gethalfmoon.com/docs/introduction/
 
 
+## interesting small midi controllers that maybe useful for instrupella
+ - https://reverb.com/item/50240054-numark-dj2go2-touch
+ - https://reverb.com/item/35995318-numark-dj2go-2
+ - numark orbit
 
 
 ## Project setup

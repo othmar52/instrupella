@@ -17,13 +17,20 @@ const ctrlKeyToFunc = (ctrlKey) => {
   console.log('ERROR ctrlKeyToFunc', ctrlKey)
 }
 
+const midiMapping = {
+  '16-noteon-55': 'd.0.toggleMuteMidi',
+  '16-noteon-66': 'd.0.toggleHotCueDeleteMode',
+  '16-controlchange-45': 'd.0.handleJogWheelRotate'
+}
 const ctrlMap = {
   'toggleMute': 'toggleMute',
+  'toggleMuteMidi': 'toggleMuteMidi',
   'togglePlay': 'togglePlay',
   'setVolume': 'setVolume',
   'nudgeAhead': 'nudgeAhead',
   'nudgeBehind': 'nudgeBehind',
   'seekToSecond': 'seekToSecond',
+  'handleJogWheelRotate': 'handleJogWheelRotate',
   'hotCueDown': 'hotCueDown',
   'hotCueUp': 'hotCueUp',
   'toggleHotCueDeleteMode': 'toggleHotCueDeleteMode'
@@ -32,8 +39,9 @@ const ctrlMap = {
 export const useMainStore = defineStore({
   id: 'main',
   state: () => ({
-    midiMappings: useStorage('midiMappings', []),
+    midiMappings: useStorage('midiMappings', midiMapping),
     midiLearn: useStorage('midiLearn', false),
+    midiLearnItem: useStorage('midiLearnItem', null),
     scrollToTop: useStorage('midiLearn', false),
     trackProps: useStorage('trackProps', []),
     decks: useStorage('decks', []),
@@ -44,7 +52,7 @@ export const useMainStore = defineStore({
       return this.midiMappings
     },
     midiMappingsEmpty() {
-      return this.midiMappings.length <= 0
+      return this.midiMappings === {}
     },
     getMidiLearn() {
       return this.midiLearn <= 0
@@ -69,6 +77,10 @@ export const useMainStore = defineStore({
     fireControlElement(controlId, value=null) {
       const deckCtrlParams = ctrlKeyToFunc(controlId)
       if (deckCtrlParams) {
+        if(this.midiLearnItem !== null) {
+          this.addMidiMapping(controlId)
+          return
+        }
         this[deckCtrlParams[1]](deckCtrlParams[0], value)
       }
     },
@@ -77,9 +89,6 @@ export const useMainStore = defineStore({
     },
     setTracks(tracks) {
       this.tracks = tracks
-    },
-    addMidiMapping(midiMapping) {
-      this.midiMappings.push(midiMapping)
     },
     addTrackProp(trackProp) {
       // console.log('store.addTrackProp() to', trackProp)
@@ -95,9 +104,14 @@ export const useMainStore = defineStore({
       // console.log('updated object', this.trackProps[index])
       
     },
+    /*
+    addMidiMapping(midiMapping) {
+      this.midiMappings.push(midiMapping)
+    },
     removeMidiMapping(index) {
       this.midiMappings.splice(index, 1)
     },
+    */
     toggleMidiLearn() {
       this.midiLearn = !this.midiLearn
       // console.log('store.toggleMidiLearn() to', this.midiLearn)
@@ -144,11 +158,16 @@ export const useMainStore = defineStore({
       this.decks.push(deck)
     },
     toggleMute(deckIndex, forceNewState=null) {
+      console.log('toggleMute', forceNewState)
       if (forceNewState === null) {
         this.decks[deckIndex].mute = !this.decks[deckIndex].mute
         return
       }
       this.decks[deckIndex].mute = forceNewState
+    },
+    toggleMuteMidi(deckIndex) {
+      // drop incoming data byte as argument
+      this.toggleMute(deckIndex, null)
     },
     togglePlay(deckIndex, forceNewState=null) {
       if (forceNewState === null) {
@@ -257,7 +276,40 @@ export const useMainStore = defineStore({
       this.decks[deckIndex].hotCues.deleteMode = forceNewState
     },
     setHotCuesChange(deckIndex, value) {
-      this.decks[deckIndex].hotCuesChange = value
+      this.decks[deckIndex].hotCuesChange = value 
+    },
+    handleJogWheelRotate(deckIndex, midiValue) {
+      if (midiValue === 1) {
+        this.nudgeAhead(deckIndex)
+        return
+      }
+      if (midiValue === 127) {
+        this.nudgeBehind(deckIndex)
+        return
+      }
+      if (midiValue < 64) {
+        this.decks[deckIndex].skipLength = midiValue * midiValue * midiValue * 0.1
+        this.nudgeAhead(deckIndex)
+        this.decks[deckIndex].skipLength = 0.05
+      }
+    },
+    handleIncomingMidiEvent(e) {
+      switch(e.message.type) {
+        case 'noteon':
+        case 'noteoff':
+        case 'controlchange':
+          const eventIdentifier = `${e.message.channel}-${e.message.type}-${e.dataBytes[0]}`
+          if (typeof this.midiMappings[eventIdentifier] !== 'undefined') {
+            console.log('SUCCESS', eventIdentifier, this.midiMappings[eventIdentifier], e.dataBytes[1])
+            this.fireControlElement(this.midiMappings[eventIdentifier], e.dataBytes[1])
+            return
+          }
+          console.log('NO MAPPING FOR ', eventIdentifier, this.midiMappings)
+
+      }
+      //console.log('handleIncomingMidiEvent', e)
+      //console.log('handleIncomingMidiEvent', e.message.channel, e.message.command, e.message.type)
+      //const eventIdentifier = `${e.message.channel}-${e.message.command}-${e.message.type}`
     }
   }
 })
