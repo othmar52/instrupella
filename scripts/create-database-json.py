@@ -13,10 +13,12 @@ from shutil import copyfile
 import subprocess
 import time
 import json
+import hashlib
 import sys
 import re
 import os
 import select
+import glob
 from subprocess import Popen, PIPE, DEVNULL, STDOUT
 from pathlib import Path
 import eyed3
@@ -26,20 +28,20 @@ import argparse
 
 
 # include trailing slash!
-targetJson = "00-acajam.json"
-mergePropsJson = "00-trackprops.json"
+targetJson = "instrupella-db.json"
+mergePropsJson = "trackprops*.json"
 musicDir = "/MUSIC/aca2/testaca/"
 pathSearchReplace = [
     "/MUSIC/aca2/testaca/",
     "./testaca/"
 ]
-'''
+
 musicDir = "/MUSIC/aca2/"
 pathSearchReplace = [
     "/MUSIC/aca2/",
     "./aca2/"
 ]
-'''
+
 
 
 mergeProps = {}
@@ -49,10 +51,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument('action', type=str, choices=['scan', 'merge'])
 res = parser.parse_args()
 
+instrupellaDir = Path(f'{musicDir}/instrupella')
+peakfilesDir = Path(f'{musicDir}/instrupella/peakfiles')
+
 def main():
+    ensureExistingDirectory(instrupellaDir)
+    ensureExistingDirectory(peakfilesDir)
+    print(instrupellaDir)
+
     if res.action == 'scan':
         mergeProps = getPropsToMerge()
         print('scanning files')
+        createDatabaseJson()
 
     if res.action == 'merge':
         mergeProps = getPropsToMerge()
@@ -62,39 +72,99 @@ def main():
         print('merging properties')
         for entry in dbJson:
             if not entry['path'] in mergeProps:
-                #print(f'no entry for path {entry["path"]}')
                 enrichedDb.append(entry)
                 continue
-
-            #print('found props to merge')
-            #print(mergeProps[entry['path']])
             for propName in mergeProps[entry['path']]:
                 entry[propName] = mergeProps[entry['path']][propName]
             
             enrichedDb.append(entry)
 
-        writeTextFile(f'{musicDir}{targetJson}', json.dumps(enrichedDb, indent=2))
+        writeTextFile(
+            Path(f'{instrupellaDir}/{targetJson}'),
+            json.dumps(enrichedDb, indent=2)
+        )
         print('done')
 
 
 def getPropsToMerge():
     propsToMerge = {}
-    try:
-        with open(f'{musicDir}{mergePropsJson}') as json_file:
-            bla = json.load(json_file)
-            for track in bla:
-                propsToMerge[track.pop('path', None)] = track
-    except FileNotFoundError:
-        print(f'file {musicDir}{mergePropsJson} does not exist')
-    except json.decoder.JSONDecodeError:
-        print(f'file {musicDir}{mergePropsJson} is not a valid json')
+    for name in sorted(glob.glob(f'{instrupellaDir}/{mergePropsJson}')):
+        try:
+            with open(name) as json_file:
+                bla = json.load(json_file)
+                for track in bla:
+                    trackPath = track.pop('path', None)
+                    if not trackPath in propsToMerge:
+                        propsToMerge[trackPath] = track
+                        print(f'{trackPath} not exists')
+                        continue
+                    print(f'{trackPath} already exists')
+                    for propName in track:
+                        propsToMerge[trackPath][propName] = track[propName]
+                    #sys.exit()
+        except FileNotFoundError:
+            print(f'file {musicDir}{mergePropsJson} does not exist')
+        except json.decoder.JSONDecodeError:
+            print(f'file {musicDir}{mergePropsJson} is not a valid json')
     return propsToMerge
+
+def createPeakFile(musicFilePath, targetJsonPath):
+    print('createPeakFile')
+    print(musicFilePath)
+    print(targetJsonPath)
+    p1 = Popen(["/usr/bin/audiowaveform", "-i", musicFilePath, "-o", targetJsonPath, "--pixels-per-second", "400", "--bits", "8"], stdout=PIPE, stderr=PIPE)
+    p1.communicate()
+
+    scale_json(targetJsonPath)
+
+
+def scale_json(filename):
+    with open(filename, "r") as f:
+        file_content = f.read()
+
+    json_content = json.loads(file_content)
+    data = json_content["data"]
+    channels = json_content["channels"]
+    # number of decimals to use when rounding the peak value
+    digits = 8
+
+    max_val = float(max(data))
+    new_data = []
+    for x in data:
+        new_data.append(round(x / max_val, digits))
+        #new_data.append(abs(round(x / max_val, digits)))
+    # audiowaveform is generating interleaved peak data when using the --split-channels flag, so we have to deinterleave it
+    if channels > 1:
+        deinterleaved_data = deinterleave(new_data, channels)
+        json_content["data"] = deinterleaved_data
+    else:
+        json_content["data"] = new_data
+    file_content = json.dumps(json_content, separators=(',', ':'))
+
+    with open(filename, "w") as f:
+        f.write(file_content)
+
+
+def deinterleave(data, channelCount):
+    # first step is to separate the values for each audio channel and min/max value pair, hence we get an array with channelCount * 2 arrays
+    deinterleaved = [data[idx::channelCount * 2] for idx in range(channelCount * 2)]
+    new_data = []
+
+    # this second step combines each min and max value again in one array so we have one array for each channel
+    for ch in range(channelCount):
+        idx1 = 2 * ch
+        idx2 = 2 * ch + 1
+        ch_data = [None] * (len(deinterleaved[idx1]) + len(deinterleaved[idx2]))
+        ch_data[::2] = deinterleaved[idx1]
+        ch_data[1::2] = deinterleaved[idx2]
+        new_data.append(ch_data)
+    return new_data
 
 
 def getDbJson():
     dbJson = {}
     try:
-        with open(f'{musicDir}{targetJson}') as json_file:
+        with open(Path(f'{instrupellaDir}/{targetJson}')) as json_file:
             dbJson = json.load(json_file)
     except FileNotFoundError:
         print(f'file {musicDir}{targetJson} does not exist')
@@ -171,6 +241,12 @@ def createDatabaseJson():
         except os.error:
             size = 0
 
+        md5 = hashlib.md5(path.encode()).hexdigest()
+        peakJsonFileName = Path(path).stem[0:30]
+        peakJsonFilePath = f'{peakfilesDir}/{peakJsonFileName}-{md5}.json'
+        createPeakFile(file, peakJsonFilePath)
+        #sys.exit()
+
         jsonObject.append({
             "path": path,
             "artist": artist,
@@ -183,6 +259,7 @@ def createDatabaseJson():
             "bpm": 0,
             "key": str(detectKey(file)),
             "downbeat": None,
+            "peakfile": peakJsonFilePath.replace(pathSearchReplace[0], pathSearchReplace[1]),
             "hotcues": []
 
 
@@ -193,8 +270,13 @@ def createDatabaseJson():
         #    break
 
 
-    writeTextFile(f'{musicDir}{targetJson}', json.dumps(jsonObject, indent=2))
+    writeTextFile(
+        Path(f'{instrupellaDir}/{targetJson}'),
+        json.dumps(jsonObject, indent=2)
+    )
 
+def ensureExistingDirectory(dirPath):
+    dirPath.mkdir(parents=True, exist_ok=True)
 
 if __name__ == "__main__":
     main()
