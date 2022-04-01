@@ -24,7 +24,24 @@ screenshot of current development status:
   - [ ] sortable tracklist
   - [ ] scroll to top button in tracklist
   - [ ] highlight loaded track in tracklist
+
+### database
   - [ ] add flag to database for marking tracks with changing tempo/downbeat (+ comment column)
+  - [ ] json export of local storage edited values that can be merged into database
+  - [ ] add like / dislike to tracks with persisting
+  - [ ] persist hotcues, tempo, downbeat
+  - [ ] apply downbeat for manually persisting downbeat
+  - [ ] apply hotcues for manually persisting hotcues
+  - [ ] add track relation to db (for listening to original full tracks with beat)?
+  - [ ] add tags to acapella tracks. for example:
+    - tempo drift
+    - downbeat drift
+    - male
+    - female
+    - sample
+    - with beat
+    - with pad
+    - vocoder
 
 ### general
   - [ ] metronome (generic track on 2nd deck)
@@ -32,7 +49,6 @@ screenshot of current development status:
   - [x] editable hotcues, tempo, downbeat
   - [x] editable tempo by tap bpm
   - [ ] editable tempo by input field
-  - [ ] persist hotcues, tempo, downbeat
   - [ ] archive.org sample list
   - [ ] add working demo to https://othmar52.github.io/
   - [x] favicon
@@ -53,7 +69,6 @@ screenshot of current development status:
   - [ ] midi mapping / learn
   - [ ] metronome sound is very quiet on iPad when track is playing - do we need a separate audio context? (not reproduceable in desktop browsers)
   - [x] drop BeatGridPlugin as soon as new version of wavesurfer is released
-  - [ ] add like / dislike to tracks with persisting
   - [ ] move github link to "about" modal to avoid leaving instrupella by accident
   - [x] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprecess()` is not fired), maybe use wavesurfer.backend.getPlayedPercents());
   - [ ] ensure very long track titles does not break layout
@@ -64,8 +79,8 @@ screenshot of current development status:
   - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
   - [ ] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload
   - [ ] ensure track info modal closes when loading a new track
+  - [ ] add deck-id to track info modal
   - [ ] optionally include tempo x 2 and tempo / 2 in bpm filter
-  - [ ] json export of local storage edited values that can be merged into database
   - [ ] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
   - [ ] set hotcue: how to read currentSecond from player within store? audioprocess callback maybe has a few milliseconds offset...
 
@@ -77,7 +92,7 @@ screenshot of current development status:
   - [ ] optional enter url for loading on deck (mp3, youtube, soundcloud, etc.)
   - [x] fix `.pitch-control: { overflow:hidden; }` hack
   - [ ] optional choose local file for loading on deck
-  - [ ] multitouch on iPad
+  - [ ] multitouch support on iPad
   - [ ] add VU-meter
   - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME & https://wavesurfer-js.org/faq/
 

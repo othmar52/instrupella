@@ -79,7 +79,9 @@ import Button from '@/components/Button.vue'
 import Metronome from '@/components/Metronome.vue'
 import TapBpm from '@/components/Deck/TapBpm.vue'
 import utils from '../../mixins/utils'
+import { useMainStore } from "@/store.js";
 const { getBpm, isManualBpm } = utils()
+const storage = useMainStore()
 const props = defineProps({
   track: {
     type: Object,
@@ -102,7 +104,7 @@ const props = defineProps({
     default: 0.01
   }
 })
-const editTempo = ref(0)
+const editTempo = computed(() => storage.getEditTempo)
 
 const metronome = ref(null)
 const metronameActive = ref(false)
@@ -111,17 +113,17 @@ const toggleMetronome = () => {
   metronameActive.value = !metronameActive.value
 }
 const doubleTempo = () => {
-  editTempo.value *= 2
+  storage.setEditTempo(editTempo.value * 2)
 }
 
 const halfTempo = () => {
-  editTempo.value /= 2
+  storage.setEditTempo(editTempo.value / 2)
 }
 const increaseTempo = (event) => {
-  editTempo.value += getStepFactor(event)
+  storage.setEditTempo(editTempo.value + getStepFactor(event))
 }
 const decreaseTempo = (event) => {
-  editTempo.value -= getStepFactor(event)
+  storage.setEditTempo(editTempo.value - getStepFactor(event))
 }
 
 // very left 15% -> minimum (= props.step bpm) 
@@ -144,7 +146,7 @@ const getStepFactor = (event) => {
 }
 
 const setTapTempo = (tempo) => {
-  editTempo.value = parseFloat(tempo)
+  storage.setEditTempo(parseFloat(tempo))
 }
 
 const setDownbeat = () => {
@@ -168,17 +170,9 @@ const applyTempo = () => {
 }
 
 const emit = defineEmits([
-  'updateTrack',
-  'newEditTempo'
+  'updateTrack'
 ])
 
-watch(() => editTempo.value, (newValue) => {
-  if (newValue < props.step) {
-    newValue = 0
-  }
-  editTempo.value = parseFloat(newValue)
-  emit('newEditTempo', editTempo.value)
-})
 
 watch(() => props.play, (newPlayState) => {
   if (metronameActive.value === false) {

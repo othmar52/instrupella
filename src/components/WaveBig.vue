@@ -32,6 +32,7 @@ import { useMainStore } from "@/store.js";
 import { ref, watch, onMounted, computed } from 'vue'
 
 const storage = useMainStore()
+const editTempo = computed(() => storage.getEditTempo)
 const { getBpm } = utils()
 const player = ref(null)
 
@@ -54,10 +55,6 @@ const props = defineProps({
   deck: {
     type: Object,
     default: null
-  },
-  editTempo: {
-    type: Number,
-    default: 0
   }
 })
 
@@ -91,9 +88,13 @@ const redrawBeatGrid = () => {
 }
 
 
+/*
 watch(() => props.deck.skipLength, (value) => {
-  player.value.params.skipLength = parseFolat(value)
+  console.log('watch skip length', value)
+  player.value.params.skipLength = parseFloat(value)
 })
+
+*/
 
 watch(() => props.deck.play, () => {
   if (!props.deck.track) {
@@ -110,17 +111,22 @@ watch(() => props.deck.volume, (newVolume) => {
 })
 
 watch(() => props.deck.nudgeAhead, (nudgeValue) => {
+  // console.log('watch nudgeAhead', nudgeValue)
   if (nudgeValue === 0) {
+    player.value.params.skipLength = 0.05 // TODO remove hardcoded value
     return
   }
+  player.value.params.skipLength = parseFloat(nudgeValue)
   player.value.skipForward()
   storage.clearNudge(props.deck.index)
 })
 
 watch(() => props.deck.nudgeBehind, (nudgeValue) => {
   if (nudgeValue === 0) {
+    player.value.params.skipLength = 0.05 // TODO remove hardcoded value
     return
   }
+  player.value.params.skipLength = parseFloat(nudgeValue)
   player.value.setMute(true)
   player.value.skipBackward()
   storage.clearNudge(props.deck.index)
@@ -282,20 +288,23 @@ const wavesurferOptions = () => {
   }
 }
 const getBeatGridOffset = (overrideDownbeat = null) => {
+  // console.log('getBeatGridOffset')
   let useTempo = 0
   if (getBpm(props.deck.track) > 0) {
     useTempo = getBpm(props.deck.track)
   }
-  if (props.editTempo > 0) {
-    useTempo = props.editTempo
+  if (editTempo.value > 0) {
+    // console.log('useTempo = editTempo', editTempo.value)
+    useTempo = editTempo.value
   }
   if (useTempo === 0) {
     return 0
   }
   const useDownbeat = (overrideDownbeat !== null)
     ? overrideDownbeat
-    : props.deck.track.downbeat
+    : (props.deck.track) ? props.deck.track.downbeat : 0
 
+  // console.log('getBeatGridOffset overrideDownbeat', overrideDownbeat, useDownbeat)
   // ensure we have timeline rendering from start to finish
   // by pushing the offset in 4-bar-steps to a negative value
   const seconds4Bars = 60 / useTempo * 16
@@ -441,7 +450,7 @@ watch(() => downbeat.value, (newDownbeat) => {
   } catch (e) { }
 })
 
-watch(() => props.editTempo, (newTempo) => {
+watch(() => storage.editTempo, (newTempo) => {
   if (newTempo === 0) {
     return
   }

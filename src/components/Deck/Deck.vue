@@ -101,7 +101,6 @@
           :playbackRate="deck.playbackRate"
           :currentSecond="deck.currentSecond"
           @updateTrack="$emit('updateTrack', $event)"
-          @newEditTempo="newEditTempo"
         />
       </div>
     </div>
@@ -143,7 +142,6 @@ const loadProgress = ref(0)
 const trackAnalyzed = ref(false)
 const currentSecond = ref(0)
 const showEditTrack = ref(false)
-const editTempo = ref(0)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
 const storage = useMainStore()
 const props = defineProps({
@@ -165,8 +163,6 @@ const setPitch = (newPitchValue) => {
 }
 const trackLoad = (percent) => {
   loadProgress.value = percent
-  storage.togglePlay(props.deck.index, false)
-  storage.toggleMute(props.deck.index, false)
   trackAnalyzed.value = false
 }
 const trackReady = () => {
@@ -181,11 +177,6 @@ const zoomTo = (pxPerSec) => {
 const error = (errormsg) => {
   console.log('TODO: handle player error', errormsg)
 }
-
-const newEditTempo = (newTempo) => {
-  editTempo.value = newTempo
-}
-
 </script>
 
 <style lang="scss">

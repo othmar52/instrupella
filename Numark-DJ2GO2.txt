@@ -1,0 +1,89 @@
+## midi controller required controls
+    [ ] sync on/off
+    [ ] play/pause
+    ( ) jogwheel
+    (o) pitch encoder +/- 0,1 bpm
+    [ ] shift 1: jogwheel quarter note | pitch fine+/- 1 bpm
+    [ ] shift 2: jogwheel 1 bar  | pich pitch +/- 5 bpm
+    [ ] shift 3: jogwheel 4 bars | pitch range
+    [ ] x mal cue
+    [ ] cue delete mode
+
+
+
+
+
+## numark DJ2GO2 midi IN
+TBC - all* LEDs of buttons are controlled via note on messages
+ velocity 0: off
+ velocity 1: dimmed
+ velocity 2-127: bright
+
+* headphone button can't be turned off
+  velo 0: dimmed
+  velo 1-127: bright
+
+
+
+For example "Deck B SYNC Button"
+sendmidi dev "DJ2GO2 MIDI 1" ch 1 on 2 0  // CH 1 note on 2 velo 0 -> left sync button off
+sendmidi dev "DJ2GO2 MIDI 1" ch 1 on 2 1  // CH 1 note on 2 velo 1 -> left sync button blue dimmed
+sendmidi dev "DJ2GO2 MIDI 1" ch 1 on 2 2  // CH 1 note on 2 velo 2-127 -> left sync button blue bright
+
+(tested with https://github.com/gbevin/SendMIDI)
+
+ch 1 note 0     Deck A PLAY/PAUSE
+ch 1 note 1     Deck A CUE
+ch 1 note 2     Deck A SYNC
+ch 1 note 27    Deck A HEADPHONE* (cant be turned off)
+
+ch 5 note 1     Deck A HOTCUE1 (pad mode 1 / cue)
+ch 5 note 2     Deck A HOTCUE2 (pad mode 1 / cue)
+ch 5 note 3     Deck A HOTCUE3 (pad mode 1 / cue)
+ch 5 note 4     Deck A HOTCUE4 (pad mode 1 / cue)
+
+ch 5 note 17    Deck A HOTCUE1 (pad mode 2 / auto)
+ch 5 note 18    Deck A HOTCUE2 (pad mode 2 / auto)
+ch 5 note 19    Deck A HOTCUE3 (pad mode 2 / auto)
+ch 5 note 20    Deck A HOTCUE4 (pad mode 2 / auto)
+
+ch 5 note 33    Deck A HOTCUE1 (pad mode 3 / manual)
+ch 5 note 34    Deck A HOTCUE2 (pad mode 3 / manual)
+ch 5 note 35    Deck A HOTCUE3 (pad mode 3 / manual)
+ch 5 note 36    Deck A HOTCUE4 (pad mode 3 / manual)
+
+ch 5 note 49    Deck A HOTCUE1 (pad mode 4 / sampler)
+ch 5 note 50    Deck A HOTCUE2 (pad mode 4 / sampler)
+ch 5 note 51    Deck A HOTCUE3 (pad mode 4 / sampler)
+ch 5 note 52    Deck A HOTCUE4 (pad mode 4 / sampler)
+
+ch 2 note 0     Deck B PLAY/PAUSE
+ch 2 note 1     Deck B CUE
+ch 2 note 2     Deck B SYNC
+ch 2 note 27    Deck B HEADPHONE* (cant be turned off)
+
+ch 6 note 1     Deck B HOTCUE1 (pad mode 1 / cue)
+ch 6 note 2     Deck B HOTCUE2 (pad mode 1 / cue)
+ch 6 note 3     Deck B HOTCUE3 (pad mode 1 / cue)
+ch 6 note 4     Deck B HOTCUE4 (pad mode 1 / cue)
+
+ch 6 note 17    Deck B HOTCUE1 (pad mode 2 / auto)
+ch 6 note 18    Deck B HOTCUE2 (pad mode 2 / auto)
+ch 6 note 19    Deck B HOTCUE3 (pad mode 2 / auto)
+ch 6 note 20    Deck B HOTCUE4 (pad mode 2 / auto)
+
+ch 6 note 33    Deck B HOTCUE1 (pad mode 3 / manual)
+ch 6 note 34    Deck B HOTCUE2 (pad mode 3 / manual)
+ch 6 note 35    Deck B HOTCUE3 (pad mode 3 / manual)
+ch 6 note 36    Deck B HOTCUE4 (pad mode 3 / manual)
+
+ch 6 note 49    Deck B HOTCUE1 (pad mode 4 / sampler)
+ch 6 note 50    Deck B HOTCUE2 (pad mode 4 / sampler)
+ch 6 note 51    Deck B HOTCUE3 (pad mode 4 / sampler)
+ch 6 note 52    Deck B HOTCUE4 (pad mode 4 / sampler)
+
+
+ch 6 note 0 velo 0   pad mode 1 / cue
+ch 6 note 0 velo 5   pad mode 2 / auto
+ch 6 note 0 velo 11  pad mode 3 / manual
+ch 6 note 0 velo 7   pad mode 4 / sampler

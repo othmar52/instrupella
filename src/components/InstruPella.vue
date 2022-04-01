@@ -7,6 +7,7 @@
       :key="deck.index"
       :deck="deck"
       :midiLearn="midiLearn"
+      @updateTrack="persistUpdateTrack"
     />
     <div v-if="tracks">
       <TrackList
@@ -57,13 +58,10 @@ const midiInput1 = ref(null)
 
 const persistUpdateTrack = (properties) => {
   storage.addTrackProp(properties)
-  for (const [key, value] of Object.entries(properties)) {
-    track.value[key] = value
-  }
 }
 
 const loadTrackList = () => {
-  fetch(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/00-acajam.json`)
+  fetch(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/instrupella/instrupella-db.json`)
     .then(response => response.json())
     .then(json => {
       tracks.value = json.map((track, idx) => ({ ...track, id: idx }))
@@ -94,9 +92,9 @@ const initMidi = () => {
     console.log('WebMidi.outputs', WebMidi.outputs)
     console.log('WebMidi.inputs', WebMidi.inputs)
 
-    midiInput1.value = WebMidi.getInputByName('Control Hub MIDI 1')
+    midiInput1.value = WebMidi.getInputByName('DJ2GO2 MIDI 1')
     if (!midiInput1.value) {
-      console.log("cant find Control Hub MIDI 1....")
+      console.log("cant find DJ2GO2 MIDI 1....")
       return
     }
     console.log('midiInput1', midiInput1)
@@ -138,6 +136,7 @@ const initMidi = () => {
     // TODO add owner check
     //this.localMidi = this.outputDN ? true : false;
   })
+  storage.resetMidiMappings()
 }
 
 onMounted(() => {

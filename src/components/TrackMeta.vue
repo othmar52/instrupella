@@ -130,8 +130,10 @@ const formatDuration = (duration) => {
   return ret
 }
 
-watch(() => props.deck.track, () => {
-  duration.value = props.deck.track.length
+watch(() => props.deck.track, (newTrack) => {
+  if (newTrack) {
+    duration.value = props.deck.track.length
+  }
 })
 </script>
 
