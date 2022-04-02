@@ -1,6 +1,11 @@
 <template>
   <BlazingBaton ref="baton" />
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
+  <!--
+  <div v-for="(item, idx) in tmpMidiDevices" :key="idx">
+      {{ idx }} {{ item }}
+  </div>
+  -->
   <div class="instrupella">
     <Deck
       v-for="deck in decks"
@@ -38,6 +43,7 @@ const track = ref(null)
 const top = ref(null)
 const tracks = ref([])
 const baton = ref(null)
+const tmpMidiDevices = ref([])
 
 const storage = useMainStore()
 const decks = computed(() => storage.getDecks)
@@ -85,14 +91,19 @@ const mergeLocalStorageTrackProperties = () => {
 const initMidi = () => {
   webmidi.enable((err) => {
     if (err) {
+      tmpMidiDevices.value.push('ERROR: ' + err)
       console.log("WebMidi could not be enabled.", err);
       return
+    }
+    for (const item of WebMidi.inputs) {
+      tmpMidiDevices.value.push(item.name)
     }
     const devices = WebMidi.outputs;
     console.log('WebMidi.outputs', WebMidi.outputs)
     console.log('WebMidi.inputs', WebMidi.inputs)
 
     midiInput1.value = WebMidi.getInputByName('DJ2GO2 MIDI 1')
+    // midiInput1.value = WebMidi.getInputByName('DJ2GO2')
     if (!midiInput1.value) {
       console.log("cant find DJ2GO2 MIDI 1....")
       return

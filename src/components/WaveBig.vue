@@ -28,12 +28,15 @@ import MinimapPlugin from 'wavesurfer.js/src/plugin/minimap/index.js'
 import MarkersPlugin from 'wavesurfer.js/src/plugin/markers/index.js'
 import TimelinePlugin from 'wavesurfer.js/src/plugin/timeline/index.js'
 import utils from '../mixins/utils.js'
+import getNegativeDownbeatMixin from '../mixins/utils/negativeDownbeat'
 import { useMainStore } from "@/store.js";
 import { ref, watch, onMounted, computed } from 'vue'
 
 const storage = useMainStore()
-const editTempo = computed(() => storage.getEditTempo)
+const workingTempo = computed(() => storage.getWorkingTempo)
+const workingDownbeat = computed(() => storage.getWorkingDownbeat)
 const { getBpm } = utils()
+const { getNegativeDownbeat } = getNegativeDownbeatMixin()
 const player = ref(null)
 
 // some helpers for dragging waveform
@@ -41,13 +44,6 @@ const dragging = ref(false)
 const dragX = ref(false)
 const startDragPlayState = ref(false)
 const lastSetSongPosition = ref(false)
-
-const downbeat = computed(() => {
-  if (!props.deck.track) {
-    return '0'
-  }
-  return props.deck.track.downbeat
-})
 
 const track = computed(() => props.deck.track)
 
@@ -58,34 +54,37 @@ const props = defineProps({
   }
 })
 
+const redrawBeatGrid = (clear=false) => {
+  if (!player.value) {
+    return
+  }
+  if (!props.deck.track) {
+    return
+  }
+  if (workingTempo.value === 0) {
+    return
+  }
+  try {
+    player.value.timeline.params.offset = getBeatGridOffset()
+    // avoid rendering invalid beatgrid during load
+    player.value.timeline.params.timeInterval = clear
+      ? 10000
+      : function () {
+          return 60 / workingTempo.value
+        }
+    player.value.timeline.render()
+  } catch (e) { }
+}
+
 watch(() => props.deck.track, (newTrack) => {
   if (!newTrack) {
     return
   }
   // avoid rendering invalid beatgrid during load
-  player.value.timeline.params.timeInterval = 10000
-
-  // TODO clear minimap
-  // approach with next 2 lines only work during pause and trackPosition 0
-  // @see https://github.com/katspaugh/wavesurfer.js/issues/2479
-  const len = player.value.minimap.drawer.getWidth();
-  player.value.minimap.drawer.progress(0)
-  player.value.minimap.drawer.drawPeaks([0], len, 0, len);
-
+  //player.value.timeline.params.timeInterval = 10000
+  redrawBeatGrid(true)
   player.value.load(newTrack.path)
 })
-
-const redrawBeatGrid = () => {
-  const bpm = getBpm(props.deck.track)
-  if (bpm === 0) {
-    return
-  }
-  player.value.timeline.params.offset = getBeatGridOffset()
-  player.value.timeline.params.timeInterval = function () {
-      return 60 / bpm
-  }
-  player.value.timeline.render()
-}
 
 
 /*
@@ -127,13 +126,14 @@ watch(() => props.deck.nudgeBehind, (nudgeValue) => {
     return
   }
   player.value.params.skipLength = parseFloat(nudgeValue)
-  player.value.setMute(true)
+  // player.value.setMute(true)
   player.value.skipBackward()
   storage.clearNudge(props.deck.index)
+  /*
   setTimeout(() => {
     player.value.setMute(false)
-    player.value.setVolume(1)
   }, player.value.params.skipLength * 1000)
+  */
 })
 
 watch(() => props.deck.seekToSecond, (sec) => {
@@ -287,32 +287,13 @@ const wavesurferOptions = () => {
     splitChannels: false
   }
 }
-const getBeatGridOffset = (overrideDownbeat = null) => {
-  // console.log('getBeatGridOffset')
-  let useTempo = 0
-  if (getBpm(props.deck.track) > 0) {
-    useTempo = getBpm(props.deck.track)
-  }
-  if (editTempo.value > 0) {
-    // console.log('useTempo = editTempo', editTempo.value)
-    useTempo = editTempo.value
-  }
-  if (useTempo === 0) {
+const getBeatGridOffset = () => {
+  if (workingTempo.value === 0) {
     return 0
   }
-  const useDownbeat = (overrideDownbeat !== null)
-    ? overrideDownbeat
-    : (props.deck.track) ? props.deck.track.downbeat : 0
-
-  // console.log('getBeatGridOffset overrideDownbeat', overrideDownbeat, useDownbeat)
   // ensure we have timeline rendering from start to finish
   // by pushing the offset in 4-bar-steps to a negative value
-  const seconds4Bars = 60 / useTempo * 16
-  let newOffset = useDownbeat
-  while (newOffset > 0) {
-    newOffset -= seconds4Bars
-  }
-  return newOffset
+  return getNegativeDownbeat(workingTempo.value, workingDownbeat.value)
 }
 
 const togglePlay = () => {
@@ -433,36 +414,19 @@ const updateMarkers = () => {
   }
 }
 
+
 watch(() => props.deck.playbackRate, () => {
   try {
     player.value.setPlaybackRate(props.deck.playbackRate)
   } catch (e) { }
 })
 
-watch(() => downbeat.value, (newDownbeat) => {
-  if (!player.value) {
-    return
-  }
-  try {
-    // console.log('downbeat has changed - updating timeline')
-    player.value.timeline.params.offset = getBeatGridOffset(newDownbeat)
-    player.value.timeline.render()
-  } catch (e) { }
+watch(() => storage.workingDownbeat, () => {
+  redrawBeatGrid()
 })
 
-watch(() => storage.editTempo, (newTempo) => {
-  if (newTempo === 0) {
-    return
-  }
-  try {
-    // console.log('edit tempo has changed - updating timeline')
-    const secondsPerQuarterNote = 60 / newTempo
-    player.value.timeline.params.timeInterval = function () {
-      return secondsPerQuarterNote
-    }
-    player.value.timeline.params.offset = getBeatGridOffset()
-    player.value.timeline.render()
-  } catch (e) { }
+watch(() => storage.workingTempo, () => {
+  redrawBeatGrid()
 })
 
 onMounted(() => {

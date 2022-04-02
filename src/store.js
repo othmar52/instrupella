@@ -1,13 +1,25 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import rangeMixin from './mixins/utils/range'
+import getSecondsPerQuarterNoteMixin from './mixins/utils/secondsPerQuarterNote'
+import mapValueMixin from './mixins/utils/mapValue'
+import getNegativeDownbeatMixin from './mixins/utils/negativeDownbeat'
+import utilsMixin from './mixins/utils'
 
+const { getBpm } = utilsMixin()
 const { range } = rangeMixin()
+const { getSecondsPerQuarterNote } = getSecondsPerQuarterNoteMixin()
+const { getNegativeDownbeat } = getNegativeDownbeatMixin()
+const { mapValue } = mapValueMixin()
 
 const ctrlKeyToFunc = (ctrlKey) => {
-  const match = /^d\.(\d*)\.(.*)$/.exec(ctrlKey)
+  let match = /^d\.(\d*)\.(.*)$/.exec(ctrlKey)
   if (match && ctrlMap[match[2]]) {
     return [parseInt(match[1]), ctrlMap[match[2]]]
+  }
+  match = /^g\.(.*)$/.exec(ctrlKey)
+  if (match && ctrlMap[match[1]]) {
+    return [null, ctrlMap[match[1]]]
   }
   console.log('ERROR ctrlKeyToFunc', ctrlKey)
 }
@@ -25,7 +37,14 @@ const midiMapping = {
   '6-noteon-3': 'd.0.hotCue3DownMidi',
   '6-noteoff-3': 'd.0.hotCue3UpMidi',
   '6-noteon-4': 'd.0.hotCue4DownMidi',
-  '6-noteoff-4': 'd.0.hotCue4UpMidi'
+  '6-noteoff-4': 'd.0.hotCue4UpMidi',
+  '1-noteon-2': 'g.midiShift1On',
+  '1-noteon-1': 'g.midiShift2On',
+  '1-noteon-0': 'g.midiShift3On',
+  '1-noteoff-2': 'g.midiShiftOff',
+  '1-noteoff-1': 'g.midiShiftOff',
+  '1-noteoff-0': 'g.midiShiftOff',
+  '2-controlchange-9': 'd.0.setPlaybackRateMidi'
 }
 const ctrlMap = {
   'toggleMute': 'toggleMute',
@@ -48,6 +67,11 @@ const ctrlMap = {
   'hotCue3UpMidi': 'hotCue3UpMidi',
   'hotCue4DownMidi': 'hotCue4DownMidi',
   'hotCue4UpMidi': 'hotCue4UpMidi',
+  'midiShift1On': 'midiShift1On',
+  'midiShift2On': 'midiShift2On',
+  'midiShift3On': 'midiShift3On',
+  'midiShiftOff': 'midiShiftOff',
+  'setPlaybackRateMidi': 'setPlaybackRateMidi',
   'toggleHotCueDeleteMode': 'toggleHotCueDeleteMode'
 }
 
@@ -57,11 +81,13 @@ export const useMainStore = defineStore({
     midiMappings: useStorage('midiMappings', midiMapping),
     midiLearn: useStorage('midiLearn', false),
     midiLearnItem: useStorage('midiLearnItem', null),
+    midiShift: useStorage('midiShift', 0),
     scrollToTop: useStorage('midiLearn', false),
     trackProps: useStorage('trackProps', []),
     decks: useStorage('decks', []),
     tracks: useStorage('tracks', []),
-    editTempo: useStorage('editTempo', 0)
+    workingTempo: useStorage('workingTempo', 0),
+    workingDownbeat: useStorage('workingDownbeat', 0)
   }),
   getters: {
     getAllMidiMappings() {
@@ -88,8 +114,11 @@ export const useMainStore = defineStore({
     getScrollToTop() {
       return this.scrollToTop
     },
-    getEditTempo() {
-      return this.editTempo
+    getWorkingTempo() {
+      return this.workingTempo
+    },
+    getWorkingDownbeat() {
+      return this.workingDownbeat
     }
   },
   actions: {
@@ -106,8 +135,27 @@ export const useMainStore = defineStore({
     setScrollToTop(value) {
       this.scrollToTop = value
     },
-    setEditTempo(value) {
-      this.editTempo = parseFloat(value)
+    midiShift1On() {
+      //console.log('midiShift', 1)
+      this.midiShift = 1
+    },
+    midiShift2On() {
+      //console.log('midiShift', 2)
+      this.midiShift = 2
+    },
+    midiShift3On() {
+      //console.log('midiShift', 3)
+      this.midiShift = 3
+    },
+    midiShiftOff() {
+      //console.log('midiShift', 0)
+      this.midiShift = 0
+    },
+    setWorkingTempo(value) {
+      this.workingTempo = parseFloat(value)
+    },
+    setWorkingDownbeat(value) {
+      this.workingDownbeat = parseFloat(value)
     },
     setTracks(tracks) {
       this.tracks = tracks
@@ -163,6 +211,7 @@ export const useMainStore = defineStore({
         skipLength: 0.05,
         timestretch: false,
         pixelPerSecond: 400,
+        jogWheelDebounce: 0,
         hotCues: {
           deleteMode: false,
           playStateOnCueStart: false,
@@ -190,7 +239,7 @@ export const useMainStore = defineStore({
       this.decks.push(deck)
     },
     toggleMute(deckIndex, forceNewState=null) {
-      console.log('toggleMute', forceNewState)
+      // console.log('toggleMute', forceNewState)
       if (forceNewState === null) {
         this.decks[deckIndex].mute = !this.decks[deckIndex].mute
         return
@@ -213,8 +262,14 @@ export const useMainStore = defineStore({
     },
     loadTrack(deckIndex, trackIndex) {
       this.setScrollToTop(true)
+      this.setWorkingTempo(getBpm(this.tracks[trackIndex]))
+      //console.log('storage set downbeat', parseFloat(this.tracks[trackIndex].downbeat), this.tracks[trackIndex])
+      this.setWorkingDownbeat(
+        (this.tracks[trackIndex].downbeat !== null)
+          ? parseFloat(this.tracks[trackIndex].downbeat)
+          : 0
+      )
       this.decks[deckIndex].track = this.tracks[trackIndex]
-      this.setEditTempo(0)
       this.togglePlay(deckIndex, false)
       this.toggleMute(deckIndex, false)
       // TODO: read persisted hot cues from track
@@ -265,6 +320,18 @@ export const useMainStore = defineStore({
     },
     setPlaybackRate(deckIndex, playbackRate) {
       this.decks[deckIndex].playbackRate = playbackRate
+    },
+    setPlaybackRateMidi(deckIndex, midiCCValue) {
+      let newPlayBackrate = 1
+      switch(true) {
+        case midiCCValue > 64:
+          newPlayBackrate = mapValue(midiCCValue, 64, 127, 1, 1.1)
+          break
+        case midiCCValue < 64:
+          newPlayBackrate = mapValue(midiCCValue, 0, 64, 0.9, 1)
+          break
+      }
+      return this.setPlaybackRate(deckIndex, newPlayBackrate)
     },
     setCurrentSecond(deckIndex, currentSecond) {
       // console.log('store.setCurrentSec', currentSecond)
@@ -352,8 +419,62 @@ export const useMainStore = defineStore({
         directionFunc = 'nudgeBehind'
         relativeValue = 128 - midiValue
       }
-      // console.log('relativeValue', relativeValue, parseFloat(duration * relativeValue))
+
+      if (this.midiShift > 0 && this.decks[deckIndex].track !== null) {
+        this.decks[deckIndex].jogWheelDebounce += relativeValue
+        if(this.decks[deckIndex].jogWheelDebounce < 20) {
+          return
+        }
+        let secondsPerQuarterNote = getSecondsPerQuarterNote(this.decks[deckIndex].track)
+        let factor
+        switch (this.midiShift) {
+          case 2:
+            factor = 4
+            break
+          case 3:
+            factor = 16
+            break
+          default:
+            factor = 1
+        }
+        if (secondsPerQuarterNote > 0) {
+          if (directionFunc === 'nudgeAhead') {
+            return this.seekToNextDivision(deckIndex, secondsPerQuarterNote*factor)
+          }
+          return this.seekToPreviousDivision(deckIndex, secondsPerQuarterNote*factor)
+        }
+      }
       this[directionFunc](deckIndex, parseFloat(duration * relativeValue))
+    },
+    seekToNextDivision(deckIndex, divisionDuration) {
+        let currentTimestamp = this.decks[deckIndex].currentSecond + 0.001
+        let trackDuration = this.decks[deckIndex].track.length
+        let loopSecond = getNegativeDownbeat(this.workingTempo, this.workingDownbeat)
+        while (loopSecond < trackDuration) {
+          loopSecond += divisionDuration
+          if(loopSecond < currentTimestamp) {
+            continue
+          }
+          this.decks[deckIndex].jogWheelDebounce = 0
+          this.seekToSecond(deckIndex, loopSecond)
+          return
+        }
+    },
+    seekToPreviousDivision(deckIndex, divisionDuration) {
+        // TODO: this does not work during play
+        // consider to read current division and directly seek to previous division
+        let currentTimestamp = this.decks[deckIndex].currentSecond - 0.1
+        let trackDuration = this.decks[deckIndex].track.length
+        let loopSecond = divisionDuration * Math.ceil(trackDuration/divisionDuration) + this.workingDownbeat
+        while (loopSecond > 0) {
+          loopSecond -= divisionDuration
+          if(loopSecond > currentTimestamp) {
+            continue
+          }
+          this.decks[deckIndex].jogWheelDebounce = 0
+          this.seekToSecond(deckIndex, loopSecond)
+          return
+        }
     },
     handleIncomingMidiEvent(e) {
       switch(e.message.type) {
@@ -362,7 +483,7 @@ export const useMainStore = defineStore({
         case 'controlchange':
           const eventIdentifier = `${e.message.channel}-${e.message.type}-${e.dataBytes[0]}`
           if (typeof this.midiMappings[eventIdentifier] !== 'undefined') {
-            console.log('SUCCESS', eventIdentifier, this.midiMappings[eventIdentifier], e.dataBytes[1])
+            // console.log('SUCCESS', eventIdentifier, this.midiMappings[eventIdentifier], e.dataBytes[1])
             this.fireControlElement(this.midiMappings[eventIdentifier], e.dataBytes[1])
             return
           }

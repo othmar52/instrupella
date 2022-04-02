@@ -49,15 +49,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import VSlider from '@/components/VSlider.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import { useMainStore } from "@/store.js";
 const storage = useMainStore()
+const slider = ref(null)
 const buttonClasses = ref('btn btn-square btn-lg m-10 mr-0')
 const range = ref(0.1)
-const min = ref(0.8)
-const max = ref(1.2)
+const min = ref(0.9)
+const max = ref(1.1)
 const props = defineProps({
   center: {
     type: Number,
@@ -73,6 +74,11 @@ const props = defineProps({
   }
 })
 
+// helper var used for bidirektional control
+// slider -> store (via GUI)
+// store -> slider (via midi)
+let playbackRateString = ''
+
 const changeRange = (newRange, id) => {
   range.value = newRange
   min.value = props.center - newRange
@@ -85,11 +91,19 @@ const changeRange = (newRange, id) => {
 }
 
 const sliderChange = (newPitchValue) => {
+  playbackRateString = newPitchValue.toString()
   storage.setPlaybackRate(
     props.deck.index,
     parseFloat(newPitchValue)
   )
 }
+
+watch(() => props.deck.playbackRate, (playbackRate) => {
+  if (playbackRate.toString() !== playbackRateString) {
+    playbackRateString = playbackRate.toString()
+    slider.value.setSliderValueFromMidi(playbackRate)
+  }
+})
 
 const pitchLabel = computed(() => {
   return `${range.value * 100}%`

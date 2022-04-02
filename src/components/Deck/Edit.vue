@@ -2,7 +2,7 @@
   <div class="edit-track">
     <div class="row">
       <div class="col-2 justify-content-between d-flex">
-        <div class="font-size-18">Tempo {{editTempo.toFixed(3)}}</div>
+        <div class="font-size-18">Tempo {{workingTempo.toFixed(3)}}</div>
       </div>
       <div class="col-10">
           <ButtonIcon
@@ -39,11 +39,16 @@
             :permaClasses="`btn btn-square btn-rect btn-default btn-lg m-5`"
             @click="increaseTempo"
           />
+          <Button
+            label="APPLY"
+            :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
+            @click="persistTempo"
+          />
       </div>
     </div>
     <div class="row">
       <div class="col-2 justify-content-betweenXXXX d-flexXXXX">
-        <span class="font-size-18">Set Downbeat</span>
+        <span class="font-size-18">Set Downbeat {{workingDownbeat.toFixed(2)}}</span>
       </div>
       <div class="col-10">
         <button class="btn btn-default btn-square btn-lg m-5 btn-bars" @click="setDownbeat">
@@ -63,9 +68,9 @@
         <Button
         label="APPLY"
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
-        @click="applyTempo"
+        @click="persistDownbeat"
         />
-        <Metronome :tempo="editTempo" ref="metronome" />
+        <Metronome :tempo="workingTempo" ref="metronome" />
 
       </div>
     </div>
@@ -104,7 +109,8 @@ const props = defineProps({
     default: 0.01
   }
 })
-const editTempo = computed(() => storage.getEditTempo)
+const workingTempo = computed(() => storage.getWorkingTempo)
+const workingDownbeat = computed(() => storage.getWorkingDownbeat)
 
 const metronome = ref(null)
 const metronameActive = ref(false)
@@ -113,17 +119,17 @@ const toggleMetronome = () => {
   metronameActive.value = !metronameActive.value
 }
 const doubleTempo = () => {
-  storage.setEditTempo(editTempo.value * 2)
+  storage.setWorkingTempo(workingTempo.value * 2)
 }
 
 const halfTempo = () => {
-  storage.setEditTempo(editTempo.value / 2)
+  storage.setWorkingTempo(workingTempo.value / 2)
 }
 const increaseTempo = (event) => {
-  storage.setEditTempo(editTempo.value + getStepFactor(event))
+  storage.setWorkingTempo(workingTempo.value + getStepFactor(event))
 }
 const decreaseTempo = (event) => {
-  storage.setEditTempo(editTempo.value - getStepFactor(event))
+  storage.setWorkingTempo(workingTempo.value - getStepFactor(event))
 }
 
 // very left 15% -> minimum (= props.step bpm) 
@@ -146,10 +152,14 @@ const getStepFactor = (event) => {
 }
 
 const setTapTempo = (tempo) => {
-  storage.setEditTempo(parseFloat(tempo))
+  storage.setWorkingTempo(parseFloat(tempo))
 }
 
 const setDownbeat = () => {
+  storage.setWorkingDownbeat(parseFloat(props.currentSecond))
+}
+
+const persistDownbeat = () => {
   emit(
     'updateTrack',
     {
@@ -159,12 +169,12 @@ const setDownbeat = () => {
   )
 }
 
-const applyTempo = () => {
+const persistTempo = () => {
   emit(
     'updateTrack',
     {
       path: props.track.path,
-      bpm: editTempo.value
+      bpm: workingTempo.value
     }
   )
 }

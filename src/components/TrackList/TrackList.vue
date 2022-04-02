@@ -84,6 +84,8 @@ const length = ref(0)
 const searchInput = ref('')
 const filteredEntries = ref([])
 
+const bpmFilterStep = 5
+
 const loadRandom = () => {
   // console.log('load random')
   const randomItem = filteredEntries.value[Math.floor(Math.random()*filteredEntries.value.length)];
@@ -125,7 +127,8 @@ const searchTermMatches = (track, searchTerm) => {
 }
 
 const tempoMatches = (trackTempo, tempo) => {
-  return trackTempo !== null && trackTempo >= tempo - 5 && trackTempo <= tempo + 5
+  const tempoDiff = bpmFilterStep/2
+  return trackTempo !== null && trackTempo >= tempo - tempoDiff && trackTempo <= tempo + tempoDiff
 }
 
 onMounted(() => {
@@ -134,7 +137,7 @@ onMounted(() => {
 
 watch(() => props.tracks, () => {
   bpmFilterValues.value = []
-  for (const tempo of range(0, 180, 10)) {
+  for (const tempo of range(0, 180, bpmFilterStep)) {
     const tracksWithTempo = props.tracks.filter(track => {
       return tempoMatches(getBpm(track), tempo)
     })
