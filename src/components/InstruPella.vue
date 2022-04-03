@@ -103,12 +103,13 @@ const initMidi = () => {
     console.log('WebMidi.inputs', WebMidi.inputs)
 
     midiInput1.value = WebMidi.getInputByName('DJ2GO2 MIDI 1')
+    // midiInput1.value = WebMidi.getInputByName('DJ2GO2 MIDI')
     // midiInput1.value = WebMidi.getInputByName('DJ2GO2')
     if (!midiInput1.value) {
       console.log("cant find DJ2GO2 MIDI 1....")
       return
     }
-    console.log('midiInput1', midiInput1)
+    console.log('midiInput1x', midiInput1)
 
     midiInput1.value.removeListener()
     midiInput1.value.addListener('midimessage', e => {

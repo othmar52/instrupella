@@ -33,15 +33,18 @@ screenshot of current development status:
   - [ ] apply downbeat for manually persisting downbeat
   - [ ] apply hotcues for manually persisting hotcues
   - [ ] add track relation to db (for listening to original full tracks with beat)?
+  - [ ] add genres
   - [ ] add tags to acapella tracks. for example:
     - tempo drift
     - downbeat drift
     - male
     - female
-    - sample
+    - spoken
+    - sample(s)
     - with beat
     - with pad
     - vocoder
+    - non 4/4
 
 ### general
   - [ ] metronome (generic track on 2nd deck)

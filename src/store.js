@@ -21,12 +21,13 @@ const ctrlKeyToFunc = (ctrlKey) => {
   if (match && ctrlMap[match[1]]) {
     return [null, ctrlMap[match[1]]]
   }
-  console.log('ERROR ctrlKeyToFunc', ctrlKey)
+  console.warn('ERROR ctrlKeyToFunc', ctrlKey)
 }
 
 const midiMapping = {
   '2-noteon-0': 'd.0.togglePlayMidi',
-  '16-noteon-55': 'd.0.toggleMuteMidi',
+  '2-noteon-27': 'd.0.toggleMuteMidi',
+  '2-noteoff-27': 'd.0.toggleMuteMidi',
   '16-noteon-66': 'd.0.toggleHotCueDeleteMode',
   '2-controlchange-6': 'd.0.handleJogWheelRotate',
   '16-controlchange-12': 'd.0.setVolumeMidi',
@@ -422,10 +423,14 @@ export const useMainStore = defineStore({
 
       if (this.midiShift > 0 && this.decks[deckIndex].track !== null) {
         this.decks[deckIndex].jogWheelDebounce += relativeValue
+        // console.log('jogWheelDebounce', relativeValue, this.decks[deckIndex].jogWheelDebounce)
         if(this.decks[deckIndex].jogWheelDebounce < 20) {
+          // console.log('jogWheelDebounce ignore')
           return
         }
-        let secondsPerQuarterNote = getSecondsPerQuarterNote(this.decks[deckIndex].track)
+        this.decks[deckIndex].jogWheelDebounce = 0
+        // console.log('jogWheelDebounce handle')
+        let secondsPerQuarterNote = getSecondsPerQuarterNote(null, this.workingTempo)
         let factor
         switch (this.midiShift) {
           case 2:
@@ -461,20 +466,17 @@ export const useMainStore = defineStore({
         }
     },
     seekToPreviousDivision(deckIndex, divisionDuration) {
-        // TODO: this does not work during play
-        // consider to read current division and directly seek to previous division
-        let currentTimestamp = this.decks[deckIndex].currentSecond - 0.1
-        let trackDuration = this.decks[deckIndex].track.length
-        let loopSecond = divisionDuration * Math.ceil(trackDuration/divisionDuration) + this.workingDownbeat
-        while (loopSecond > 0) {
-          loopSecond -= divisionDuration
-          if(loopSecond > currentTimestamp) {
-            continue
-          }
-          this.decks[deckIndex].jogWheelDebounce = 0
-          this.seekToSecond(deckIndex, loopSecond)
-          return
-        }
+        const negativeDownbeat = getNegativeDownbeat(this.workingTempo, this.workingDownbeat)
+        const currentDivision = Math.floor(
+          (this.decks[deckIndex].currentSecond - negativeDownbeat)
+          / divisionDuration
+        )
+        let targetSecond = negativeDownbeat + ((currentDivision-1) * divisionDuration)
+        this.seekToSecond(
+          deckIndex,
+          targetSecond < 0 ? 0 : targetSecond
+        )
+
     },
     handleIncomingMidiEvent(e) {
       switch(e.message.type) {

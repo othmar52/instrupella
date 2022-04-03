@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, watch } from 'vue'
 import utils from '../../mixins/utils'
 import rangeMixin from '../../mixins/utils/range'
 import formatDurationMixin from '../../mixins/format/duration'
@@ -113,6 +113,9 @@ const searchEntries = () => {
   if (bpmFilter.value !== null) {
     filteredEntries.value = filteredEntries.value.filter(track => {
       return tempoMatches(getBpm(track), parseInt(bpmFilter.value))
+        // TODO: make double&half tempo matches optional by configuration
+        || tempoMatches(getBpm(track)/2, parseInt(bpmFilter.value))
+        || tempoMatches(getBpm(track)*2, parseInt(bpmFilter.value))
     })
   }
 }
@@ -130,10 +133,6 @@ const tempoMatches = (trackTempo, tempo) => {
   const tempoDiff = bpmFilterStep/2
   return trackTempo !== null && trackTempo >= tempo - tempoDiff && trackTempo <= tempo + tempoDiff
 }
-
-onMounted(() => {
-
-})
 
 watch(() => props.tracks, () => {
   bpmFilterValues.value = []

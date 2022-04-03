@@ -164,7 +164,7 @@ const persistDownbeat = () => {
     'updateTrack',
     {
       path: props.track.path,
-      downbeat: props.currentSecond
+      downbeat: workingDownbeat.value
     }
   )
 }
