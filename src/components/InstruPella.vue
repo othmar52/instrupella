@@ -88,26 +88,48 @@ const mergeLocalStorageTrackProperties = () => {
   }
 }
 
+const showStickyAlert = (options) => {
+    window.halfmoon.initStickyAlert(options)
+}
+
 const initMidi = () => {
   webmidi.enable((err) => {
     if (err) {
       tmpMidiDevices.value.push('ERROR: ' + err)
-      console.log("WebMidi could not be enabled.", err);
+      showStickyAlert({
+        content: "WebMidi could not be enabled.",
+        alertType: 'alert-danger'
+      })
       return
     }
+    const midiControllerName = 'DJ2GO2'
     for (const item of WebMidi.inputs) {
       tmpMidiDevices.value.push(item.name)
+      if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
+        midiInput1.value = item
+        showStickyAlert({
+          content: `MIDI INPUT ${midiControllerName}`,
+          alertType: 'alert-success'
+        })
+      }
     }
-    const devices = WebMidi.outputs
-    window.tmpMidiOut = WebMidi.outputs[1]
-    console.log('WebMidi.outputs', WebMidi.outputs)
-    console.log('WebMidi.inputs', WebMidi.inputs)
+    for (const item of WebMidi.outputs) {
+      tmpMidiDevices.value.push(item.name)
+      if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
+        window.tmpMidiOut = item
+        showStickyAlert({
+          content: `MIDI OUTPUT ${midiControllerName}`,
+          alertType: 'alert-success'
+        })
+      }
+    }
 
-    // midiInput1.value = WebMidi.getInputByName('DJ2GO2 MIDI 1')
-    midiInput1.value = WebMidi.getInputByName('DJ2GO2 MIDI')
     // midiInput1.value = WebMidi.getInputByName('DJ2GO2')
     if (!midiInput1.value) {
-      console.log("cant find DJ2GO2 MIDI 1....")
+      showStickyAlert({
+        content: `cant find MIDI ${midiControllerName}`,
+        alertType: 'alert-danger'
+      })
       return
     }
     console.log('midiInput1', midiInput1)

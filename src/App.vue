@@ -1,6 +1,7 @@
 <template>
   <Settings />
   <div class="page-wrapper with-navbar">
+    <div class="sticky-alerts"></div>
     <nav class="navbar justify-content-between">
       <div class="navbar-content">
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
@@ -38,6 +39,7 @@ import IconClock from './components/Icons/Clock.vue'
 import ButtonIcon from './components/ButtonIcon.vue'
 import Button from './components/Button.vue'
 import IconGithub from './components/Icons/Github.vue'
+import NoSleep from 'nosleep.js/src/index.js'
 
 // window.halfmoon = require('halfmoon/js/halfmoon.min.js')
 window.halfmoon = require('halfmoon')
@@ -73,6 +75,8 @@ const midiLearn = computed(() => storage.midiLearn)
 
 onMounted(() => {
   settings.value = defaultSettings()
+  const noSleep = new NoSleep()
+  noSleep.enable()
 })
 
 </script>
