@@ -70,6 +70,23 @@
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
         @click="persistDownbeat"
         />
+        <span class="ml-20"></span>
+        <Button
+        label="+1"
+        :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12 ml-30`"
+        @click="persistLike"
+        />
+        <Button
+        label="-1"
+        :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
+        @click="persistUnlike"
+        />
+        <button class="btn btn-default btn-square btn-lg m-5 ml-20 btn-bars" @click="persistToggleTempoDrift">
+            <strong class="bars">DRIFT</strong><br><span class="text-muted font-size-12 label-bars">tempo</span>
+        </button>
+        <button class="btn btn-default btn-square btn-lg m-5 btn-bars" @click="persistToggleDownbeatDrift">
+            <strong class="bars">DRIFT</strong><br><span class="text-muted font-size-12 label-bars">dBeat</span>
+        </button>
         <Metronome :tempo="workingTempo" ref="metronome" />
 
       </div>
@@ -160,23 +177,38 @@ const setDownbeat = () => {
 }
 
 const persistDownbeat = () => {
-  emit(
-    'updateTrack',
-    {
-      path: props.track.path,
-      downbeat: workingDownbeat.value
-    }
-  )
+  props.track.downbeat = workingDownbeat.value
+  persistTrackProperty('downbeat')
 }
 
 const persistTempo = () => {
-  emit(
-    'updateTrack',
-    {
-      path: props.track.path,
-      bpm: workingTempo.value
-    }
-  )
+  props.track.bpm = workingTempo.value
+  persistTrackProperty('bpm')
+}
+
+const persistTrackProperty = (propName) => {
+  const trackProps = { path: props.track.path }
+  trackProps[propName] = props.track[propName]
+  emit('updateTrack', trackProps)
+}
+
+const persistToggleDownbeatDrift = () => {
+  props.track.downbeatDrift = !props.track.downbeatDrift
+  persistTrackProperty('downbeatDrift')
+}
+
+const persistToggleTempoDrift = () => {
+  props.track.tempoDrift = !props.track.tempoDrift
+  persistTrackProperty('tempoDrift')
+}
+const persistLike = () => {
+  props.track.like = 1
+  persistTrackProperty('like')
+}
+
+const persistUnlike = () => {
+  props.track.like = -1
+  persistTrackProperty('like')
 }
 
 const emit = defineEmits([

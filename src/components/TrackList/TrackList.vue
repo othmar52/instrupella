@@ -35,6 +35,7 @@
             Artist - Title
             count {{filteredEntries.length}}
         </th>
+        <th></th>
         <th>KEY</th>
         <th>BPM</th>
         <th>LENGTH</th>
@@ -44,6 +45,10 @@
     <tbody>
       <tr v-for="track in filteredEntries" :key="track.id">
         <td v-html="formatArtistTitle(track)"></td>
+        <td>
+          <span v-if="track.like > 0" class="text-success">&#129093;</span>
+          <span v-if="track.like < 0" class="text-danger">&#129095;</span>
+        </td>
         <td>{{ track.key }}</td>
         <td>
           <ColoredTempo :track="track" />
