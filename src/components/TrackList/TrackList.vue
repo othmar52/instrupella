@@ -45,8 +45,8 @@
       <tr v-for="track in filteredEntries" :key="track.id">
         <td v-html="formatArtistTitle(track)"></td>
         <td>{{ track.key }}</td>
-        <td :class="isManualBpm(track) ? 'text-success' : ''">
-          {{ parseInt(getBpm(track))}}<span v-if="track.downbeat" class="text-success">*</span>
+        <td>
+          <ColoredTempo :track="track" />
         </td>
         <td>{{ formatDuration(track.length) }}</td>
         <td @click="storage.loadTrack(0, track.id)">
@@ -66,10 +66,11 @@ import formatDurationMixin from '../../mixins/format/duration'
 import formatArtistTitleMixin from '../../mixins/format/artisttitle'
 
 import BpmFilter from '@/components/TrackList/BpmFilter.vue'
+import ColoredTempo from '@/components/ColoredTempo.vue'
 import { useMainStore } from "@/store.js";
 const { formatArtistTitle } = formatArtistTitleMixin()
 const storage = useMainStore()
-const { getBpm, isManualBpm } = utils()
+const { getBpm } = utils()
 const { range } = rangeMixin()
 const { formatDuration } = formatDurationMixin()
 const props = defineProps({

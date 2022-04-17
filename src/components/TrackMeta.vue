@@ -48,7 +48,7 @@
   <div class="track-meta p-5 d-flex justify-content-between" @click="toggleFormat">
     <a href="#track-details" v-html="formatArtistTitle(deck.track)"></a>
     <div>
-      <span :class="bpmClass">{{formattedTempo}}</span>
+      <ColoredTempo :track="deck.track" :digits="2" />
       <span class="text-muted"> BPM</span>
     </div>
     <div>
@@ -71,6 +71,7 @@
 import { ref, watch, computed } from 'vue'
 import utils from '../mixins/utils.js'
 import formatArtistTitleMixin from '../mixins/format/artisttitle'
+import ColoredTempo from '@/components/ColoredTempo.vue'
 const { getBpm, isManualBpm } = utils()
 const { formatArtistTitle } = formatArtistTitleMixin()
 

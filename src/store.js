@@ -177,6 +177,34 @@ export const useMainStore = defineStore({
       this.workingDownbeat = parseFloat(value)
     },
     setTracks(tracks) {
+      // ensure all track properties exists
+      const trackTemplate = {
+        path: "",
+        artist: "",
+        title: "",
+        year: 0,
+        length: 0.0,
+        size: 0,
+        bpmdetect: 0.0,
+        bpm: 0.0,
+        key: "",
+        downbeat: null,
+        peakfile: "",
+        hotcues: [],
+        tempoDrift: false,
+        downbeatDrift: false,
+        like: 0,
+        noTempo: false,
+        tags: []
+      }
+      for (const track of tracks) {
+        for (const [key, value] of Object.entries(trackTemplate)) {
+          if (key in track === true) {
+            continue
+          }
+          track[key] = trackTemplate[key]
+        }
+      }
       this.tracks = tracks
     },
     addTrackProp(trackProp) {
