@@ -462,7 +462,10 @@ export const useMainStore = defineStore({
         }
         this.decks[deckIndex].jogWheelDebounce = 0
         // console.log('jogWheelDebounce handle')
-        let secondsPerQuarterNote = getSecondsPerQuarterNote(null, this.workingTempo)
+        let secondsPerQuarterNote = getSecondsPerQuarterNote(
+          null,
+          (this.workingTempo < 30) ? 120.0 : this.workingTempo
+        )
         let factor
         switch (this.midiShift) {
           case 2:

@@ -24,6 +24,8 @@ screenshot of current development status:
   - [ ] sortable tracklist
   - [ ] scroll to top button in tracklist
   - [ ] highlight loaded track in tracklist
+  - [ ] add possibility for prelistening random timestamps (without loading into wavesurfer player)
+        ( consider to respect (non)silence )
 
 ### database
   - [ ] add flag to database for marking tracks with changing tempo/downbeat (+ comment column)
@@ -80,11 +82,14 @@ screenshot of current development status:
   - [ ] BUG load new track with different wave zoom -> drag big wave is messed up
   - [x] BUG auto scroll to top after load track does not work during play
   - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
+  - [ ] BUG changing volume during mute unmutes the audio
+  - [ ] BUG change play state during hot cue hold is not respected on release
+  - [x] BUG jogwheel shift functions does not work when track tempo is 0 bpm
   - [ ] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload
   - [ ] ensure track info modal closes when loading a new track
   - [ ] add deck-id to track info modal
   - [ ] optionally include tempo x 2 and tempo / 2 in bpm filter
-  - [ ] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
+  - [x] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
   - [ ] set hotcue: how to read currentSecond from player within store? audioprocess callback maybe has a few milliseconds offset...
 
 ## low prio TODO

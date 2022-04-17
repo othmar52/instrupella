@@ -1,11 +1,9 @@
 <template>
   <BlazingBaton ref="baton" />
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
-  <!--
-  <div v-for="(item, idx) in tmpMidiDevices" :key="idx">
+  <!--div v-for="(item, idx) in tmpMidiDevices" :key="idx">
       {{ idx }} {{ item }}
-  </div>
-  -->
+  </div-->
   <div class="instrupella">
     <Deck
       v-for="deck in decks"
@@ -114,7 +112,6 @@ const initMidi = () => {
       }
     }
     for (const item of WebMidi.outputs) {
-      tmpMidiDevices.value.push(item.name)
       if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
         window.tmpMidiOut = item
         showStickyAlert({
