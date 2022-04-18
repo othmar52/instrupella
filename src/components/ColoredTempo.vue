@@ -23,10 +23,14 @@ const props = defineProps({
   digits: {
     type: Number,
     default: 0
+  },
+  playbackRate: {
+    type: Number,
+    default: 1
   }
 })
 
 const formattedTempo = computed(() => {
-  return getBpm(props.track).toFixed(props.digits)
+  return (getBpm(props.track)*props.playbackRate).toFixed(props.digits)
 })
 </script>

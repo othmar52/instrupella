@@ -48,7 +48,7 @@
   <div class="track-meta p-5 d-flex justify-content-between" @click="toggleFormat">
     <a href="#track-details" v-html="formatArtistTitle(deck.track)"></a>
     <div>
-      <ColoredTempo :track="deck.track" :digits="2" />
+      <ColoredTempo :track="deck.track" :digits="2" :playbackRate="deck.playbackRate"/>
       <span class="text-muted"> BPM</span>
     </div>
     <div>
