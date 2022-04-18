@@ -89,6 +89,7 @@ screenshot of current development status:
   - [ ] ensure track info modal closes when loading a new track
   - [ ] add deck-id to track info modal
   - [ ] optionally include tempo x 2 and tempo / 2 in bpm filter
+  - [ ] optionally double or half displayed tempo without affecting playback speed
   - [x] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
   - [ ] set hotcue: how to read currentSecond from player within store? audioprocess callback maybe has a few milliseconds offset...
 

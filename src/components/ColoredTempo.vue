@@ -4,6 +4,7 @@
     <span :class="isManualBpm(track) ? 'text-success' : 'text-primary'">{{ formattedTempo }}</span>
     <span v-if="track && track.downbeatDrift" class="text-secondary">!</span>
     <span v-if="track && track.downbeat" class="text-success">*</span>
+    <span v-if="showUnit" class="text-muted m-5">BPM</span>
   </span>
 </template>
 
@@ -13,12 +14,7 @@ import utils from '../mixins/utils'
 const { getBpm, isManualBpm } = utils()
 const props = defineProps({
   track: {
-    type: Object,
-    default: {
-      downbeat: null,
-      bpmdetect: 0,
-      bpm: 0
-    }
+    type: Object
   },
   digits: {
     type: Number,
@@ -27,10 +23,18 @@ const props = defineProps({
   playbackRate: {
     type: Number,
     default: 1
+  },
+  tempoFactor: {
+    type: Number,
+    default: 1
+  },
+  showUnit: {
+    type: Boolean,
+    default: false
   }
 })
 
 const formattedTempo = computed(() => {
-  return (getBpm(props.track)*props.playbackRate).toFixed(props.digits)
+  return (getBpm(props.track)*props.playbackRate*props.tempoFactor).toFixed(props.digits)
 })
 </script>

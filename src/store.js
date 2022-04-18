@@ -254,6 +254,7 @@ export const useMainStore = defineStore({
         mute: false,
         volume: 1,
         playbackRate: 1,
+        tempoFactor: 1, // normal, double or half tempo
         currentSecond: 0,
         skipLength: 0.05,
         timestretch: false,
@@ -325,6 +326,7 @@ export const useMainStore = defineStore({
           : 0
       )
       this.decks[deckIndex].track = this.tracks[trackIndex]
+      this.decks[deckIndex].tempoFactor = 1
       this.togglePlay(deckIndex, false)
       this.toggleMute(deckIndex, false)
       // TODO: read persisted hot cues from track
@@ -373,6 +375,17 @@ export const useMainStore = defineStore({
     },
     setVolumeMidi(deckIndex, volume) {
       this.setVolume(deckIndex, volume * 1/127)
+    },
+    loopTempoFactor(deckIndex) {
+      if (this.decks[deckIndex].tempoFactor === 1) {
+        this.decks[deckIndex].tempoFactor = 2
+        return
+      }
+      if (this.decks[deckIndex].tempoFactor === 2) {
+        this.decks[deckIndex].tempoFactor = 0.5
+        return
+      }
+      this.decks[deckIndex].tempoFactor = 1
     },
     setPlaybackRate(deckIndex, playbackRate) {
       this.decks[deckIndex].playbackRate = playbackRate
