@@ -6,7 +6,7 @@
         <TrackMeta
           :deck="deck"
         />
-        <ZoomControl :pixelPerSecond="deck.pixelPerSecond" @zoomTo="zoomTo" />
+        <ZoomControl :deck="deck" />
         <div class="wave-big-wrap">
           <Transition name="slide-fade">
             <div class="text-center align-middle" v-if="loadProgress <= 100 && trackAnalyzed === false">
@@ -136,7 +136,6 @@ import { useMainStore } from "@/store.js";
 const player = ref(null)
 const play = ref(false)
 const mute = ref(false)
-const pixelPerSecond = ref(400)
 const playbackRate = ref(1)
 const loadProgress = ref(0)
 const trackAnalyzed = ref(false)
@@ -170,9 +169,6 @@ const trackReady = () => {
 }
 const waveformReady = () => {
   trackAnalyzed.value = true
-}
-const zoomTo = (pxPerSec) => {
-  pixelPerSecond.value = pxPerSec
 }
 const error = (errormsg) => {
   console.log('TODO: handle player error', errormsg)

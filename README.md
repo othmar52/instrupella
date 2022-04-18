@@ -77,7 +77,8 @@ screenshot of current development status:
   - [ ] ensure very long track titles does not break layout
   - [ ] big wave form position is crazy during play in combination with fast pitch changes
   - [x] BUG volume slider position is not respected on new loaded tracks
-  - [ ] BUG load new track with different wave zoom -> drag big wave is messed up
+  - [x] BUG load new track with different wave zoom -> drag big wave is messed up
+  - [x] BUG big wave zoom broken
   - [x] BUG auto scroll to top after load track does not work during play
   - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
   - [ ] [wavesurfer-BUG](https://github.com/katspaugh/wavesurfer.js/issues/2502) changing volume during mute unmutes the audio

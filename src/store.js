@@ -286,6 +286,29 @@ export const useMainStore = defineStore({
       }
       this.decks.push(deck)
     },
+    setPixelsPerSecond(deckIndex, pxPerSec) {
+      this.decks[deckIndex].pixelPerSecond = parseInt(pxPerSec)
+    },
+    zoomIn(deckIndex) {
+      if (this.decks[deckIndex].pixelPerSecond >= 700) {
+        return
+      }
+      if (this.decks[deckIndex].pixelPerSecond === 50) {
+        this.setPixelsPerSecond(deckIndex, 100)
+        return
+      }
+      this.setPixelsPerSecond(deckIndex, this.decks[deckIndex].pixelPerSecond + 100)
+    },
+    zoomOut(deckIndex) {
+      if (this.decks[deckIndex].pixelPerSecond <= 50) {
+        return
+      }
+      if (this.decks[deckIndex].pixelPerSecond <= 100) {
+        this.setPixelsPerSecond(deckIndex, 50)
+        return
+      }
+      this.setPixelsPerSecond(deckIndex, this.decks[deckIndex].pixelPerSecond - 100)
+    },
     toggleMute(deckIndex, forceNewState=null) {
       // console.log('toggleMute', forceNewState)
       const newMuteState = (forceNewState === null)

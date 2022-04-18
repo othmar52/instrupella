@@ -126,14 +126,8 @@ watch(() => props.deck.nudgeBehind, (nudgeValue) => {
     return
   }
   player.value.params.skipLength = parseFloat(nudgeValue)
-  // player.value.setMute(true)
   player.value.skipBackward()
   storage.clearNudge(props.deck.index)
-  /*
-  setTimeout(() => {
-    player.value.setMute(false)
-  }, player.value.params.skipLength * 1000)
-  */
 })
 
 watch(() => props.deck.seekToSecond, (sec) => {
@@ -175,10 +169,13 @@ watch(() => props.deck.pixelPerSecond, () => {
 
   // TODO: this approach for zoom seem to be faster!?
   //    but it does not zoom at the very beginning of the track
-  // this.player.params.minPxPerSec = pixelPerSecond.value
-  // const targetSeekPercent = this.player.getCurrentTime() /this.player.getDuration()
+  // player.value.params.minPxPerSec = props.deck.pixelPerSecond
+  // const targetSeekPercent = player.value.getCurrentTime() /player.value.getDuration()
   // console.log('percent', targetSeekPercent)
-  // this.player.seekAndCenter(targetSeekPercent)
+  // player.value.seekAndCenter(targetSeekPercent)
+
+  // this works for beginning of the track. but its inperformant like zoom()
+  // player.value.drawBuffer()
 })
 
 const emit = defineEmits([
