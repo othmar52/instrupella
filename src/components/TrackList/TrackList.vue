@@ -93,16 +93,10 @@ const filteredEntries = ref([])
 const bpmFilterStep = 5
 
 const loadRandom = () => {
-  // console.log('load random')
   const randomItem = filteredEntries.value[Math.floor(Math.random()*filteredEntries.value.length)];
-  // console.log(randomItem.id)
   if (randomItem) {
-   loadTrack(randomItem.id)
+    storage.loadTrack(0, randomItem.id)
   }
-}
-
-const loadTrack = (trackIndex) => {
-  storage.loadTrack(0, trackIndex)
 }
 
 const setBpmFilter = (tempo) => {

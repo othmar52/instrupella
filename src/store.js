@@ -97,16 +97,16 @@ const ctrlMap = {
 export const useMainStore = defineStore({
   id: 'main',
   state: () => ({
-    midiInputMappings: useStorage('midiInputMappings', midiInputMapping),
-    midiLearn: useStorage('midiLearn', false),
-    midiLearnItem: useStorage('midiLearnItem', null),
-    midiShift: useStorage('midiShift', 0),
-    scrollToTop: useStorage('midiLearn', false),
+    midiInputMappings: midiInputMapping,
+    midiLearn: false,
+    midiLearnItem: null,
+    midiShift: 0,
+    scrollToTop: false,
     trackProps: useStorage('trackProps', []),
-    decks: useStorage('decks', []),
-    tracks: useStorage('tracks', []),
-    workingTempo: useStorage('workingTempo', 0),
-    workingDownbeat: useStorage('workingDownbeat', 0)
+    decks: [],
+    tracks: [],
+    workingTempo: 0,
+    workingDownbeat: 0
   }),
   getters: {
     getAllmidiInputMappings() {

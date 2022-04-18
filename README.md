@@ -22,7 +22,7 @@ screenshot of current development status:
 ### tracklist
   - [ ] iPad BUG when added to home screen the keyboard does not appear on search input (seems to work in chrome) @see [issue #1](https://github.com/othmar52/instrupella/issues/1)
   - [ ] sortable tracklist
-  - [ ] scroll to top button in tracklist
+  - [x] scroll to top button in tracklist
   - [ ] highlight loaded track in tracklist
   - [ ] add possibility for prelistening random timestamps (without loading into wavesurfer player)
         ( consider to respect (non)silence )
@@ -73,7 +73,7 @@ screenshot of current development status:
   - [ ] metronome sound is very quiet on iPad when track is playing - do we need a separate audio context? (not reproduceable in desktop browsers)
   - [x] drop BeatGridPlugin as soon as new version of wavesurfer is released
   - [ ] move github link to "about" modal to avoid leaving instrupella by accident
-  - [x] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprecess()` is not fired), maybe use wavesurfer.backend.getPlayedPercents());
+  - [x] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprocess()` is not fired), maybe use wavesurfer.backend.getPlayedPercents());
   - [ ] ensure very long track titles does not break layout
   - [ ] big wave form position is crazy during play in combination with fast pitch changes
   - [x] BUG volume slider position is not respected on new loaded tracks

@@ -1,6 +1,6 @@
 <template>
-  <BlazingBaton ref="baton" />
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
+  <BlazingBaton ref="baton" />
   <!--div v-for="(item, idx) in tmpMidiDevices" :key="idx">
       {{ idx }} {{ item }}
   </div-->
@@ -20,12 +20,16 @@
     <div v-else>
       loading tracklist...
     </div>
+    <span
+      class="btn btn-primary btn-scroll-to-top"
+      v-show="showScrollToTop"
+      @click="storage.setScrollToTop(true)">🡅</span>
   </div>
 </template>
 
 <script setup>
 import { WebMidi } from "webmidi";
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import { useMainStore } from "@/store.js";
 import Deck from '@/components/Deck/Deck.vue'
 import TrackList from '@/components/TrackList/TrackList.vue'
@@ -42,6 +46,7 @@ const top = ref(null)
 const tracks = ref([])
 const baton = ref(null)
 const tmpMidiDevices = ref([])
+const showScrollToTop = ref(false)
 
 const storage = useMainStore()
 const decks = computed(() => storage.getDecks)
@@ -50,10 +55,13 @@ watch(() => storage.scrollToTop, (value) => {
   if (value === false) {
     return
   }
-  top.value.scrollIntoView({
-    behavior: 'smooth',
-    block: 'end'
-  })
+  // TODO: why does smooth scrolling not work?
+  // maybe absolute positioning (body & more) of halfmoon framework is the reason
+  // top.value.scrollIntoView({
+  //   behavior: 'smooth',
+  //   block: 'end'
+  // })
+  top.value.scrollIntoView(false)
   storage.setScrollToTop(false)
 })
 
@@ -179,15 +187,29 @@ const initMidi = () => {
   storage.resetMidiMappings()
 }
 
+const scrollListener = () => {
+  showScrollToTop.value = top.value.getBoundingClientRect().top < 0 ? true : false
+}
+
 onMounted(() => {
   loadTrackList()
   storage.clearDecks()
   storage.createDeck()
   initMidi()
+  document.querySelector('.content-wrapper').addEventListener('scroll', scrollListener)
+})
+
+onBeforeUnmount(() => {
+  document.querySelector('.content-wrapper').removeEventListener('scroll', scrollListener)
 })
 
 </script>
 
 <style lang="scss">
-
+.btn-scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+}
 </style>
