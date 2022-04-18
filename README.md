@@ -28,17 +28,15 @@ screenshot of current development status:
         ( consider to respect (non)silence )
 
 ### database
-  - [ ] add flag to database for marking tracks with changing tempo/downbeat (+ comment column)
+  - [x] add flag to database for marking tracks with changing tempo/downbeat
   - [ ] json export of local storage edited values that can be merged into database
-  - [ ] add like / dislike to tracks with persisting
+  - [x] add like / dislike to tracks with persisting
   - [ ] persist hotcues, tempo, downbeat
-  - [ ] apply downbeat for manually persisting downbeat
+  - [x] apply downbeat for manually persisting downbeat
   - [ ] apply hotcues for manually persisting hotcues
   - [ ] add track relation to db (for listening to original full tracks with beat)?
   - [ ] add genres
   - [ ] add tags to acapella tracks. for example:
-    - tempo drift
-    - downbeat drift
     - male
     - female
     - spoken
@@ -82,20 +80,20 @@ screenshot of current development status:
   - [ ] BUG load new track with different wave zoom -> drag big wave is messed up
   - [x] BUG auto scroll to top after load track does not work during play
   - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
-  - [ ] BUG changing volume during mute unmutes the audio
+  - [ ] [wavesurfer-BUG](https://github.com/katspaugh/wavesurfer.js/issues/2502) changing volume during mute unmutes the audio
   - [ ] BUG change play state during hot cue hold is not respected on release
   - [x] BUG jogwheel shift functions does not work when track tempo is 0 bpm
   - [x] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload
   - [ ] ensure track info modal closes when loading a new track
   - [ ] add deck-id to track info modal
   - [ ] optionally include tempo x 2 and tempo / 2 in bpm filter
-  - [ ] optionally double or half displayed tempo without affecting playback speed
+  - [x] optionally double or half displayed tempo without affecting playback speed
   - [x] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
   - [ ] set hotcue: how to read currentSecond from player within store? audioprocess callback maybe has a few milliseconds offset...
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag
-  - [ ] add some kind of delay when swiping **big wave** instead of quick stop
+  - [ ] add some kind of delay/easeOut when swiping **big wave** instead of quick stop
   - [ ] improve playback during wave swipe (change playbackRate and length according to swipe move to get vinyl like sound)
   - [ ] choose from several metronome sounds
   - [ ] optional enter url for loading on deck (mp3, youtube, soundcloud, etc.)
