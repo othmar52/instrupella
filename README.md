@@ -82,6 +82,7 @@ screenshot of current development status:
   - [x] BUG auto scroll to top after load track does not work during play
   - [x] keep wavesurfer instance alive instead of destroying/recreating on every track load
   - [ ] [wavesurfer-BUG](https://github.com/katspaugh/wavesurfer.js/issues/2502) changing volume during mute unmutes the audio
+  - [x] BUG clicking track title toggles time format
   - [ ] BUG change play state during hot cue hold is not respected on release
   - [x] BUG jogwheel shift functions does not work when track tempo is 0 bpm
   - [x] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload

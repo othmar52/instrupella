@@ -45,7 +45,7 @@
       </div>
     </div>
   </div>
-  <div class="track-meta p-5 d-flex justify-content-between" @click="toggleFormat">
+  <div class="track-meta p-5 d-flex justify-content-between">
     <a href="#track-details" v-html="formatArtistTitle(deck.track)"></a>
     <div>
       <ColoredTempoFactorizeable
@@ -54,7 +54,7 @@
         :showUnit="true"
       />
     </div>
-    <div>
+    <div @click="toggleFormat">
         <div v-if="format">
             {{formatDuration(deck.currentSecond)}}
             <span class="text-primary"> | </span>
