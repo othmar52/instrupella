@@ -85,7 +85,7 @@ screenshot of current development status:
   - [ ] BUG changing volume during mute unmutes the audio
   - [ ] BUG change play state during hot cue hold is not respected on release
   - [x] BUG jogwheel shift functions does not work when track tempo is 0 bpm
-  - [ ] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload
+  - [x] add reload button to settings in case we have any unresponsiveness due to bugs. consider to pass loaded track as get parameter and auto load this track after reload
   - [ ] ensure track info modal closes when loading a new track
   - [ ] add deck-id to track info modal
   - [ ] optionally include tempo x 2 and tempo / 2 in bpm filter

@@ -71,6 +71,14 @@ const loadTrackList = () => {
       tracks.value = json.map((track, idx) => ({ ...track, id: idx }))
       mergeLocalStorageTrackProperties()
       storage.setTracks(tracks.value)
+      // check url get params if we have a track to load
+      const loadTrack = new URLSearchParams(window.location.search).get('d0')
+      if (loadTrack === null) {
+        return
+      }
+      storage.loadTrackByPath(0, loadTrack)
+      // TODO: this is incompatible to file:/// protocol
+      window.history.pushState({}, null, '/#');
     })
 }
 

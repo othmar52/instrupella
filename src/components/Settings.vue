@@ -25,6 +25,7 @@
             </p>
             <div class="text-center mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
                 <a href="#" class="btn btn-primary" role="button">Close</a>
+                <span @click="reloadInstrupella" class="btn btn-primary m-10" role="button">Reload</span>
             </div>
         </div>
     </div>
@@ -32,11 +33,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import IconMusicNote from '@/components/Icons/MusicNote.vue'
+import { useMainStore } from "@/store.js";
+const storage = useMainStore()
 
-const track = ref(null)
-const tracks = ref([])
+const reloadInstrupella = () => {
+  // TODO: add tracks of all decks to reload
+  // but currently we have only one deck...
+
+  // TODO: this is incompatible to file:/// protocol
+  if (storage.getDecks[0].track === null) {
+    document.location.href= "/"
+    return
+  }
+  const trackArgument = encodeURIComponent(storage.getDecks[0].track.path)
+  document.location.href= `/?d0=${trackArgument}`
+}
 
 </script>
 

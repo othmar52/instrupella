@@ -316,6 +316,13 @@ export const useMainStore = defineStore({
           : `d.${deckIndex}.pause`
       )
     },
+    loadTrackByPath(deckIndex, path) {
+      const trackResult = this.tracks.filter(item => item.path === path)
+      if (trackResult.length === 0) {
+        return
+      }
+      this.loadTrack(deckIndex, trackResult[0].id)
+    },
     loadTrack(deckIndex, trackIndex) {
       this.setScrollToTop(true)
       this.setWorkingTempo(getBpm(this.tracks[trackIndex]))
