@@ -13,6 +13,7 @@
       @updateTrack="persistUpdateTrack"
     />
     <div v-if="tracks">
+      <a href="#" ref="tracklist" id="tracklist"><!-- used for scroll to tracklist --></a>
       <TrackList
         :tracks="tracks"
       />
@@ -43,6 +44,7 @@ const props = defineProps({
 console.log('webmidi', WebMidi)
 const track = ref(null)
 const top = ref(null)
+const tracklist = ref(null)
 const tracks = ref([])
 const baton = ref(null)
 const tmpMidiDevices = ref([])
@@ -63,6 +65,19 @@ watch(() => storage.scrollToTop, (value) => {
   // })
   top.value.scrollIntoView(false)
   storage.setScrollToTop(false)
+})
+
+watch(() => storage.scrollToTrackList, (value) => {
+  if (value === false) {
+    return
+  }
+  // TODO: why does smooth scrolling not work?
+  // maybe absolute positioning (body & more) of halfmoon framework is the reason
+  tracklist.value.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  })
+  storage.setScrollToTrackList(false)
 })
 
 const webmidi = WebMidi

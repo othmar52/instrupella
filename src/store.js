@@ -25,6 +25,11 @@ const ctrlKeyToFunc = (ctrlKey) => {
 }
 
 const midiInputMapping = {
+  '16-noteon-6': 'g.loopFocus',
+  '16-noteon-2': 'g.sniffAudioStartMidi',
+  '16-noteoff-2': 'g.sniffAudioStop',
+  '16-noteon-3': 'd.0.loadTrackMidi',
+  '16-controlchange-0': 'g.handleBrowseWheelRotate',
   '2-noteon-0': 'd.0.togglePlayMidi',
   '2-noteon-27': 'd.0.toggleMuteMidi',
   '2-noteoff-27': 'd.0.toggleMuteMidi',
@@ -66,6 +71,12 @@ const midiOutputMapping = {
   'd.0.hotCue4On': ['sendNoteOn', [4, [6], {rawAttack: 2}]]
 }
 const ctrlMap = {
+  'loopFocus': 'loopFocus',
+  'handleBrowseWheelRotate': 'handleBrowseWheelRotate',
+  'sniffAudioStart': 'sniffAudioStart',
+  'sniffAudioStartMidi': 'sniffAudioStartMidi',
+  'loadTrackMidi': 'loadTrackMidi',
+  'sniffAudioStop': 'sniffAudioStop',
   'toggleMute': 'toggleMute',
   'toggleMuteMidi': 'toggleMuteMidi',
   'togglePlay': 'togglePlay',
@@ -101,7 +112,6 @@ export const useMainStore = defineStore({
     midiLearn: false,
     midiLearnItem: null,
     midiShift: 0,
-    scrollToTop: false,
     trackProps: useStorage('trackProps', []),
     decks: [],
     tracks: [],
@@ -109,7 +119,15 @@ export const useMainStore = defineStore({
     workingDownbeat: 0,
     sniffAudioSegment: 0,
     sniffAudioTrack: {},
-    sniffAudioNode: null
+    sniffAudioNode: null,
+    scrollToTop: false,
+    scrollToTrackList: false,
+    scrollToNextTrack: false,
+    scrollToPreviousTrack: false,
+    currentTrackFocus: null,
+    loadCurrentTrackFocusToDeck: false,
+    focusItems: ['top', 'track-list'],
+    currentFocus: 0
   }),
   getters: {
     getAllmidiInputMappings() {
@@ -136,6 +154,9 @@ export const useMainStore = defineStore({
     getScrollToTop() {
       return this.scrollToTop
     },
+    getScrollToTrackList() {
+      return this.scrollToTrackList
+    },
     getWorkingTempo() {
       return this.workingTempo
     },
@@ -147,6 +168,12 @@ export const useMainStore = defineStore({
     },
     getSniffAudioNode() {
       return this.sniffAudioNode
+    },
+    getCurrentTrackFocus() {
+      return this.currentTrackFocus
+    },
+    getLoadCurrentTrackFocusToDeck() {
+      return this.loadCurrentTrackFocusToDeck
     }
   },
   actions: {
@@ -162,6 +189,39 @@ export const useMainStore = defineStore({
     },
     setScrollToTop(value) {
       this.scrollToTop = value
+    },
+    setScrollToTrackList(value) {
+      this.scrollToTrackList = value
+    },
+    setScrollToNextTrack(value) {
+      this.scrollToNextTrack = value
+    },
+    setScrollToPreviousTrack(value) {
+      this.scrollToPreviousTrack = value
+    },
+    setCurrentTrackFocus(track) {
+      this.currentTrackFocus = track
+    },
+    setLoadCurrentTrackFocusToDeck(deckIndex) {
+      this.loadCurrentTrackFocusToDeck = deckIndex
+    },
+    loopFocus() {
+      if (this.currentFocus == 0) {
+        this.currentFocus = 1
+        this.scrollToTrackList = true
+        return
+      }
+      this.currentFocus = 0
+      this.scrollToTop = true
+    },
+    handleBrowseWheelRotate(deckIndex, midiValue) {
+      this.currentFocus = 1
+      if (midiValue === 1) {
+        this.scrollToNextTrack = true
+      }
+      if (midiValue === 127) {
+        this.scrollToPreviousTrack = true
+      }
     },
     midiShift1On() {
       //console.log('midiShift', 1)
@@ -375,6 +435,9 @@ export const useMainStore = defineStore({
         return
       }
       this.loadTrack(deckIndex, trackResult[0].id)
+    },
+    loadTrackMidi(deckIndex) {
+      this.setLoadCurrentTrackFocusToDeck(deckIndex)
     },
     loadTrack(deckIndex, trackIndex) {
       this.setScrollToTop(true)
@@ -651,6 +714,11 @@ export const useMainStore = defineStore({
     },
     fireMidiEvent(funcName, args) {
       window.tmpMidiOut[funcName](...args)
+    },
+    sniffAudioStartMidi() {
+      if (this.currentTrackFocus !== null) {
+        this.sniffAudioStart(this.currentTrackFocus)
+      }
     },
     sniffAudioStart(track) {
       // console.log('sniffAudioStart')

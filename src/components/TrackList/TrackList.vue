@@ -47,7 +47,8 @@
       <tr
         v-for="track in filteredEntries"
         :key="track.id"
-        :class="storage.getDeckIndexForTrackId(track.id) >= 0 ? 'table-primary' : ''"
+        :class="trackRowClass(track)"
+        :id="`track-row-${track.id}`"
       >
         <td v-html="formatArtistTitle(track)"></td>
         <td>
@@ -105,6 +106,62 @@ const filteredEntries = ref([])
 
 const bpmFilterStep = 5
 
+// only needed for browsing via midi controller
+let focusedTrackIndex = 0
+
+watch(() => storage.loadCurrentTrackFocusToDeck, (value) => {
+  if (value === false) {
+    return
+  }
+  storage.setLoadCurrentTrackFocusToDeck(false)
+  if (filteredEntries.value.length === 0) {
+    return
+  }
+  storage.loadTrack(value, filteredEntries.value[focusedTrackIndex].id)
+})
+
+watch(() => storage.scrollToNextTrack, (value) => {
+  if (value === false) {
+    return
+  }
+  storage.setScrollToNextTrack(false)
+  if (filteredEntries.value.length === 0) {
+    focusedTrackIndex = 0
+    return
+  }
+  focusedTrackIndex ++
+  if (focusedTrackIndex > filteredEntries.value.length - 1) {
+    focusedTrackIndex = 0
+  }
+  handleTrackFocusChange()
+})
+
+
+watch(() => storage.scrollToPreviousTrack, (value) => {
+  if (value === false) {
+    return
+  }
+  storage.setScrollToPreviousTrack(false)
+  if (filteredEntries.value.length === 0) {
+    focusedTrackIndex = 0
+    return
+  }
+  focusedTrackIndex --
+  if (focusedTrackIndex < 0) {
+    focusedTrackIndex = filteredEntries.value.length - 1
+  }
+  handleTrackFocusChange()
+})
+
+const handleTrackFocusChange = () => {
+  // console.log(`#track-row-${filteredEntries.value[focusedTrackIndex].id}`)
+  document.querySelector(`#track-row-${filteredEntries.value[focusedTrackIndex].id}`).scrollIntoView({
+    behavior: 'auto',
+    block: 'center'
+  })
+  storage.setCurrentTrackFocus(filteredEntries.value[focusedTrackIndex])
+}
+
 const loadRandom = () => {
   const randomItem = filteredEntries.value[Math.floor(Math.random()*filteredEntries.value.length)];
   if (randomItem) {
@@ -112,10 +169,18 @@ const loadRandom = () => {
   }
 }
 
+const trackRowClass = (track) => {
+  if (storage.getCurrentTrackFocus && storage.getCurrentTrackFocus.id === track.id) {
+    return 'table-primary'
+  }
+  return storage.getDeckIndexForTrackId(track.id) >= 0 ? 'table-primary' : ''
+}
+
 const setBpmFilter = (tempo) => {
   bpmFilter.value = tempo
   searchEntries()
 }
+
 const searchEntries = () => {
   filteredEntries.value = props.tracks
   if (searchInput.value !== '') {
@@ -131,6 +196,12 @@ const searchEntries = () => {
         || tempoMatches(getBpm(track)*2, parseInt(bpmFilter.value))
     })
   }
+  focusedTrackIndex = 0
+  storage.setCurrentTrackFocus(
+    filteredEntries.value.length
+      ? filteredEntries.value[0]
+      : null
+  )
 }
 
 const searchTermMatches = (track, searchTerm) => {
