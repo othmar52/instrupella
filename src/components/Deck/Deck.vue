@@ -73,6 +73,12 @@
             :midiLearn="midiLearn"
             @click="storage.fireControlElement(`d.${deck.index}.toggleMute`)"
           />
+          <Button
+            label="SNYC"
+            :permaClasses="`${buttonClasses}`"
+            :activeClass="deck.sync ? 'btn-primary' : ''"
+            @click="storage.fireControlElement(`d.${deck.index}.toggleSync`)"
+          />
         </div>
         <br />
 

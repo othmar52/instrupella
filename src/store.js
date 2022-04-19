@@ -25,6 +25,7 @@ const ctrlKeyToFunc = (ctrlKey) => {
 }
 
 const midiInputMapping = {
+  '2-noteon-2': 'd.0.toggleSyncMidi',
   '2-noteon-0': 'd.0.togglePlayMidi',
   '2-noteon-27': 'd.0.toggleMuteMidi',
   '2-noteoff-27': 'd.0.toggleMuteMidi',
@@ -48,6 +49,8 @@ const midiInputMapping = {
   '2-controlchange-9': 'd.0.setPlaybackRateMidi'
 }
 const midiOutputMapping = {
+  'd.0.syncOn': ['sendNoteOn', [2, [2], {rawAttack: 1}]],
+  'd.0.syncOff': ['sendNoteOn', [2, [2], {rawAttack: 0}]],
   'd.0.muteOn': ['sendNoteOn', [27, [2], {rawAttack: 1}]],
   'd.0.muteOff': ['sendNoteOn', [27, [2], {rawAttack: 0}]],
   'd.0.play': ['sendNoteOn', [0, [2], {rawAttack: 2}]],
@@ -66,6 +69,8 @@ const midiOutputMapping = {
   'd.0.hotCue4On': ['sendNoteOn', [4, [6], {rawAttack: 2}]]
 }
 const ctrlMap = {
+  'toggleSync': 'toggleSync',
+  'toggleSyncMidi': 'toggleSyncMidi',
   'toggleMute': 'toggleMute',
   'toggleMuteMidi': 'toggleMuteMidi',
   'togglePlay': 'togglePlay',
@@ -276,6 +281,7 @@ export const useMainStore = defineStore({
         track: null,
         play: false,
         mute: false,
+        sync: false,
         volume: 1,
         playbackRate: 1,
         tempoFactor: 1, // normal, double or half tempo
@@ -344,6 +350,21 @@ export const useMainStore = defineStore({
           ? `d.${deckIndex}.muteOn`
           : `d.${deckIndex}.muteOff`
       )
+    },
+    toggleSync(deckIndex, forceNewState=null) {
+      const newSyncState = (forceNewState === null)
+        ? !this.decks[deckIndex].sync
+        : forceNewState
+      this.decks[deckIndex].sync = newSyncState
+      this.checkFireMidiEvent(
+        newSyncState
+          ? `d.${deckIndex}.syncOn`
+          : `d.${deckIndex}.syncOff`
+      )
+    },
+    toggleSyncMidi(deckIndex) {
+      // drop incoming data byte as argument
+      this.toggleSync(deckIndex, null)
     },
     toggleMuteMidi(deckIndex) {
       // drop incoming data byte as argument
