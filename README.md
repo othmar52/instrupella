@@ -24,6 +24,7 @@ screenshot of current development status:
   - [ ] sortable tracklist
   - [x] scroll to top button in tracklist
   - [x] highlight loaded track in tracklist
+  - [x] display beat in case its different from 4/4
   - [x] add possibility for prelistening random timestamps (without loading into wavesurfer player)
         ( consider to respect (non)silence )
 

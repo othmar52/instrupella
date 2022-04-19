@@ -203,6 +203,7 @@ export const useMainStore = defineStore({
         tempoDrift: false,
         downbeatDrift: false,
         like: 0,
+        beat: null,
         noTempo: false,
         tags: []
       }
