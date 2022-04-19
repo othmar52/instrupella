@@ -24,8 +24,13 @@
                 </ul>
             </p>
             <div class="text-center mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
+                <label>Track edits</label>
+                <span @click="downloadTrackEdits" class="btn btn-primary m-10" role="button">Download</span>
+                <span @click="storage.clearTrackProps()" class="btn btn-danger m-10" role="button">Clear</span>
+            </div>
+            <div class="text-center mt-20">
                 <a href="#" class="btn btn-primary" role="button">Close</a>
-                <span @click="reloadInstrupella" class="btn btn-primary m-10" role="button">Reload</span>
+                <span @click="reloadInstrupella" class="btn btn-danger m-10" role="button">Reload instru☻pella</span>
             </div>
         </div>
     </div>
@@ -34,8 +39,24 @@
 
 <script setup>
 import IconMusicNote from '@/components/Icons/MusicNote.vue'
-import { useMainStore } from "@/store.js";
+import downloadMixin from '../mixins/utils/download'
+import { useMainStore } from '@/store.js'
+
 const storage = useMainStore()
+const { download } = downloadMixin()
+
+const downloadTrackEdits = () => {
+  download(
+    JSON.stringify(storage.getAllTrackProps, null, 2),
+    'application/json;charset=utf-8',
+    `trackprops-${
+    new Date()
+      .toISOString()
+      .replaceAll('T', '.')
+      .replaceAll(':', '-')
+      .substring(0, 16)}.json`
+  )
+}
 
 const reloadInstrupella = () => {
   // TODO: add tracks of all decks to reload

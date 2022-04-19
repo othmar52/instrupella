@@ -29,7 +29,7 @@ screenshot of current development status:
 
 ### database
   - [x] add flag to database for marking tracks with changing tempo/downbeat
-  - [ ] json export of local storage edited values that can be merged into database
+  - [x] json export of local storage edited values that can be merged into database
   - [x] add like / dislike to tracks with persisting
   - [ ] persist hotcues, tempo, downbeat
   - [x] apply downbeat for manually persisting downbeat

@@ -207,6 +207,9 @@ export const useMainStore = defineStore({
       }
       this.tracks = tracks
     },
+    clearTrackProps() {
+      this.trackProps = []
+    },
     addTrackProp(trackProp) {
       // console.log('store.addTrackProp() to', trackProp)
       // update local db
