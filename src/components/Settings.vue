@@ -23,8 +23,8 @@
                     <li>show/hide volume control </li>
                 </ul>
             </p>
-            <div class="text-center mt-20"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
-                <label>Track edits</label>
+            <div class="text-center mt-20" v-if="storage.getAllTrackProps.length > 0"> <!-- text-right = text-align: right, mt-20 = margin-top: 2rem (20px) -->
+                <label>Track edits ({{storage.getAllTrackProps.length}})</label>
                 <span @click="downloadTrackEdits" class="btn btn-primary m-10" role="button">Download</span>
                 <span @click="storage.clearTrackProps()" class="btn btn-danger m-10" role="button">Clear</span>
             </div>

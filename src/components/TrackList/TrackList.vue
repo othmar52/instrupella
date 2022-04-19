@@ -3,7 +3,7 @@
   <table class="track-list table table-striped table-hover">
     <thead>
       <tr>
-        <th colspan="5">
+        <th colspan="7">
           <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-2">
