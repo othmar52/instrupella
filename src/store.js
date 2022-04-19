@@ -49,8 +49,8 @@ const midiInputMapping = {
   '2-controlchange-9': 'd.0.setPlaybackRateMidi'
 }
 const midiOutputMapping = {
-  'd.0.syncOn': ['sendNoteOn', [2, [2], {rawAttack: 1}]],
-  'd.0.syncOff': ['sendNoteOn', [2, [2], {rawAttack: 0}]],
+  'd.0.syncOn': ['sendNoteOn', [2, [2], {rawAttack: 2}]],
+  'd.0.syncOff': ['sendNoteOn', [2, [2], {rawAttack: 1}]],
   'd.0.muteOn': ['sendNoteOn', [27, [2], {rawAttack: 1}]],
   'd.0.muteOff': ['sendNoteOn', [27, [2], {rawAttack: 0}]],
   'd.0.play': ['sendNoteOn', [0, [2], {rawAttack: 2}]],
