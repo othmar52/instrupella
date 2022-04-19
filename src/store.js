@@ -106,7 +106,10 @@ export const useMainStore = defineStore({
     decks: [],
     tracks: [],
     workingTempo: 0,
-    workingDownbeat: 0
+    workingDownbeat: 0,
+    sniffAudioSegment: 0,
+    sniffAudioTrack: {},
+    sniffAudioNode: null
   }),
   getters: {
     getAllmidiInputMappings() {
@@ -138,6 +141,12 @@ export const useMainStore = defineStore({
     },
     getWorkingDownbeat() {
       return this.workingDownbeat
+    },
+    getSniffAudioTrack() {
+      return this.sniffAudioTrack
+    },
+    getSniffAudioNode() {
+      return this.sniffAudioNode
     }
   },
   actions: {
@@ -632,6 +641,33 @@ export const useMainStore = defineStore({
     },
     fireMidiEvent(funcName, args) {
       window.tmpMidiOut[funcName](...args)
+    },
+    sniffAudioStart(track) {
+      // console.log('sniffAudioStart')
+      // TODO replace segments with selected timestamps
+      // (respect downbeat if available and respect silences)
+      const maxSegments = 7
+      if (!this.sniffAudioTrack || this.sniffAudioTrack.id !== track.id) {
+        this.sniffAudioTrack = track
+        this.sniffAudioNode = new Audio(track.path)
+        this.sniffAudioSegment = 0
+        if (track.downbeat > 0) {
+          this.sniffAudioNode.currentTime = track.downbeat
+        }
+      } else {
+        this.sniffAudioSegment ++
+        if (this.sniffAudioSegment > maxSegments-1) {
+          this.sniffAudioSegment = 0
+        }
+        this.sniffAudioNode.currentTime = this.sniffAudioSegment * this.sniffAudioTrack.length/maxSegments;
+      }
+      this.sniffAudioNode.play()
+    },
+    sniffAudioStop() {
+      // console.log('sniffAudioStop')
+      if (this.sniffAudioNode) {
+        this.sniffAudioNode.pause()
+      }
     }
   }
 })

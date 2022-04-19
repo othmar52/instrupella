@@ -40,6 +40,7 @@
         <th>BPM</th>
         <th>LENGTH</th>
         <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -58,6 +59,14 @@
           <ColoredTempo :track="track" />
         </td>
         <td>{{ formatDuration(track.length) }}</td>
+        <td
+          @mousedown="storage.sniffAudioStart(track)"
+          @touchstart="storage.sniffAudioStart(track)"
+          @mouseup="storage.sniffAudioStop()"
+          @touchend="storage.sniffAudioStop()"
+        >
+          <strong class="btn btn-default btn-primary">&#9658;</strong>
+        </td>
         <td @click="storage.loadTrack(0, track.id)">
           <strong class="btn btn-default btn-primary">LOAD</strong>
         </td>

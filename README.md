@@ -24,7 +24,7 @@ screenshot of current development status:
   - [ ] sortable tracklist
   - [x] scroll to top button in tracklist
   - [x] highlight loaded track in tracklist
-  - [ ] add possibility for prelistening random timestamps (without loading into wavesurfer player)
+  - [x] add possibility for prelistening random timestamps (without loading into wavesurfer player)
         ( consider to respect (non)silence )
 
 ### database
