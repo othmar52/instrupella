@@ -292,7 +292,8 @@ export const useMainStore = defineStore({
         jogWheelDebounce: 0,
         hotCues: {
           deleteMode: false,
-          playStateOnCueStart: false,
+          nowPlaying: false, // for ignoring stop() during cue hold
+          stopAfterRelease: false,
           ignoreNextEndEvent: false,
           haveAnyCues: false,
           cues: []
@@ -377,12 +378,17 @@ export const useMainStore = defineStore({
       const newPlayState = (forceNewState === null)
         ? !this.decks[deckIndex].play
         : forceNewState
-      this.decks[deckIndex].play = newPlayState
+
       this.checkFireMidiEvent(
         newPlayState
           ? `d.${deckIndex}.play`
           : `d.${deckIndex}.pause`
       )
+      if (this.decks[deckIndex].hotCues.nowPlaying === true && newPlayState === false) {
+        this.decks[deckIndex].hotCues.stopAfterRelease = true
+        return
+      }
+      this.decks[deckIndex].play = newPlayState
     },
     loadTrackByPath(deckIndex, path) {
       const trackResult = this.tracks.filter(item => item.path === path)
@@ -394,7 +400,6 @@ export const useMainStore = defineStore({
     loadTrack(deckIndex, trackIndex) {
       this.setScrollToTop(true)
       this.setWorkingTempo(getBpm(this.tracks[trackIndex]))
-      //console.log('storage set downbeat', parseFloat(this.tracks[trackIndex].downbeat), this.tracks[trackIndex])
       this.setWorkingDownbeat(
         (this.tracks[trackIndex].downbeat !== null)
           ? parseFloat(this.tracks[trackIndex].downbeat)
@@ -407,7 +412,8 @@ export const useMainStore = defineStore({
       // TODO: read persisted hot cues from track
       this.decks[deckIndex].hotCues = {
         deleteMode: false,
-        playStateOnCueStart: false,
+        nowPlaying: false,
+        stopAfterRelease: false,
         ignoreNextEndEvent: false,
         haveAnyCues: false,
         cues: []
@@ -509,7 +515,7 @@ export const useMainStore = defineStore({
         this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Dimmed`)
         return
       }
-      this.decks[deckIndex].hotCues.playStateOnCueStart = this.decks[deckIndex].play
+      this.decks[deckIndex].hotCues.nowPlaying = true
       this.decks[deckIndex].seekToSecondAndPlay = this.decks[deckIndex].hotCues.cues[hotCueIndex].second
       this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}On`)
     },
@@ -531,10 +537,13 @@ export const useMainStore = defineStore({
         this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Off`)
         return
       }
-      // console.log('pressHotCueEnd', idx, 'props.play', props.play, 'playStateOnCueStart', playStateOnCueStart.value)
-      if (this.decks[deckIndex].hotCues.playStateOnCueStart === false) {
+      this.decks[deckIndex].hotCues.nowPlaying = false
+      if (this.decks[deckIndex].play === false || this.decks[deckIndex].hotCues.stopAfterRelease === true) {
         this.decks[deckIndex].seekToSecondAndStop = this.decks[deckIndex].hotCues.cues[hotCueIndex].second
-        
+      }
+      if (this.decks[deckIndex].hotCues.stopAfterRelease === true) {
+        this.decks[deckIndex].play = false
+        this.decks[deckIndex].hotCues.stopAfterRelease = false
       }
       this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Dimmed`)
     },
