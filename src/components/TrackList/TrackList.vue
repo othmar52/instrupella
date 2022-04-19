@@ -43,7 +43,11 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="track in filteredEntries" :key="track.id">
+      <tr
+        v-for="track in filteredEntries"
+        :key="track.id"
+        :class="storage.getDeckIndexForTrackId(track.id) >= 0 ? 'table-primary' : ''"
+      >
         <td v-html="formatArtistTitle(track)"></td>
         <td>
           <span v-if="track.like > 0" class="text-success">&#129093;</span>

@@ -23,7 +23,7 @@ screenshot of current development status:
   - [ ] iPad BUG when added to home screen the keyboard does not appear on search input (seems to work in chrome) @see [issue #1](https://github.com/othmar52/instrupella/issues/1)
   - [ ] sortable tracklist
   - [x] scroll to top button in tracklist
-  - [ ] highlight loaded track in tracklist
+  - [x] highlight loaded track in tracklist
   - [ ] add possibility for prelistening random timestamps (without loading into wavesurfer player)
         ( consider to respect (non)silence )
 

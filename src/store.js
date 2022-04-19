@@ -243,6 +243,17 @@ export const useMainStore = defineStore({
       this.midiLearn = !this.midiLearn
       // console.log('store.toggleMidiLearn() to', this.midiLearn)
     },
+    getDeckIndexForTrackId(trackId) {
+      for (const idx in this.decks) {
+        if (!this.decks[idx].track) {
+          continue
+        }
+        if (this.decks[idx].track.id === trackId) {
+          return idx
+        }
+      }
+      return -1
+    },
     clearDecks() {
       this.decks = []
     },
