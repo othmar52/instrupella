@@ -27,6 +27,7 @@ screenshot of current development status:
   - [x] display beat in case its different from 4/4
   - [x] add possibility for prelistening random timestamps (without loading into wavesurfer player)
         ( consider to respect (non)silence )
+  - [x] make tracklist browsable by midi controller + sniff audio + load to deck
 
 ### database
   - [x] add flag to database for marking tracks with changing tempo/downbeat
