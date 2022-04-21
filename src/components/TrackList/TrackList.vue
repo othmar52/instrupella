@@ -66,10 +66,15 @@
           @mouseup="storage.sniffAudioStop()"
           @touchend="storage.sniffAudioStop()"
         >
-          <strong class="btn btn-default btn-primary">&#9658;</strong>
+          <strong :class="`btn btn-default ${storage.getSniffAudioIsPlaying === track.id ? 'btn-primary' : ''}`">&#9658;</strong>
         </td>
         <td @click="storage.loadTrack(0, track.id)">
-          <strong class="btn btn-default btn-primary">LOAD</strong>
+          <strong v-if="storage.getDeckIndexForTrackId(track.id) < 0">
+            <span class="btn btn-default">LOAD</span>
+          </strong>
+          <strong v-else>
+            <span class="btn btn-default btn-primary">DECK {{storage.getDeckIndexForTrackId(track.id)*1 + 1}}</span>
+          </strong>
         </td>
       </tr>
     </tbody>
@@ -133,6 +138,15 @@ watch(() => storage.scrollToNextTrack, (value) => {
   if (focusedTrackIndex > filteredEntries.value.length - 1) {
     focusedTrackIndex = 0
   }
+  handleTrackFocusChange()
+})
+
+
+watch(() => storage.scrollToFocusedTrack, (value) => {
+  if (value === false) {
+    return
+  }
+  storage.setScrollToFocusedTrack(false)
   handleTrackFocusChange()
 })
 

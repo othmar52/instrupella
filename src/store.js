@@ -120,10 +120,12 @@ export const useMainStore = defineStore({
     sniffAudioSegment: 0,
     sniffAudioTrack: {},
     sniffAudioNode: null,
+    sniffAudioIsPlaying: -1,
     scrollToTop: false,
     scrollToTrackList: false,
     scrollToNextTrack: false,
     scrollToPreviousTrack: false,
+    scrollToFocusedTrack: false,
     currentTrackFocus: null,
     loadCurrentTrackFocusToDeck: false,
     focusItems: ['top', 'track-list'],
@@ -169,6 +171,9 @@ export const useMainStore = defineStore({
     getSniffAudioNode() {
       return this.sniffAudioNode
     },
+    getSniffAudioIsPlaying() {
+      return this.sniffAudioIsPlaying
+    },
     getCurrentTrackFocus() {
       return this.currentTrackFocus
     },
@@ -199,6 +204,9 @@ export const useMainStore = defineStore({
     setScrollToPreviousTrack(value) {
       this.scrollToPreviousTrack = value
     },
+    setScrollToFocusedTrack(value) {
+      this.scrollToFocusedTrack = value
+    },
     setCurrentTrackFocus(track) {
       this.currentTrackFocus = track
     },
@@ -208,6 +216,10 @@ export const useMainStore = defineStore({
     loopFocus() {
       if (this.currentFocus == 0) {
         this.currentFocus = 1
+        if (this.currentTrackFocus !== null) {
+          this.scrollToFocusedTrack = true
+          return
+        }
         this.scrollToTrackList = true
         return
       }
@@ -215,7 +227,11 @@ export const useMainStore = defineStore({
       this.scrollToTop = true
     },
     handleBrowseWheelRotate(deckIndex, midiValue) {
-      this.currentFocus = 1
+      if (this.currentFocus === 0 && this.currentTrackFocus !== null) {
+        this.scrollToFocusedTrack = true
+        this.currentFocus = 1
+        return
+      }
       if (midiValue === 1) {
         this.scrollToNextTrack = true
       }
@@ -740,11 +756,13 @@ export const useMainStore = defineStore({
         this.sniffAudioNode.currentTime = this.sniffAudioSegment * this.sniffAudioTrack.length/maxSegments;
       }
       this.sniffAudioNode.play()
+      this.sniffAudioIsPlaying = this.sniffAudioTrack.id
     },
     sniffAudioStop() {
       // console.log('sniffAudioStop')
       if (this.sniffAudioNode) {
         this.sniffAudioNode.pause()
+        this.sniffAudioIsPlaying = -1
       }
     }
   }
