@@ -184,13 +184,14 @@ export const useMainStore = defineStore({
   actions: {
     fireControlElement(controlId, value=null) {
       const deckCtrlParams = ctrlKeyToFunc(controlId)
-      if (deckCtrlParams) {
-        if(this.midiLearnItem !== null) {
-          this.addMidiMapping(controlId)
-          return
-        }
-        this[deckCtrlParams[1]](deckCtrlParams[0], value)
+      if (!deckCtrlParams) {
+        return
       }
+      if(this.midiLearnItem !== null) {
+        this.addMidiMapping(controlId)
+        return
+      }
+      this[deckCtrlParams[1]](deckCtrlParams[0], value)
     },
     setScrollToTop(value) {
       this.scrollToTop = value
@@ -223,10 +224,9 @@ export const useMainStore = defineStore({
       this.currentFocus = 1
       if (midiValue === 1) {
         this.scrollToNextTrack = true
+        return
       }
-      if (midiValue === 127) {
-        this.scrollToPreviousTrack = true
-      }
+      this.scrollToPreviousTrack = true
     },
     midiShift1On() {
       //console.log('midiShift', 1)

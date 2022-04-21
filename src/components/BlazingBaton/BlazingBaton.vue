@@ -6,6 +6,7 @@
       :key="idx"
       :class="`btn btn-sm btn-square mr-5 ${ledClasses[idx]}`"
     ></span>
+    <span>{{debouncedTempo}}</span>
     </h4>
   </div>
 </template>
@@ -17,6 +18,14 @@ import rangeMixin from '../../mixins/utils/range'
 const { range } = rangeMixin()
 const isRunning = ref(false)
 const ppqn = 24
+
+// independent from start/stop state
+// because many midi clocks send ticks during stop as well
+let trackedTempo = 0
+let trackedTempoCounter = 0
+let trackedTempoLastQuarter = 0
+let debouncedTempo = ref(0)
+
 
 const ledClasses = ref([])
 
@@ -134,6 +143,24 @@ const messageClock = (midiEvent) => {
   if (tickCounterQuarterLoop >= ppqn) {
     tickCounterQuarterLoop = 0
     nextQuarterNote()
+  }
+  trackedTempoCounter++
+  if (trackedTempoCounter % ppqn === 0) {
+    trackedTempoCounter = 0
+    if (trackedTempoLastQuarter === 0) {
+      trackedTempoLastQuarter = new Date().getTime()
+      return
+    }
+    trackedTempo = 60000 / (new Date().getTime() - trackedTempoLastQuarter)
+    trackedTempoLastQuarter = new Date().getTime()
+    if (debouncedTempo.value === 0) {
+      debouncedTempo.value = trackedTempo
+      return
+    }
+    debouncedTempo.value = debouncedTempo.value*0.9 + trackedTempo*0.1
+    if (!isFinite(debouncedTempo.value) || debouncedTempo.value > 300) {
+      debouncedTempo.value = trackedTempo
+    }
   }
 }
 
