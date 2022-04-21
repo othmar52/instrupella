@@ -115,6 +115,7 @@ export const useMainStore = defineStore({
     trackProps: useStorage('trackProps', []),
     decks: [],
     tracks: [],
+    hotCueAmount: 4,
     workingTempo: 0,
     workingDownbeat: 0,
     sniffAudioSegment: 0,
@@ -152,6 +153,9 @@ export const useMainStore = defineStore({
     },
     getTracks() {
       return this.tracks
+    },
+    getHotCueAmount() {
+      return this.hotCueAmount
     },
     getScrollToTop() {
       return this.scrollToTop
@@ -343,6 +347,25 @@ export const useMainStore = defineStore({
       }
       return -1
     },
+    getDefaultHotCues() {
+      const hotCues = {
+        deleteMode: false,
+        nowPlaying: false, // for ignoring stop() during cue hold
+        stopAfterRelease: false,
+        ignoreNextEndEvent: false,
+        haveAnyCues: false,
+        cues: []
+      }
+      // TODO: read persisted hot cues for track
+      for (const idx in range(0, this.hotCueAmount)) {
+        hotCues.cues.push({
+          down: false,
+          up: false,
+          second: null
+        })
+      }
+      return hotCues
+    },
     clearDecks() {
       this.decks = []
     },
@@ -360,14 +383,7 @@ export const useMainStore = defineStore({
         timestretch: false,
         pixelPerSecond: 400,
         jogWheelDebounce: 0,
-        hotCues: {
-          deleteMode: false,
-          nowPlaying: false, // for ignoring stop() during cue hold
-          stopAfterRelease: false,
-          ignoreNextEndEvent: false,
-          haveAnyCues: false,
-          cues: []
-        },
+        hotCues: this.getDefaultHotCues(),
 
         // control helpers
         nudgeAhead: 0,
@@ -376,14 +392,6 @@ export const useMainStore = defineStore({
         seekToSecondAndPlay: -1,
         seekToSecondAndStop: -1,
         hotCuesChange: false
-      }
-      // TODO: read hot cue amount from config
-      for (const idx in range(0, 5)) {
-        deck.hotCues.cues.push({
-          down: false,
-          up: false,
-          second: null
-        })
       }
       this.decks.push(deck)
     },
@@ -457,6 +465,7 @@ export const useMainStore = defineStore({
     },
     loadTrack(deckIndex, trackIndex) {
       this.setScrollToTop(true)
+      this.currentFocus = 0
       this.setWorkingTempo(getBpm(this.tracks[trackIndex]))
       this.setWorkingDownbeat(
         (this.tracks[trackIndex].downbeat !== null)
@@ -465,6 +474,7 @@ export const useMainStore = defineStore({
       )
       this.decks[deckIndex].track = this.tracks[trackIndex]
       this.decks[deckIndex].tempoFactor = 1
+      this.decks[deckIndex].currentSecond = 0
       this.togglePlay(deckIndex, false)
       this.toggleMute(deckIndex, false)
       // TODO: read persisted hot cues from track
@@ -476,12 +486,8 @@ export const useMainStore = defineStore({
         haveAnyCues: false,
         cues: []
       }
-      for (const idx in range(0, 5)) {
-        this.decks[deckIndex].hotCues.cues.push({
-          down: false,
-          up: false,
-          second: null
-        })
+      this.decks[deckIndex].hotCues = this.getDefaultHotCues()
+      for (const idx in range(0, this.hotCueAmount)) {
         this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+idx*1}Off`)
       }
       this.setHotCuesChange(deckIndex, true)
