@@ -7,10 +7,10 @@
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
         <a href="#settings" class="btn-lg" role="button"><IconMidiDin /></a>
         <a href="#settings" class="btn-lg" role="button"><IconClock /></a>
-        <a href="#" :class="`btn-lg ${midiLearn ? 'text-danger' : ''}`" role="button" @click="toggleMidiLearn"><IconMidiLearn /></a>
+        <!--a href="#" :class="`btn-lg ${midiLearn ? 'text-danger' : ''}`" role="button" @click="toggleMidiLearn"><IconMidiLearn /></a-->
       </div>
       <div class="navbar-content">
-        <h4 class="navbar-text text-monoXspace m-5">INSTRU
+        <h4 class="navbar-text m-5">INSTRU
           <img alt="Vue logo" src="./assets/instrupella.svg" width="40">
           PELLA
         </h4>
