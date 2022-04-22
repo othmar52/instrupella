@@ -1,6 +1,6 @@
 <template>
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
-  <BlazingBaton ref="baton" />
+  <BlazingBaton v-if="storage.getShowIncomingMidiClock" ref="baton" />
   <!--div v-for="(item, idx) in tmpMidiDevices" :key="idx">
       {{ idx }} {{ item }}
   </div-->
@@ -81,6 +81,8 @@ watch(() => storage.scrollToTrackList, (value) => {
 })
 
 const webmidi = WebMidi
+
+window.wm = webmidi
 const midiInput1 = ref(null)
 
 const persistUpdateTrack = (properties) => {
@@ -101,7 +103,7 @@ const loadTrackList = () => {
       }
       storage.loadTrackByPath(0, loadTrack)
       // TODO: this is incompatible to file:/// protocol
-      window.history.pushState({}, null, '/#');
+      window.history.pushState({}, null, '/#')
     })
 }
 
@@ -122,6 +124,65 @@ const showStickyAlert = (options) => {
 }
 
 const initMidi = () => {
+  webmidi.addListener("connected", e => {
+    console.log("TODO MIDI connect", e.port.name, e.port)
+  })
+  webmidi.addListener("disconnected", e => {
+    console.log("TODO MIDI disconnect", e.port.name)
+  })
+  webmidi.addListener("portschanged", e => {
+    console.log("TODO MIDI portschanged", e)
+  })
+
+  const midiControllerName = 'DJ2GO2'
+  for (const item of WebMidi.inputs) {
+    tmpMidiDevices.value.push(item.name)
+    if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
+      midiInput1.value = item
+      showStickyAlert({
+        content: `MIDI INPUT ${midiControllerName}`,
+        alertType: 'alert-success'
+      })
+    }
+  }
+  for (const item of WebMidi.outputs) {
+    if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
+      window.tmpMidiOut = item
+      showStickyAlert({
+        content: `MIDI OUTPUT ${midiControllerName}`,
+        alertType: 'alert-success'
+      })
+    }
+  }
+
+  if (!midiInput1.value) {
+    showStickyAlert({
+      content: `cant find MIDI ${midiControllerName}`,
+      alertType: 'alert-danger'
+    })
+    return
+  }
+  console.log('midiInput1', midiInput1)
+
+  midiInput1.value.removeListener()
+  midiInput1.value.addListener('midimessage', e => {
+    switch(e.message.type) {
+      case 'clock':
+        baton.value.messageClock(e)
+        break
+      case 'start':
+        baton.value.messageStart(e)
+        break
+      case 'stop':
+        baton.value.messageStop(e)
+        break
+      default:
+        storage.handleIncomingMidiEvent(e)
+    }
+  })
+}
+
+const checkInitMidi = () => {
   webmidi.enable((err) => {
     if (err) {
       tmpMidiDevices.value.push('ERROR: ' + err)
@@ -131,75 +192,8 @@ const initMidi = () => {
       })
       return
     }
-    const midiControllerName = 'DJ2GO2'
-    for (const item of WebMidi.inputs) {
-      tmpMidiDevices.value.push(item.name)
-      if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
-        midiInput1.value = item
-        showStickyAlert({
-          content: `MIDI INPUT ${midiControllerName}`,
-          alertType: 'alert-success'
-        })
-      }
-    }
-    for (const item of WebMidi.outputs) {
-      if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
-        window.tmpMidiOut = item
-        showStickyAlert({
-          content: `MIDI OUTPUT ${midiControllerName}`,
-          alertType: 'alert-success'
-        })
-      }
-    }
-
-    // midiInput1.value = WebMidi.getInputByName('DJ2GO2')
-    if (!midiInput1.value) {
-      showStickyAlert({
-        content: `cant find MIDI ${midiControllerName}`,
-        alertType: 'alert-danger'
-      })
-      return
-    }
-    console.log('midiInput1', midiInput1)
-
-    midiInput1.value.removeListener()
-    midiInput1.value.addListener('midimessage', e => {
-      switch(e.message.type) {
-        case 'clock':
-          baton.value.messageClock(e)
-          break
-        case 'start':
-          baton.value.messageStart(e)
-          break
-        case 'stop':
-          baton.value.messageStop(e)
-          break
-        default:
-          storage.handleIncomingMidiEvent(e)
-      }
-    })
-    /*
-    midiInput1.value.addListener('noteon', e => {
-      console.log('noteon', e);
-      storage.fireControlElement(`d.0.hotCueDown`, 2)
-    }, {channels: [16]})
-    midiInput1.value.addListener('noteoff', e => {
-      // console.log('noteon', e);
-      storage.fireControlElement(`d.0.hotCueUp`, 2)
-    }, {channels: [16]})
-    midiInput1.value.addListener('controlchange', e => {
-      if(e.message.data[1] === 28) {
-        //console.log('controlchange', e.message.data[1], e.message.data[2]*(1/127));
-        storage.fireControlElement(`d.0.setVolume`, e.message.data[2]*(1/127))
-      }
-    }, {channels: [16]})
-    */
-
-    //this.outputDN = WebMidi.getOutputByName("Elektron Digitone");
-    // TODO add owner check
-    //this.localMidi = this.outputDN ? true : false;
+    initMidi()
   })
-  storage.resetMidiMappings()
 }
 
 const scrollListener = () => {
@@ -210,7 +204,7 @@ onMounted(() => {
   loadTrackList()
   storage.clearDecks()
   storage.createDeck()
-  initMidi()
+  checkInitMidi()
   document.querySelector('.content-wrapper').addEventListener('scroll', scrollListener)
 })
 
