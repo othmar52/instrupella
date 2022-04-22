@@ -34,6 +34,7 @@ screenshot of current development status:
   - [x] add flag to database for marking tracks with changing tempo/downbeat
   - [x] json export of local storage edited values that can be merged into database
   - [x] add like / dislike to tracks with persisting
+  - [ ] create a tracklist json thats compatible for loading with file:/// protocol
   - [ ] persist hotcues, tempo, downbeat
   - [x] apply downbeat for manually persisting downbeat
   - [ ] apply hotcues for manually persisting hotcues
@@ -96,6 +97,22 @@ screenshot of current development status:
   - [x] optionally double or half displayed tempo without affecting playback speed
   - [x] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
   - [ ] set hotcue: how to read currentSecond from player within store? audioprocess callback maybe has a few milliseconds offset...
+  - [ ] pitching via MIDI controller does not respect 10/20/50 % factor
+  - [ ] position of reload-button to top within settings modal
+  - [ ] add timestretch GET-parameter to reload url (or local storage)
+  - [ ] make beatgrid bars for quarter notes brighter
+  - [ ] replace ascii chars with svg (🡅, &#129093;, &#129095;, ...)
+  - [ ] ensure sniff-audio-play-button has no selectable text (maybe solved by replace with svg)
+  - [ ] change default zoom on mobile devices from 400 to 500 px / sec
+  - [ ] compatibility to file:/// protocol (tracklist fetch + reload)
+  - [ ] hide / smaller size for a few control elements in case midi controller is connected
+  - [ ] observe & handle midi controller connect/disconnect during runtime
+  - [x] force landscape orientation on mobile chrome
+
+
+
+
+
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag
@@ -108,6 +125,7 @@ screenshot of current development status:
   - [ ] multitouch support on iPad
   - [ ] add VU-meter
   - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME & https://wavesurfer-js.org/faq/
+  - [ ] consider to have assignable samples on left half of MIDI controller "Numark DJ2GO2"
 
 
 ## Resources for development
