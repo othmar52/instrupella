@@ -109,7 +109,7 @@ screenshot of current development status:
   - [ ] observe & handle midi controller connect/disconnect during runtime
   - [x] force landscape orientation on mobile chrome
   - [x] display viewport dimensions in settings
-  - [ ] hide blazing baton when we dont have an incoming MIDI clock
+  - [x] hide blazing baton when we dont have an incoming MIDI clock
   - [x] hide midi learn button until midi learn is implemented
 
 

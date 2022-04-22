@@ -112,6 +112,7 @@ export const useMainStore = defineStore({
     midiLearn: false,
     midiLearnItem: null,
     midiShift: 0,
+    showIncomingMidiClock: false,
     trackProps: useStorage('trackProps', []),
     decks: [],
     tracks: [],
@@ -141,6 +142,9 @@ export const useMainStore = defineStore({
     },
     getMidiLearn() {
       return this.midiLearn <= 0
+    },
+    getShowIncomingMidiClock() {
+      return this.showIncomingMidiClock
     },
     getAllTrackProps() {
       return this.trackProps
@@ -258,6 +262,9 @@ export const useMainStore = defineStore({
     midiShiftOff() {
       //console.log('midiShift', 0)
       this.midiShift = 0
+    },
+    setShowIncomingMidiClock(value) {
+      this.showIncomingMidiClock = value
     },
     setWorkingTempo(value) {
       this.workingTempo = parseFloat(value)

@@ -89,6 +89,12 @@ onMounted(() => {
   --content-and-card-spacing: 1.5rem;
 }
 
+@media screen and (max-width: 800px) {
+  :root {
+    --content-and-card-spacing: 0.5rem;
+  }
+}
+
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */

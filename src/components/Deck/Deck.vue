@@ -74,8 +74,6 @@
             @click="storage.fireControlElement(`d.${deck.index}.toggleMute`)"
           />
         </div>
-        <br />
-
       </div>
     </div>
     <div class="col-3">
