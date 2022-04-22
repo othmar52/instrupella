@@ -6,6 +6,16 @@
                 <span aria-hidden="true">&times;</span>
             </a>
             <h5 class="modal-title">Settings</h5>
+            <div class="text-center mt-20">
+                <span @click="reloadInstrupella" class="btn btn-danger m-10" role="button">Reload instru☻pella</span>
+                <a href="#" class="btn btn-default" role="button">Close settings</a>
+            </div>
+            <p>Viewport dimensions:
+              <strong>{{wW}}</strong>
+              <span class="text-muted"> x </span>
+              <strong>{{wH}}</strong>
+              <span class="text-muted"> px</span>
+            </p>
             <div class="custom-switch">
                 <input type="checkbox" id="switch-1" value="">
                 <label for="switch-1">timestretch <IconMusicNote /></label>
@@ -29,8 +39,7 @@
                 <span @click="storage.clearTrackProps()" class="btn btn-danger m-10" role="button">Clear</span>
             </div>
             <div class="text-center mt-20">
-                <a href="#" class="btn btn-primary" role="button">Close</a>
-                <span @click="reloadInstrupella" class="btn btn-danger m-10" role="button">Reload instru☻pella</span>
+                <a href="#" class="btn btn-default" role="button">Close settings</a>
             </div>
         </div>
     </div>
@@ -38,12 +47,15 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import IconMusicNote from '@/components/Icons/MusicNote.vue'
 import downloadMixin from '../mixins/utils/download'
 import { useMainStore } from '@/store.js'
 
 const storage = useMainStore()
 const { download } = downloadMixin()
+const wW = computed(() => window.innerWidth)
+const wH = computed(() => window.innerHeight)
 
 const downloadTrackEdits = () => {
   download(

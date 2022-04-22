@@ -98,7 +98,7 @@ screenshot of current development status:
   - [x] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
   - [ ] set hotcue: how to read currentSecond from player within store? audioprocess callback maybe has a few milliseconds offset...
   - [ ] pitching via MIDI controller does not respect 10/20/50 % factor
-  - [ ] position of reload-button to top within settings modal
+  - [x] position of reload-button to top within settings modal
   - [ ] add timestretch GET-parameter to reload url (or local storage)
   - [ ] make beatgrid bars for quarter notes brighter
   - [ ] replace ascii chars with svg (🡅, &#129093;, &#129095;, ...)
@@ -108,6 +108,7 @@ screenshot of current development status:
   - [ ] hide / smaller size for a few control elements in case midi controller is connected
   - [ ] observe & handle midi controller connect/disconnect during runtime
   - [x] force landscape orientation on mobile chrome
+  - [x] display viewport dimensions in settings
 
 
 
