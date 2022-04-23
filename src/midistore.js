@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { WebMidi } from 'webmidi'
-import { useMainStore } from "@/store.js";
+import { useMainStore } from '@/store.js';
 
 const DJ2GO2 = 'DJ2GO2'
 const CONTROLHUB = 'CONTROL Hub'
@@ -38,22 +38,22 @@ const midiInputMappings = {
 
 const midiOutputMappings = {
   [DJ2GO2]: {
-    'd.0.muteOn': ['sendNoteOn', [27, [2], {rawAttack: 1}]],
-    'd.0.muteOff': ['sendNoteOn', [27, [2], {rawAttack: 0}]],
-    'd.0.play': ['sendNoteOn', [0, [2], {rawAttack: 2}]],
-    'd.0.pause': ['sendNoteOn', [0, [2], {rawAttack: 1}]],
-    'd.0.hotCue1Off': ['sendNoteOn', [1, [6], {rawAttack: 0}]],
-    'd.0.hotCue1Dimmed': ['sendNoteOn', [1, [6], {rawAttack: 1}]],
-    'd.0.hotCue1On': ['sendNoteOn', [1, [6], {rawAttack: 2}]],
-    'd.0.hotCue2Off': ['sendNoteOn', [2, [6], {rawAttack: 0}]],
-    'd.0.hotCue2Dimmed': ['sendNoteOn', [2, [6], {rawAttack: 1}]],
-    'd.0.hotCue2On': ['sendNoteOn', [2, [6], {rawAttack: 2}]],
-    'd.0.hotCue3Off': ['sendNoteOn', [3, [6], {rawAttack: 0}]],
-    'd.0.hotCue3Dimmed': ['sendNoteOn', [3, [6], {rawAttack: 1}]],
-    'd.0.hotCue3On': ['sendNoteOn', [3, [6], {rawAttack: 2}]],
-    'd.0.hotCue4Off': ['sendNoteOn', [4, [6], {rawAttack: 0}]],
-    'd.0.hotCue4Dimmed': ['sendNoteOn', [4, [6], {rawAttack: 1}]],
-    'd.0.hotCue4On': ['sendNoteOn', [4, [6], {rawAttack: 2}]]
+    'd.0.muteOn': ['sendNoteOn', [27, [2], { rawAttack: 1 }]],
+    'd.0.muteOff': ['sendNoteOn', [27, [2], { rawAttack: 0 }]],
+    'd.0.play': ['sendNoteOn', [0, [2], { rawAttack: 2 }]],
+    'd.0.pause': ['sendNoteOn', [0, [2], { rawAttack: 1 }]],
+    'd.0.hotCue1Off': ['sendNoteOn', [1, [6], { rawAttack: 0 }]],
+    'd.0.hotCue1Dimmed': ['sendNoteOn', [1, [6], { rawAttack: 1 }]],
+    'd.0.hotCue1On': ['sendNoteOn', [1, [6], { rawAttack: 2 }]],
+    'd.0.hotCue2Off': ['sendNoteOn', [2, [6], { rawAttack: 0 }]],
+    'd.0.hotCue2Dimmed': ['sendNoteOn', [2, [6], { rawAttack: 1 }]],
+    'd.0.hotCue2On': ['sendNoteOn', [2, [6], { rawAttack: 2 }]],
+    'd.0.hotCue3Off': ['sendNoteOn', [3, [6], { rawAttack: 0 }]],
+    'd.0.hotCue3Dimmed': ['sendNoteOn', [3, [6], { rawAttack: 1 }]],
+    'd.0.hotCue3On': ['sendNoteOn', [3, [6], { rawAttack: 2 }]],
+    'd.0.hotCue4Off': ['sendNoteOn', [4, [6], { rawAttack: 0 }]],
+    'd.0.hotCue4Dimmed': ['sendNoteOn', [4, [6], { rawAttack: 1 }]],
+    'd.0.hotCue4On': ['sendNoteOn', [4, [6], { rawAttack: 2 }]]
   },
   [CONTROLHUB]: {}
 }
@@ -111,23 +111,23 @@ export const useMidiStore = defineStore({
           return
         }
         this.addGuiAlert({
-          content: "WebMidi could not be enabled.",
+          content: 'WebMidi could not be enabled.',
           alertType: 'alert-danger'
         })
       })
     },
     initMidi() {
-      this.midiInputPorts = this.webmidi.inputs
-      this.midiOutputPorts = this.webmidi.outputs
       this.setupMidiPorts()
-      this.webmidi.addListener("connected", e => {
+      this.webmidi.addListener('connected', e => {
         this.setupMidiPorts()
       })
-      this.webmidi.addListener("disconnected", e => {
+      this.webmidi.addListener('disconnected', e => {
         this.setupMidiPorts()
       })
     },
     setupMidiPorts() {
+      this.midiInputPorts = this.webmidi.inputs
+      this.midiOutputPorts = this.webmidi.outputs
       this.setupMidiPort('midiInputMain', 'midiInputPorts')
       this.setupMidiPort('midiOutput', 'midiOutputPorts')
     },
@@ -146,14 +146,14 @@ export const useMidiStore = defineStore({
         this[portType] = midiPort
         this[`${portType}SetupCallback`](portIdentifier)
         this.addGuiAlert({
-          content: `MIDI INPUT ${this[portType].name}`,
+          content: `${portType} ${this[portType].name}`,
           alertType: 'alert-success'
         })
         return
       }
       // scenario 2: attached port is still the target port
       if (this[portType] !== null && midiPort !== null
-      && this[portType].id === midiPort.id) {
+        && this[portType].id === midiPort.id) {
         // console.log('no change of midiInputMain')
         return
       }
@@ -161,7 +161,7 @@ export const useMidiStore = defineStore({
       if (this[portType] !== null && midiPort === null) {
         this[portType].removeListener()
         this.addGuiAlert({
-          content: `MIDI INPUT ${this[portType].name} is gone`,
+          content: `${portType} ${this[portType].name} is gone`,
           alertType: 'alert-danger'
         })
         this[portType] = null
@@ -170,15 +170,15 @@ export const useMidiStore = defineStore({
       // scenario 4: attached port is different from priority port
       if (this[portType] !== null && midiPort !== null
         && this[portType].id !== midiPort.id) {
-          this[portType].removeListener()
-          this.addGuiAlert({
-            content: `CHANGE MIDI INPUT from ${this[portType].name} to ${midiPort.name}`,
-            alertType: 'alert-success'
-          })
-          this[portType] = midiPort
-          this[`${portType}SetupCallback`](portIdentifier)
-          return
-        }
+        this[portType].removeListener()
+        this.addGuiAlert({
+          content: `CHANGE ${portType} from ${this[portType].name} to ${midiPort.name}`,
+          alertType: 'alert-success'
+        })
+        this[portType] = midiPort
+        this[`${portType}SetupCallback`](portIdentifier)
+        return
+      }
     },
     searchMidiPort(portType, portName) {
       for (const item of this[portType]) {
@@ -191,28 +191,31 @@ export const useMidiStore = defineStore({
     midiInputMainSetupCallback(portIdentifier) {
       this.midiInputMapping = midiInputMappings[portIdentifier]
       this.midiOutputMapping = midiOutputMappings[portIdentifier]
-      this.midiInputMain.addListener('midimessage', e => {
-        switch(e.message.type) {
+      this.midiInputMain.addListener('midimessage', midiEvent => {
+        switch (midiEvent.message.type) {
           case 'clock':
           case 'start':
           case 'stop':
             break
           default:
-            this.handleIncomingMidiEvent(e)
+            this.handleIncomingMidiEvent(midiEvent)
         }
       })
     },
     midiOutputSetupCallback(portIdentifier) {
       // console.log('midiOutputSetupCallback', portIdentifier)
     },
-    handleIncomingMidiEvent(e) {
-      switch(e.message.type) {
+    handleIncomingMidiEvent(midiEvent) {
+      switch (midiEvent.message.type) {
         case 'noteon':
         case 'noteoff':
         case 'controlchange':
-          const eventIdentifier = `${e.message.channel}-${e.message.type}-${e.dataBytes[0]}`
+          const eventIdentifier = `${midiEvent.message.channel}-${midiEvent.message.type}-${midiEvent.dataBytes[0]}`
           if (typeof this.midiInputMapping[eventIdentifier] !== 'undefined') {
-            this.mainstorage.fireControlElement(this.midiInputMapping[eventIdentifier], e.dataBytes[1])
+            this.mainstorage.fireControlElement(
+              this.midiInputMapping[eventIdentifier],
+              midiEvent.dataBytes[1]
+            )
             return
           }
           console.log('NO MAPPING FOR ', eventIdentifier)

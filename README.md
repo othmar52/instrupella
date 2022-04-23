@@ -52,7 +52,6 @@ screenshot of current development status:
 
 ### general
   - [ ] metronome (generic track on 2nd deck)
-  - [ ] observe & handle midi device changes
   - [x] hotcues
   - [x] editable hotcues, tempo, downbeat
   - [x] editable tempo by tap bpm
@@ -98,6 +97,7 @@ screenshot of current development status:
   - [x] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
   - [ ] set hotcue: how to read currentSecond from player within store? audioprocess callback maybe has a few milliseconds offset...
   - [ ] pitching via MIDI controller does not respect 10/20/50 % factor
+  - [ ] flip pitch slider upside down to direction bottom -> increase
   - [x] position of reload-button to top within settings modal
   - [ ] add timestretch GET-parameter to reload url (or local storage)
   - [ ] make beatgrid bars for quarter notes brighter
