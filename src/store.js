@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { useMidiStore } from "@/midistore.js";
 import rangeMixin from './mixins/utils/range'
 import getSecondsPerQuarterNoteMixin from './mixins/utils/secondsPerQuarterNote'
 import mapValueMixin from './mixins/utils/mapValue'
@@ -24,52 +25,6 @@ const ctrlKeyToFunc = (ctrlKey) => {
   console.warn('ERROR ctrlKeyToFunc', ctrlKey)
 }
 
-const midiInputMapping = {
-  '16-noteon-6': 'g.loopFocus',
-  '16-noteon-2': 'g.sniffAudioStartMidi',
-  '16-noteoff-2': 'g.sniffAudioStop',
-  '16-noteon-3': 'd.0.loadTrackMidi',
-  '16-controlchange-0': 'g.handleBrowseWheelRotate',
-  '2-noteon-0': 'd.0.togglePlayMidi',
-  '2-noteon-27': 'd.0.toggleMuteMidi',
-  '2-noteoff-27': 'd.0.toggleMuteMidi',
-  '16-noteon-66': 'd.0.toggleHotCueDeleteMode',
-  '2-controlchange-6': 'd.0.handleJogWheelRotate',
-  '2-controlchange-22': 'd.0.setVolumeMidi',
-  '6-noteon-1': 'd.0.hotCue1DownMidi',
-  '6-noteoff-1': 'd.0.hotCue1UpMidi',
-  '6-noteon-2': 'd.0.hotCue2DownMidi',
-  '6-noteoff-2': 'd.0.hotCue2UpMidi',
-  '6-noteon-3': 'd.0.hotCue3DownMidi',
-  '6-noteoff-3': 'd.0.hotCue3UpMidi',
-  '6-noteon-4': 'd.0.hotCue4DownMidi',
-  '6-noteoff-4': 'd.0.hotCue4UpMidi',
-  '1-noteon-2': 'g.midiShift1On',
-  '1-noteon-1': 'g.midiShift2On',
-  '1-noteon-0': 'g.midiShift3On',
-  '1-noteoff-2': 'g.midiShiftOff',
-  '1-noteoff-1': 'g.midiShiftOff',
-  '1-noteoff-0': 'g.midiShiftOff',
-  '2-controlchange-9': 'd.0.setPlaybackRateMidi'
-}
-const midiOutputMapping = {
-  'd.0.muteOn': ['sendNoteOn', [27, [2], {rawAttack: 1}]],
-  'd.0.muteOff': ['sendNoteOn', [27, [2], {rawAttack: 0}]],
-  'd.0.play': ['sendNoteOn', [0, [2], {rawAttack: 2}]],
-  'd.0.pause': ['sendNoteOn', [0, [2], {rawAttack: 1}]],
-  'd.0.hotCue1Off': ['sendNoteOn', [1, [6], {rawAttack: 0}]],
-  'd.0.hotCue1Dimmed': ['sendNoteOn', [1, [6], {rawAttack: 1}]],
-  'd.0.hotCue1On': ['sendNoteOn', [1, [6], {rawAttack: 2}]],
-  'd.0.hotCue2Off': ['sendNoteOn', [2, [6], {rawAttack: 0}]],
-  'd.0.hotCue2Dimmed': ['sendNoteOn', [2, [6], {rawAttack: 1}]],
-  'd.0.hotCue2On': ['sendNoteOn', [2, [6], {rawAttack: 2}]],
-  'd.0.hotCue3Off': ['sendNoteOn', [3, [6], {rawAttack: 0}]],
-  'd.0.hotCue3Dimmed': ['sendNoteOn', [3, [6], {rawAttack: 1}]],
-  'd.0.hotCue3On': ['sendNoteOn', [3, [6], {rawAttack: 2}]],
-  'd.0.hotCue4Off': ['sendNoteOn', [4, [6], {rawAttack: 0}]],
-  'd.0.hotCue4Dimmed': ['sendNoteOn', [4, [6], {rawAttack: 1}]],
-  'd.0.hotCue4On': ['sendNoteOn', [4, [6], {rawAttack: 2}]]
-}
 const ctrlMap = {
   'loopFocus': 'loopFocus',
   'handleBrowseWheelRotate': 'handleBrowseWheelRotate',
@@ -108,7 +63,7 @@ const ctrlMap = {
 export const useMainStore = defineStore({
   id: 'main',
   state: () => ({
-    midiInputMappings: midiInputMapping,
+    midistorage: useMidiStore(),
     midiLearn: false,
     midiLearnItem: null,
     midiShift: 0,
@@ -134,12 +89,6 @@ export const useMainStore = defineStore({
     currentFocus: 0
   }),
   getters: {
-    getAllmidiInputMappings() {
-      return this.midiInputMappings
-    },
-    midiInputMappingsEmpty() {
-      return this.midiInputMappings === {}
-    },
     getMidiLearn() {
       return this.midiLearn <= 0
     },
@@ -328,17 +277,6 @@ export const useMainStore = defineStore({
       // console.log('updated object', this.trackProps[index])
       
     },
-    /*
-    addMidiMapping(midiMapping) {
-      this.midiInputMappings.push(midiMapping)
-    },
-    removeMidiMapping(index) {
-      this.midiInputMappings.splice(index, 1)
-    },
-    */
-    resetMidiMappings() {
-      this.midiInputMappings = midiInputMapping
-    },
     toggleMidiLearn() {
       this.midiLearn = !this.midiLearn
       // console.log('store.toggleMidiLearn() to', this.midiLearn)
@@ -431,7 +369,7 @@ export const useMainStore = defineStore({
         ? !this.decks[deckIndex].mute
         : forceNewState
       this.decks[deckIndex].mute = newMuteState
-      this.checkFireMidiEvent(
+      this.midistorage.checkFireMidiEvent(
         newMuteState
           ? `d.${deckIndex}.muteOn`
           : `d.${deckIndex}.muteOff`
@@ -449,7 +387,7 @@ export const useMainStore = defineStore({
         ? !this.decks[deckIndex].play
         : forceNewState
 
-      this.checkFireMidiEvent(
+      this.midistorage.checkFireMidiEvent(
         newPlayState
           ? `d.${deckIndex}.play`
           : `d.${deckIndex}.pause`
@@ -495,7 +433,7 @@ export const useMainStore = defineStore({
       }
       this.decks[deckIndex].hotCues = this.getDefaultHotCues()
       for (const idx in range(0, this.hotCueAmount)) {
-        this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+idx*1}Off`)
+        this.midistorage.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+idx*1}Off`)
       }
       this.setHotCuesChange(deckIndex, true)
     },
@@ -583,12 +521,12 @@ export const useMainStore = defineStore({
         this.decks[deckIndex].hotCues.ignoreNextEndEvent = true
         this.decks[deckIndex].hotCuesChange = true
         this.decks[deckIndex].hotCues.haveAnyCues = true
-        this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Dimmed`)
+        this.midistorage.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Dimmed`)
         return
       }
       this.decks[deckIndex].hotCues.nowPlaying = true
       this.decks[deckIndex].seekToSecondAndPlay = this.decks[deckIndex].hotCues.cues[hotCueIndex].second
-      this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}On`)
+      this.midistorage.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}On`)
     },
     hotCueUp(deckIndex, hotCueIndex) {
       // console.log('hotCueUp', deckIndex, hotCueIndex)
@@ -605,7 +543,7 @@ export const useMainStore = defineStore({
           return
         }
         this.deleteHotCue(deckIndex, hotCueIndex)
-        this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Off`)
+        this.midistorage.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Off`)
         return
       }
       this.decks[deckIndex].hotCues.nowPlaying = false
@@ -616,7 +554,7 @@ export const useMainStore = defineStore({
         this.decks[deckIndex].play = false
         this.decks[deckIndex].hotCues.stopAfterRelease = false
       }
-      this.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Dimmed`)
+      this.midistorage.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}Dimmed`)
     },
     deleteHotCue(deckIndex, hotCueIndex) {
       // console.log('deleteHotCue', deckIndex, hotCueIndex)
@@ -708,41 +646,6 @@ export const useMainStore = defineStore({
           targetSecond < 0 ? 0 : targetSecond
         )
 
-    },
-    handleIncomingMidiEvent(e) {
-      switch(e.message.type) {
-        case 'noteon':
-        case 'noteoff':
-        case 'controlchange':
-          const eventIdentifier = `${e.message.channel}-${e.message.type}-${e.dataBytes[0]}`
-          if (typeof this.midiInputMappings[eventIdentifier] !== 'undefined') {
-            // console.log('SUCCESS', eventIdentifier, this.midiInputMappings[eventIdentifier], e.dataBytes[1])
-            this.fireControlElement(this.midiInputMappings[eventIdentifier], e.dataBytes[1])
-            return
-          }
-          console.log('NO MAPPING FOR ', eventIdentifier)
-
-      }
-      //console.log('handleIncomingMidiEvent', e)
-      //console.log('handleIncomingMidiEvent', e.message.channel, e.message.command, e.message.type)
-      //const eventIdentifier = `${e.message.channel}-${e.message.command}-${e.message.type}`
-    },
-    checkFireMidiEvent(arg) {
-      if (!window.tmpMidiOut) {
-        return
-      }
-      // console.log('checkFireMidiEvent', arg)
-      if (typeof midiOutputMapping[arg] === 'undefined') {
-        console.log('no output mapping found', arg)
-        return
-      }
-      this.fireMidiEvent(
-        midiOutputMapping[arg][0],
-        midiOutputMapping[arg][1]
-      )
-    },
-    fireMidiEvent(funcName, args) {
-      window.tmpMidiOut[funcName](...args)
     },
     sniffAudioStartMidi() {
       if (this.currentTrackFocus !== null) {

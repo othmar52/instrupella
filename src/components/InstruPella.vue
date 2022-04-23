@@ -1,9 +1,6 @@
 <template>
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
   <BlazingBaton v-if="storage.getShowIncomingMidiClock" ref="baton" />
-  <!--div v-for="(item, idx) in tmpMidiDevices" :key="idx">
-      {{ idx }} {{ item }}
-  </div-->
   <div class="instrupella">
     <Deck
       v-for="deck in decks"
@@ -29,9 +26,9 @@
 </template>
 
 <script setup>
-import { WebMidi } from "webmidi";
 import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
 import { useMainStore } from "@/store.js";
+import { useMidiStore } from "@/midistore.js";
 import Deck from '@/components/Deck/Deck.vue'
 import TrackList from '@/components/TrackList/TrackList.vue'
 import BlazingBaton from '@/components/BlazingBaton/BlazingBaton.vue'
@@ -41,16 +38,15 @@ const props = defineProps({
     default: false
   }
 })
-console.log('webmidi', WebMidi)
 const track = ref(null)
 const top = ref(null)
 const tracklist = ref(null)
 const tracks = ref([])
 const baton = ref(null)
-const tmpMidiDevices = ref([])
 const showScrollToTop = ref(false)
 
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const decks = computed(() => storage.getDecks)
 
 watch(() => storage.scrollToTop, (value) => {
@@ -67,6 +63,13 @@ watch(() => storage.scrollToTop, (value) => {
   storage.setScrollToTop(false)
 })
 
+watch(() => midistorage.getHaveGuiAlerts, () => {
+  for (const item of midistorage.getGuiAlerts) {
+    showStickyAlert(item)
+  }
+  midistorage.setGuiAlerts([])
+})
+
 watch(() => storage.scrollToTrackList, (value) => {
   if (value === false) {
     return
@@ -80,16 +83,12 @@ watch(() => storage.scrollToTrackList, (value) => {
   storage.setScrollToTrackList(false)
 })
 
-const webmidi = WebMidi
-
-window.wm = webmidi
-const midiInput1 = ref(null)
-
 const persistUpdateTrack = (properties) => {
   storage.addTrackProp(properties)
 }
 
 const loadTrackList = () => {
+  // TODO: fetch() is incompatible to file:/// protocol
   fetch(`./${process.env.VUE_APP_MUSIC_ABSPATH.split(/\//).pop()}/instrupella/instrupella-db.json`)
     .then(response => response.json())
     .then(json => {
@@ -97,6 +96,7 @@ const loadTrackList = () => {
       mergeLocalStorageTrackProperties()
       storage.setTracks(tracks.value)
       // check url get params if we have a track to load
+      // TODO: handle any amount of decks (d0, d1, d2, ...)
       const loadTrack = new URLSearchParams(window.location.search).get('d0')
       if (loadTrack === null) {
         return
@@ -123,79 +123,6 @@ const showStickyAlert = (options) => {
     window.halfmoon.initStickyAlert(options)
 }
 
-const initMidi = () => {
-  webmidi.addListener("connected", e => {
-    console.log("TODO MIDI connect", e.port.name, e.port)
-  })
-  webmidi.addListener("disconnected", e => {
-    console.log("TODO MIDI disconnect", e.port.name)
-  })
-  webmidi.addListener("portschanged", e => {
-    console.log("TODO MIDI portschanged", e)
-  })
-
-  const midiControllerName = 'DJ2GO2'
-  for (const item of WebMidi.inputs) {
-    tmpMidiDevices.value.push(item.name)
-    if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
-      midiInput1.value = item
-      showStickyAlert({
-        content: `MIDI INPUT ${midiControllerName}`,
-        alertType: 'alert-success'
-      })
-    }
-  }
-  for (const item of WebMidi.outputs) {
-    if (item.name.toUpperCase().indexOf(midiControllerName) !== -1) {
-      window.tmpMidiOut = item
-      showStickyAlert({
-        content: `MIDI OUTPUT ${midiControllerName}`,
-        alertType: 'alert-success'
-      })
-    }
-  }
-
-  if (!midiInput1.value) {
-    showStickyAlert({
-      content: `cant find MIDI ${midiControllerName}`,
-      alertType: 'alert-danger'
-    })
-    return
-  }
-  console.log('midiInput1', midiInput1)
-
-  midiInput1.value.removeListener()
-  midiInput1.value.addListener('midimessage', e => {
-    switch(e.message.type) {
-      case 'clock':
-        baton.value.messageClock(e)
-        break
-      case 'start':
-        baton.value.messageStart(e)
-        break
-      case 'stop':
-        baton.value.messageStop(e)
-        break
-      default:
-        storage.handleIncomingMidiEvent(e)
-    }
-  })
-}
-
-const checkInitMidi = () => {
-  webmidi.enable((err) => {
-    if (err) {
-      tmpMidiDevices.value.push('ERROR: ' + err)
-      showStickyAlert({
-        content: "WebMidi could not be enabled.",
-        alertType: 'alert-danger'
-      })
-      return
-    }
-    initMidi()
-  })
-}
-
 const scrollListener = () => {
   showScrollToTop.value = top.value.getBoundingClientRect().top < 0 ? true : false
 }
@@ -204,7 +131,7 @@ onMounted(() => {
   loadTrackList()
   storage.clearDecks()
   storage.createDeck()
-  checkInitMidi()
+  midistorage.checkInitMidi()
   document.querySelector('.content-wrapper').addEventListener('scroll', scrollListener)
 })
 

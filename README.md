@@ -106,7 +106,7 @@ screenshot of current development status:
   - [ ] change default zoom on mobile devices from 400 to 500 px / sec
   - [ ] compatibility to file:/// protocol (tracklist fetch + reload)
   - [ ] hide / smaller size for a few control elements in case midi controller is connected
-  - [ ] observe & handle midi controller connect/disconnect during runtime
+  - [x] observe & handle midi controller connect/disconnect during runtime
   - [x] force landscape orientation on mobile chrome
   - [x] display viewport dimensions in settings
   - [x] hide blazing baton when we dont have an incoming MIDI clock
@@ -129,6 +129,7 @@ screenshot of current development status:
   - [ ] add VU-meter
   - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME & https://wavesurfer-js.org/faq/
   - [ ] consider to have assignable samples on left half of MIDI controller "Numark DJ2GO2"
+  - [ ] compatibility to mobile portrait orientation
 
 
 ## Resources for development
