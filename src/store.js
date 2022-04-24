@@ -32,6 +32,7 @@ const ctrlMap = {
   'sniffAudioStartMidi': 'sniffAudioStartMidi',
   'loadTrackMidi': 'loadTrackMidi',
   'sniffAudioStop': 'sniffAudioStop',
+  'sniffRandomAudioStartMidi': 'sniffRandomAudioStartMidi',
   'toggleMute': 'toggleMute',
   'toggleMuteMidi': 'toggleMuteMidi',
   'togglePlay': 'togglePlay',
@@ -83,6 +84,7 @@ export const useMainStore = defineStore({
     scrollToNextTrack: false,
     scrollToPreviousTrack: false,
     scrollToFocusedTrack: false,
+    scrollToRandomTrack: false,
     currentTrackFocus: null,
     loadCurrentTrackFocusToDeck: false,
     focusItems: ['top', 'track-list'],
@@ -163,6 +165,9 @@ export const useMainStore = defineStore({
     },
     setScrollToFocusedTrack(value) {
       this.scrollToFocusedTrack = value
+    },
+    setScrollToRandomTrack(value) {
+      this.scrollToRandomTrack = value
     },
     setCurrentTrackFocus(track) {
       this.currentTrackFocus = track
@@ -673,6 +678,9 @@ export const useMainStore = defineStore({
       }
       this.sniffAudioNode.play()
       this.sniffAudioIsPlaying = this.sniffAudioTrack.id
+    },
+    sniffRandomAudioStartMidi() {
+      this.scrollToRandomTrack = true
     },
     sniffAudioStop() {
       // console.log('sniffAudioStop')

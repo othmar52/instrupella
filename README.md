@@ -74,6 +74,7 @@ screenshot of current development status:
   - [x] volume control
   - [ ] optional sync to midi clock / CV-clock
   - [ ] midi mapping / learn
+  - [ ] respect seek, nudge, tempo change, etc. in metronome sound
   - [ ] metronome sound is very quiet on iPad when track is playing - do we need a separate audio context? (not reproduceable in desktop browsers)
   - [x] drop BeatGridPlugin as soon as new version of wavesurfer is released
   - [ ] move github link to "about" modal to avoid leaving instrupella by accident
@@ -111,10 +112,7 @@ screenshot of current development status:
   - [x] display viewport dimensions in settings
   - [x] hide blazing baton when we dont have an incoming MIDI clock
   - [x] hide midi learn button until midi learn is implemented
-
-
-
-
+  - [x] add functionality to listen to random timestamp of random track
 
 
 ## low prio TODO

@@ -10,6 +10,8 @@ const midiInputMappings = {
     '16-noteon-6': 'g.loopFocus',
     '16-noteon-2': 'g.sniffAudioStartMidi',
     '16-noteoff-2': 'g.sniffAudioStop',
+    '5-noteon-1': 'g.sniffRandomAudioStartMidi',
+    '5-noteoff-1': 'g.sniffAudioStop',
     '16-noteon-3': 'd.0.loadTrackMidi',
     '16-controlchange-0': 'g.handleBrowseWheelRotate',
     '2-noteon-0': 'd.0.togglePlayMidi',

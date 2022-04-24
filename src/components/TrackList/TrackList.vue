@@ -167,13 +167,30 @@ watch(() => storage.scrollToPreviousTrack, (value) => {
   handleTrackFocusChange()
 })
 
-const handleTrackFocusChange = () => {
+watch(() => storage.scrollToRandomTrack, (value) => {
+  if (value === false) {
+    return
+  }
+  storage.setScrollToRandomTrack(false)
+  if (filteredEntries.value.length === 0) {
+    focusedTrackIndex = 0
+    return
+  }
+  focusedTrackIndex = Math.floor(Math.random() * filteredEntries.value.length)
+  handleTrackFocusChange(true)
+})
+
+const handleTrackFocusChange = (sniffAudio = false) => {
   // console.log(`#track-row-${filteredEntries.value[focusedTrackIndex].id}`)
   document.querySelector(`#track-row-${filteredEntries.value[focusedTrackIndex].id}`).scrollIntoView({
     behavior: 'auto',
     block: 'center'
   })
   storage.setCurrentTrackFocus(filteredEntries.value[focusedTrackIndex])
+  if (sniffAudio === false) {
+    return
+  }
+  storage.sniffAudioStartMidi()
 }
 
 const loadRandom = () => {
