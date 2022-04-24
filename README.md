@@ -97,7 +97,7 @@ screenshot of current development status:
   - [x] optionally double or half displayed tempo without affecting playback speed
   - [x] clear track minimap when loading a new track. minimap of previous track is shown during load/analyze.@see https://github.com/katspaugh/wavesurfer.js/issues/2479
   - [ ] set hotcue: how to read currentSecond from player within store? audioprocess callback maybe has a few milliseconds offset...
-  - [ ] pitching via MIDI controller does not respect 10/20/50 % factor
+  - [x] pitching via MIDI controller does not respect 10/20/50 % factor
   - [ ] flip pitch slider upside down to direction bottom -> increase
   - [x] position of reload-button to top within settings modal
   - [ ] add timestretch GET-parameter to reload url (or local storage)
@@ -128,6 +128,7 @@ screenshot of current development status:
   - [ ] pre rendering data for waveforms @see https://codepen.io/entonbiba/pen/VPqvME & https://wavesurfer-js.org/faq/
   - [ ] consider to have assignable samples on left half of MIDI controller "Numark DJ2GO2"
   - [ ] compatibility to mobile portrait orientation
+  - [ ] npm served dev-instance does not work in Firefox (built version works)
 
 
 ## Resources for development

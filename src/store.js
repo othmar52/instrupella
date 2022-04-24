@@ -327,6 +327,7 @@ export const useMainStore = defineStore({
         mute: false,
         volume: 1,
         playbackRate: 1,
+        pitchRange: 0.1,
         tempoFactor: 1, // normal, double or half tempo
         currentSecond: 0,
         skipLength: 0.05,
@@ -482,6 +483,9 @@ export const useMainStore = defineStore({
       }
       this.decks[deckIndex].tempoFactor = 1
     },
+    setPitchRange(deckIndex, pitchRange) {
+      this.decks[deckIndex].pitchRange = pitchRange
+    },
     setPlaybackRate(deckIndex, playbackRate) {
       this.decks[deckIndex].playbackRate = playbackRate
     },
@@ -489,10 +493,10 @@ export const useMainStore = defineStore({
       let newPlayBackrate = 1
       switch(true) {
         case midiCCValue > 64:
-          newPlayBackrate = mapValue(midiCCValue, 64, 127, 1, 1.1)
+          newPlayBackrate = mapValue(midiCCValue, 64, 127, 1, 1 + this.decks[deckIndex].pitchRange)
           break
         case midiCCValue < 64:
-          newPlayBackrate = mapValue(midiCCValue, 0, 64, 0.9, 1)
+          newPlayBackrate = mapValue(midiCCValue, 0, 64, 1 - this.decks[deckIndex].pitchRange, 1)
           break
       }
       return this.setPlaybackRate(deckIndex, newPlayBackrate)

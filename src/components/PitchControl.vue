@@ -56,9 +56,7 @@ import { useMainStore } from "@/store.js";
 const storage = useMainStore()
 const slider = ref(null)
 const buttonClasses = ref('btn btn-square btn-lg m-10 mr-0')
-const range = ref(0.1)
-const min = ref(0.9)
-const max = ref(1.1)
+
 const props = defineProps({
   center: {
     type: Number,
@@ -73,16 +71,16 @@ const props = defineProps({
     default: false
   }
 })
-
+const range = ref(props.deck.pitchRange)
+const min = ref(1 - props.deck.pitchRange)
+const max = ref(1 + props.deck.pitchRange)
 // helper var used for bidirektional control
 // slider -> store (via GUI)
 // store -> slider (via midi)
 let playbackRateString = ''
 
 const changeRange = (newRange, id) => {
-  range.value = newRange
-  min.value = props.center - newRange
-  max.value = props.center + newRange
+  storage.setPitchRange(props.deck.index, newRange)
 
   // TODO: how to properly close halfmoon dropdown on click?
   setTimeout(() => {
@@ -98,6 +96,13 @@ const sliderChange = (newPitchValue) => {
   )
 }
 
+watch(() => props.deck.pitchRange, (pitchRange) => {
+  console.log('watch pitchRange', pitchRange)
+  range.value = pitchRange
+  min.value = props.center - pitchRange
+  max.value = props.center + pitchRange
+})
+
 watch(() => props.deck.playbackRate, (playbackRate) => {
   if (playbackRate.toString() !== playbackRateString) {
     playbackRateString = playbackRate.toString()
@@ -111,6 +116,7 @@ const pitchLabel = computed(() => {
 
 onMounted(() => {
   halfmoon.onDOMContentLoaded()
+  changeRange(props.deck.pitchRange, 'pitch-control-items')
 })
 </script>
 
