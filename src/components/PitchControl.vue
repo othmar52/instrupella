@@ -6,6 +6,7 @@
         :topSliderValue="min"
         :showSliderValue="true"
         :midiLearn="midiLearn"
+        :additionalClasses="additionalPitchSliderClasses"
         @sliderChange="sliderChange"
         ref="slider"
       />
@@ -53,9 +54,16 @@ import { ref, onMounted, computed, watch } from 'vue'
 import VSlider from '@/components/VSlider.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import { useMainStore } from "@/store.js";
+import { useMidiStore } from "@/midistore.js";
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const slider = ref(null)
 const buttonClasses = ref('btn btn-square btn-lg m-10 mr-0')
+
+
+const additionalPitchSliderClasses = computed(() => {
+  return midistorage.getAdditionalClassForGuiElement(`d.${props.deck.index}.pitchSlider`)
+})
 
 const props = defineProps({
   center: {

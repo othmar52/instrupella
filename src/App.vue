@@ -105,6 +105,12 @@ onMounted(() => {
                                   supported by Chrome, Opera and Firefox */
 }
 
+.invisible {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 .icon {
   width: 1rem;
   height: 1rem;

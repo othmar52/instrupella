@@ -107,7 +107,7 @@ screenshot of current development status:
   - [ ] ensure sniff-audio-play-button has no selectable text (maybe solved by replace with svg)
   - [ ] change default zoom on mobile devices from 400 to 500 px / sec
   - [ ] compatibility to file:/// protocol (tracklist fetch + reload)
-  - [ ] hide / smaller size for a few control elements in case midi controller is connected
+  - [x] hide / smaller size for a few control elements in case midi controller is connected
   - [x] observe & handle midi controller connect/disconnect during runtime
   - [x] force landscape orientation on mobile chrome
   - [x] display viewport dimensions in settings

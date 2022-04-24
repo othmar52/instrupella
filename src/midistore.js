@@ -5,7 +5,7 @@ import { useMainStore } from '@/store.js';
 const DJ2GO2 = 'DJ2GO2'
 const CONTROLHUB = 'CONTROL Hub'
 
-const midiInputMappings = {
+const midiInputMainMappings = {
   [DJ2GO2]: {
     '16-noteon-6': 'g.loopFocus',
     '16-noteon-2': 'g.sniffAudioStartMidi',
@@ -59,6 +59,17 @@ const midiOutputMappings = {
   },
   [CONTROLHUB]: {}
 }
+const addGuiElementClass = {
+  [DJ2GO2]: {
+    'd.0.loadTrack': 'invisible',
+    'd.0.toBegin': 'invisible',
+    'd.0.pitchSlider': 'slider-small',
+    'd.0.volumeSlider': 'slider-small',
+    'd.0.nudgeBehind': 'invisible',
+    'd.0.nudgeAhead': 'invisible'
+  },
+  [CONTROLHUB]: {}
+}
 
 export const useMidiStore = defineStore({
   id: 'midi',
@@ -74,8 +85,9 @@ export const useMidiStore = defineStore({
     midiInputMainPriority: [DJ2GO2, CONTROLHUB],
     midiInputClockPriority: [CONTROLHUB],
     midiOutputPriority: [DJ2GO2],
-    midiInputMapping: null,
+    midiInputMainMapping: null,
     midiOutputMapping: null,
+    midiInputMainGuiElementClasses: null,
     guiAlerts: []
   }),
   getters: {
@@ -93,6 +105,14 @@ export const useMidiStore = defineStore({
     }
   },
   actions: {
+    getAdditionalClassForGuiElement(guiElementIdentifier) {
+      if (!this.midiInputMainGuiElementClasses) {
+        return ''
+      }
+      if (guiElementIdentifier in this.midiInputMainGuiElementClasses) {
+        return this.midiInputMainGuiElementClasses[guiElementIdentifier]
+      }
+    },
     setMidiInputPorts(value) {
       this.getMidiInputPorts = value
     },
@@ -167,6 +187,8 @@ export const useMidiStore = defineStore({
           alertType: 'alert-danger'
         })
         this[portType] = null
+        this[`${portType}Mapping`] = null
+        this[`${portType}GuiElementClasses`] = null
         return
       }
       // scenario 4: attached port is different from priority port
@@ -191,8 +213,8 @@ export const useMidiStore = defineStore({
       return null
     },
     midiInputMainSetupCallback(portIdentifier) {
-      this.midiInputMapping = midiInputMappings[portIdentifier]
-      this.midiOutputMapping = midiOutputMappings[portIdentifier]
+      this.midiInputMainMapping = midiInputMainMappings[portIdentifier]
+      this.midiInputMainGuiElementClasses = addGuiElementClass[portIdentifier]
       this.midiInputMain.addListener('midimessage', midiEvent => {
         switch (midiEvent.message.type) {
           case 'clock':
@@ -205,6 +227,7 @@ export const useMidiStore = defineStore({
       })
     },
     midiOutputSetupCallback(portIdentifier) {
+      this.midiOutputMapping = midiOutputMappings[portIdentifier]
       // console.log('midiOutputSetupCallback', portIdentifier)
     },
     handleIncomingMidiEvent(midiEvent) {
@@ -213,9 +236,9 @@ export const useMidiStore = defineStore({
         case 'noteoff':
         case 'controlchange':
           const eventIdentifier = `${midiEvent.message.channel}-${midiEvent.message.type}-${midiEvent.dataBytes[0]}`
-          if (typeof this.midiInputMapping[eventIdentifier] !== 'undefined') {
+          if (typeof this.midiInputMainMapping[eventIdentifier] !== 'undefined') {
             this.mainstorage.fireControlElement(
-              this.midiInputMapping[eventIdentifier],
+              this.midiInputMainMapping[eventIdentifier],
               midiEvent.dataBytes[1]
             )
             return

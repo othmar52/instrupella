@@ -5,6 +5,7 @@
         :bottomSliderValue="min"
         :topSliderValue="max"
         :midiLearn="midiLearn"
+        :additionalClasses="additionalVolumeSliderClasses"
         @sliderChange="sliderChange"
         ref="slider"
       />
@@ -15,11 +16,16 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import VSlider from '@/components/VSlider.vue'
-import { useMainStore } from "@/store.js";
+import { useMainStore } from "@/store.js"
+import { useMidiStore } from "@/midistore.js"
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const slider = ref(null)
 const min = ref(0)
 const max = ref(1)
+const additionalVolumeSliderClasses = computed(() => {
+  return midistorage.getAdditionalClassForGuiElement(`d.${props.deck.index}.volumeSlider`)
+})
 const props = defineProps({
   center: {
     type: Number,

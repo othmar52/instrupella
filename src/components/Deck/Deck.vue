@@ -42,7 +42,7 @@
           />
           <ButtonIcon
             componentName="IconArrowToFirst"
-            :permaClasses="`${buttonClasses} mr-0`"
+            :permaClasses="`${buttonClasses} mr-0 ${midistorage.getAdditionalClassForGuiElement('d.'+deck.index+'.toBegin')}`"
             :midiLearn="midiLearn"
             @click="storage.fireControlElement(`d.${deck.index}.seekToSecond`, 0)"
           />
@@ -56,13 +56,13 @@
           />
           <ButtonIcon
             componentName="IconMinus"
-            :permaClasses="`rounded-circle ${buttonClasses}`"
+            :permaClasses="`rounded-circle ${buttonClasses} ${midistorage.getAdditionalClassForGuiElement('d.'+deck.index+'.nudgeBehind')}`"
             :midiLearn="midiLearn"
             @click="storage.fireControlElement(`d.${deck.index}.nudgeBehind`)"
           />
           <ButtonIcon
             componentName="IconPlus"
-            :permaClasses="`rounded-circle ${buttonClasses}`"
+            :permaClasses="`rounded-circle ${buttonClasses} ${midistorage.getAdditionalClassForGuiElement('d.'+deck.index+'.nudgeAhead')}`"
             :midiLearn="midiLearn"
             @click="storage.fireControlElement(`d.${deck.index}.nudgeAhead`)"
           />
@@ -131,6 +131,7 @@ import VolumeControl from '@/components/VolumeControl.vue'
 import Edit from '@/components/Deck/Edit.vue'
 import HotCues from '@/components/HotCues.vue'
 import { useMainStore } from "@/store.js";
+import { useMidiStore } from "@/midistore.js";
 const player = ref(null)
 const play = ref(false)
 const mute = ref(false)
@@ -141,6 +142,7 @@ const currentSecond = ref(0)
 const showEditTrack = ref(false)
 const buttonClasses = ref('btn btn-square btn-default btn-lg m-10')
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const props = defineProps({
   deck: {
     type: Object,

@@ -3,7 +3,7 @@
   <table class="track-list table table-striped table-hover">
     <thead>
       <tr>
-        <th colspan="7">
+        <th colspan="6">
           <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-2">
@@ -40,7 +40,6 @@
         <th>BPM</th>
         <th>LENGTH</th>
         <th></th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -50,7 +49,12 @@
         :class="trackRowClass(track)"
         :id="`track-row-${track.id}`"
       >
-        <td v-html="formatArtistTitle(track)"></td>
+        <td>
+          <strong v-if="storage.getDeckIndexForTrackId(track.id) >= 0">
+            <span class="btn btn-default btn-primary">D{{storage.getDeckIndexForTrackId(track.id)*1 + 1}}</span>
+          </strong>
+          <span v-html="formatArtistTitle(track)"></span>
+        </td>
         <td>
           <span v-if="track.like > 0" class="text-success">&#129093;</span>
           <span v-if="track.like < 0" class="text-danger">&#129095;</span>
@@ -60,21 +64,20 @@
           <ColoredTempo :track="track" />
         </td>
         <td>{{ formatDuration(track.length) }}</td>
-        <td
-          @mousedown="storage.sniffAudioStart(track)"
-          @touchstart="storage.sniffAudioStart(track)"
-          @mouseup="storage.sniffAudioStop()"
-          @touchend="storage.sniffAudioStop()"
-        >
+        <td class="d-flex">
+          <span
+            @mousedown="storage.sniffAudioStart(track)"
+            @touchstart="storage.sniffAudioStart(track)"
+            @mouseup="storage.sniffAudioStop()"
+            @touchend="storage.sniffAudioStop()"
+          >
           <strong :class="`btn btn-default ${storage.getSniffAudioIsPlaying === track.id ? 'btn-primary' : ''}`">&#9658;</strong>
-        </td>
-        <td @click="storage.loadTrack(0, track.id)">
+        </span>
+        <span @click="storage.loadTrack(0, track.id)">
           <strong v-if="storage.getDeckIndexForTrackId(track.id) < 0">
-            <span class="btn btn-default">LOAD</span>
+            <span :class="`ml-5 btn btn-default ${midistorage.getAdditionalClassForGuiElement('d.0.loadTrack')}`">LOAD</span>
           </strong>
-          <strong v-else>
-            <span class="btn btn-default btn-primary">DECK {{storage.getDeckIndexForTrackId(track.id)*1 + 1}}</span>
-          </strong>
+        </span>
         </td>
       </tr>
     </tbody>
@@ -92,8 +95,10 @@ import formatArtistTitleMixin from '../../mixins/format/artisttitle'
 import BpmFilter from '@/components/TrackList/BpmFilter.vue'
 import ColoredTempo from '@/components/ColoredTempo.vue'
 import { useMainStore } from "@/store.js";
+import { useMidiStore } from "@/midistore.js";
 const { formatArtistTitle } = formatArtistTitleMixin()
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const { getBpm } = utils()
 const { range } = rangeMixin()
 const { formatDuration } = formatDurationMixin()
@@ -201,10 +206,9 @@ const loadRandom = () => {
 }
 
 const trackRowClass = (track) => {
-  if (storage.getCurrentTrackFocus && storage.getCurrentTrackFocus.id === track.id) {
-    return 'table-primary'
-  }
-  return storage.getDeckIndexForTrackId(track.id) >= 0 ? 'table-primary' : ''
+  return (storage.getCurrentTrackFocus && storage.getCurrentTrackFocus.id === track.id)
+    ? 'table-primary'
+    : ''
 }
 
 const setBpmFilter = (tempo) => {

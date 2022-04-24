@@ -4,7 +4,7 @@
     style="position: absolute; width: 22.5%; height: 80%; z-index: 200; opacity: 0.7;">
     
     </div>
-    <div class="vslider slider" ref="sliderWrapper">
+    <div :class="`vslider slider ${additionalClasses}`" ref="sliderWrapper">
       <input
         type="range"
         orient="vertical"
@@ -50,13 +50,17 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  additionalClasses: {
+    type: String,
+    default: ''
+  },
   midiLearn: {
     type: Boolean,
     default: false
   }
 })
 const factor = computed(() => {
-  return localSliderValue.value.toFixed(3)
+  return localSliderValue.value.toFixed(2)
 })
 const sliderMaxValue = computed(() => {
   return (props.bottomSliderValue > props.topSliderValue)
@@ -148,6 +152,7 @@ defineExpose({
 $track-w: 15em;
 $track-h: .25em;
 $thumb-d: 3.5em;
+$thumb-d-small: 1.5em;
 
 @mixin track() {
   box-sizing: border-box;
@@ -163,6 +168,10 @@ $thumb-d: 3.5em;
   width: $thumb-d/3;
   height: $thumb-d;
   background-color: var(--dm-button-primary-bg-color);
+}
+@mixin thumb-small() {
+  width: $thumb-d-small/3;
+  height: $thumb-d-small;
 }
 
 .vslider {
@@ -209,4 +218,18 @@ input[type=range][orient=vertical] {
 
   &::-ms-tooltip { display: none }
 }
+
+
+.slider-small input[type=range][orient=vertical] {
+  &::-webkit-slider-thumb {
+    margin-top: .5*($track-h - $thumb-d-small);
+    @include thumb-small
+  }
+  &::-moz-range-thumb { @include thumb-small }
+  &::-ms-thumb {
+    margin-top: 0;
+    @include thumb-small
+  }
+}
+
 </style>
