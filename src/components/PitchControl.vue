@@ -2,8 +2,8 @@
   <div class="pitch-control d-flex">
     <div class="">
       <VSlider
-        :minSliderValue="min"
-        :maxSliderValue="max"
+        :bottomSliderValue="max"
+        :topSliderValue="min"
         :showSliderValue="true"
         :midiLearn="midiLearn"
         @sliderChange="sliderChange"
@@ -27,10 +27,10 @@
         </div>
       </div>
       <ButtonIcon
-        componentName="IconPlus"
+        componentName="IconMinus"
         :permaClasses="buttonClasses"
         :midiLearn="midiLearn"
-        @click="$refs.slider.increment()"
+        @click="$refs.slider.decrement()"
       />
       <ButtonIcon
         componentName="IconArrowsToCenter"
@@ -39,10 +39,10 @@
         @click="$refs.slider.reset()"
       />
       <ButtonIcon
-        componentName="IconMinus"
+        componentName="IconPlus"
         :permaClasses="buttonClasses"
         :midiLearn="midiLearn"
-        @click="$refs.slider.decrement()"
+        @click="$refs.slider.increment()"
       />
     </div>
   </div>
@@ -97,7 +97,6 @@ const sliderChange = (newPitchValue) => {
 }
 
 watch(() => props.deck.pitchRange, (pitchRange) => {
-  console.log('watch pitchRange', pitchRange)
   range.value = pitchRange
   min.value = props.center - pitchRange
   max.value = props.center + pitchRange

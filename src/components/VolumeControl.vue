@@ -2,8 +2,8 @@
   <div class="volume-control">
     <div class="">
       <VSlider
-        :minSliderValue="min"
-        :maxSliderValue="max"
+        :bottomSliderValue="min"
+        :topSliderValue="max"
         :midiLearn="midiLearn"
         @sliderChange="sliderChange"
         ref="slider"

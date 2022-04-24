@@ -8,11 +8,12 @@
       <input
         type="range"
         orient="vertical"
+        ref="sliderElement"
         @touchstart="disableScroll"
         @touchend="enableScroll"
-        :min="props.minSliderValue"
+        :max="sliderMaxValue"
         :step="props.step"
-        :max="props.maxSliderValue"
+        :min="sliderMinValue"
         v-model="localSliderValue"
       />
 
@@ -24,14 +25,15 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue'
 const localSliderValue = ref(1)
+const sliderElement = ref(null)
 const bodyStyles = ref(document.querySelector('body').style)
 const props = defineProps({
-  minSliderValue: {
+  bottomSliderValue: {
     type: [Number, String],
     default: 0.5,
     validator: value => !isNaN(value - parseFloat(value))
   },
-  maxSliderValue: {
+  topSliderValue: {
     type: [Number, String],
     default: 1.5,
     validator: value => !isNaN(value - parseFloat(value))
@@ -56,6 +58,16 @@ const props = defineProps({
 const factor = computed(() => {
   return localSliderValue.value.toFixed(3)
 })
+const sliderMaxValue = computed(() => {
+  return (props.bottomSliderValue > props.topSliderValue)
+    ? props.bottomSliderValue
+    : props.topSliderValue
+})
+const sliderMinValue = computed(() => {
+  return (props.bottomSliderValue > props.topSliderValue)
+    ? props.topSliderValue
+    : props.bottomSliderValue
+})
 
 const emit = defineEmits([
   'sliderChange'
@@ -73,18 +85,18 @@ const enableScroll = () => {
   bodyStyles.value.removeProperty('top')
 }
 const increment = () => {
-  if (localSliderValue.value + props.step <= props.maxSliderValue) {
+  if (localSliderValue.value + props.step <= sliderMaxValue.value) {
     localSliderValue.value += props.step
     return
   }
-  localSliderValue.value = props.maxSliderValue
+  localSliderValue.value = sliderMaxValue.value
 }
 const decrement = () => {
-  if (localSliderValue.value - props.step >= props.minSliderValue) {
+  if (localSliderValue.value - props.step >= sliderMinValue.value) {
     localSliderValue.value -= props.step
     return
   }
-  localSliderValue.value = props.minSliderValue
+  localSliderValue.value = sliderMinValue.value
 }
 const reset = () => {
   localSliderValue.value = 1.0
@@ -99,20 +111,23 @@ watch(localSliderValue, (newValue) => {
   emit('sliderChange', localSliderValue.value)
 })
 
-watch(() => props.maxSliderValue, () => {
-  if (localSliderValue.value > props.maxSliderValue) {
-    localSliderValue.value = props.maxSliderValue
+watch(() => props.topSliderValue, () => {
+  if (localSliderValue.value > props.topSliderValue) {
+    localSliderValue.value = props.topSliderValue
   }
 })
 
-watch(() => props.minSliderValue, () => {
-  if (localSliderValue.value < props.minSliderValue) {
-    localSliderValue.value = props.minSliderValue
+watch(() => props.bottomSliderValue, () => {
+  if (localSliderValue.value < props.bottomSliderValue) {
+    localSliderValue.value = props.bottomSliderValue
   }
 })
 
 onMounted(() => {
-
+  if (props.topSliderValue < props.bottomSliderValue) {
+    // flip slider top to bottom
+    sliderElement.value.style.transform = 'translate(-50%, -50%) rotate(90deg)';
+  }
 })
 
 defineExpose({
