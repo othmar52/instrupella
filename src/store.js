@@ -170,6 +170,7 @@ export const useMainStore = defineStore({
       this.scrollToRandomTrack = value
     },
     setCurrentTrackFocus(track) {
+      this.currentFocus = 1
       this.currentTrackFocus = track
     },
     setLoadCurrentTrackFocusToDeck(deckIndex) {
@@ -665,6 +666,7 @@ export const useMainStore = defineStore({
       // console.log('sniffAudioStart')
       // TODO replace segments with selected timestamps
       // (respect downbeat if available and respect silences)
+      this.currentFocus = 1
       const maxSegments = 7
       if (!this.sniffAudioTrack || this.sniffAudioTrack.id !== track.id) {
         this.sniffAudioTrack = track
