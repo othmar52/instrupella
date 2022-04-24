@@ -80,7 +80,7 @@ screenshot of current development status:
   - [ ] move github link to "about" modal to avoid leaving instrupella by accident
   - [x] ensure player current time gets updated when seeking on wave-overview during stop (`wavesurfer.audioprocess()` is not fired), maybe use wavesurfer.backend.getPlayedPercents());
   - [ ] ensure very long track titles does not break layout
-  - [ ] big wave form position is crazy during play in combination with fast pitch changes
+  - [x] big wave form position is crazy during play in combination with fast pitch changes
   - [x] BUG volume slider position is not respected on new loaded tracks
   - [x] BUG load new track with different wave zoom -> drag big wave is messed up
   - [x] BUG big wave zoom broken

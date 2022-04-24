@@ -411,10 +411,12 @@ const updateMarkers = () => {
   }
 }
 
-
 watch(() => props.deck.playbackRate, () => {
   try {
     player.value.setPlaybackRate(props.deck.playbackRate)
+    seekToSecondAndCenter(
+      player.value.getCurrentTime()
+    )
   } catch (e) { }
 })
 
