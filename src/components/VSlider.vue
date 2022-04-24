@@ -106,21 +106,27 @@ const setSliderValueFromMidi = (newValue) => {
   localSliderValue.value = parseFloat(newValue)
 }
 
+const ensureSliderValueWithinMinMax = () => {
+  if (localSliderValue.value > sliderMaxValue.value) {
+    localSliderValue.value = sliderMaxValue.value
+    return
+  }
+  if (localSliderValue.value < sliderMinValue.value) {
+    localSliderValue.value = sliderMinValue.value
+  }
+}
+
 watch(localSliderValue, (newValue) => {
   localSliderValue.value = parseFloat(newValue)
   emit('sliderChange', localSliderValue.value)
 })
 
 watch(() => props.topSliderValue, () => {
-  if (localSliderValue.value > props.topSliderValue) {
-    localSliderValue.value = props.topSliderValue
-  }
+  ensureSliderValueWithinMinMax()
 })
 
 watch(() => props.bottomSliderValue, () => {
-  if (localSliderValue.value < props.bottomSliderValue) {
-    localSliderValue.value = props.bottomSliderValue
-  }
+  ensureSliderValueWithinMinMax()
 })
 
 onMounted(() => {

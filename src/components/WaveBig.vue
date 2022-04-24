@@ -417,6 +417,8 @@ watch(() => props.deck.playbackRate, () => {
     seekToSecondAndCenter(
       player.value.getCurrentTime()
     )
+    // TODO: we have some audio distortion during fast pitch changes
+    // why does player.value.drawer.recenter(targetCenterValue) not work?
   } catch (e) { }
 })
 
