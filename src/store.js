@@ -221,10 +221,16 @@ export const useMainStore = defineStore({
     midiShift3On() {
       //console.log('midiShift', 3)
       this.midiShift = 3
+      for (const deckIndex of this.decks.keys()) {
+        this.toggleHotCueDeleteMode(deckIndex, true)
+      }
     },
     midiShiftOff() {
       //console.log('midiShift', 0)
       this.midiShift = 0
+      for (const deckIndex of this.decks.keys()) {
+        this.toggleHotCueDeleteMode(deckIndex, false)
+      }
     },
     setShowIncomingMidiClock(value) {
       this.showIncomingMidiClock = value

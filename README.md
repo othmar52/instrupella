@@ -115,9 +115,9 @@ screenshot of current development status:
   - [x] hide midi learn button until midi learn is implemented
   - [x] add functionality to listen to random timestamp of random track
   - [x] rotary knob controlled BPM filter
-  - [ ] enter hot cue delete mode via midi
+  - [x] toggle hot cue delete mode via midi (use existing midi shift?)
   - [ ] support multiple midi input controllers simultaneously
-  - [ ] add some kind of manual with midi controller mapping
+  - [ ] add some kind of manual with shows midi controller mapping of configured controllers
 
 
 ## low prio TODO
