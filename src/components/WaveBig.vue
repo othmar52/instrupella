@@ -242,7 +242,7 @@ const wavesurferOptions = () => {
         secondaryColor: 'tomato',
         primaryFontColor: 'white', // 1 bar
         secondaryFontColor: '#ff4d4f', // 4 bars
-        unlabeledNotchColor: '#232323', // quarter note
+        unlabeledNotchColor: '#585858', // quarter note
         height: 150,
         secondaryLabelInterval: 16,
         primaryLabelInterval: 4,

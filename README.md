@@ -102,7 +102,7 @@ screenshot of current development status:
   - [x] flip pitch slider upside down to direction bottom -> increase
   - [x] position of reload-button to top within settings modal
   - [ ] add timestretch GET-parameter to reload url (or local storage)
-  - [ ] make beatgrid bars for quarter notes brighter
+  - [x] make beatgrid bars for quarter notes brighter
   - [ ] replace ascii chars with svg (🡅, &#129093;, &#129095;, ...)
   - [ ] ensure sniff-audio-play-button has no selectable text (maybe solved by replace with svg)
   - [ ] change default zoom on mobile devices from 400 to 500 px / sec
@@ -114,6 +114,10 @@ screenshot of current development status:
   - [x] hide blazing baton when we dont have an incoming MIDI clock
   - [x] hide midi learn button until midi learn is implemented
   - [x] add functionality to listen to random timestamp of random track
+  - [ ] rotary knob controlled BPM filter
+  - [ ] enter hot cue delete mode via midi
+  - [ ] support multiple midi input controllers simultaneously
+  - [ ] add some kind of manual with midi controller mapping
 
 
 ## low prio TODO
