@@ -194,4 +194,25 @@ onMounted(() => {
         -ms-hyphens: auto;
             hyphens: auto;
 }
+
+
+.backdropped {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: rgba(0,0,0, 0.6);
+  text-align: center;
+  overflow: hidden;
+  z-index: 1000;
+  &>* {
+    position: fixed;
+    margin: auto;
+    font-size: 10vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
 </style>

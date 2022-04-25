@@ -14,6 +14,7 @@ const midiInputMainMappings = {
     '5-noteoff-1': 'g.sniffAudioStop',
     '16-noteon-3': 'd.0.loadTrackMidi',
     '16-controlchange-0': 'g.handleBrowseWheelRotate',
+    '16-controlchange-12': 'g.setBpmFilterMidi',
     '2-noteon-0': 'd.0.togglePlayMidi',
     '2-noteon-27': 'd.0.toggleMuteMidi',
     '2-noteoff-27': 'd.0.toggleMuteMidi',

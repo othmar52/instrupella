@@ -43,6 +43,7 @@ const ctrlMap = {
   'nudgeBehind': 'nudgeBehind',
   'seekToSecond': 'seekToSecond',
   'handleJogWheelRotate': 'handleJogWheelRotate',
+  'setBpmFilterMidi': 'setBpmFilterMidi',
   'hotCueDown': 'hotCueDown',
   'hotCueUp': 'hotCueUp',
   'hotCue1DownMidi': 'hotCue1DownMidi',
@@ -68,6 +69,7 @@ export const useMainStore = defineStore({
     midiLearn: false,
     midiLearnItem: null,
     midiShift: 0,
+    bpmFilterMidi: 0,
     showIncomingMidiClock: false,
     trackProps: useStorage('trackProps', []),
     decks: [],
@@ -96,6 +98,9 @@ export const useMainStore = defineStore({
     },
     getShowIncomingMidiClock() {
       return this.showIncomingMidiClock
+    },
+    getBpmFilterMidi() {
+      return this.bpmFilterMidi
     },
     getAllTrackProps() {
       return this.trackProps
@@ -175,6 +180,9 @@ export const useMainStore = defineStore({
     },
     setLoadCurrentTrackFocusToDeck(deckIndex) {
       this.loadCurrentTrackFocusToDeck = deckIndex
+    },
+    setBpmFilterMidi(deckIndex, midiValue) {
+      this.bpmFilterMidi = midiValue
     },
     loopFocus() {
       if (this.currentFocus == 0) {

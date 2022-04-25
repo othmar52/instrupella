@@ -114,7 +114,7 @@ screenshot of current development status:
   - [x] hide blazing baton when we dont have an incoming MIDI clock
   - [x] hide midi learn button until midi learn is implemented
   - [x] add functionality to listen to random timestamp of random track
-  - [ ] rotary knob controlled BPM filter
+  - [x] rotary knob controlled BPM filter
   - [ ] enter hot cue delete mode via midi
   - [ ] support multiple midi input controllers simultaneously
   - [ ] add some kind of manual with midi controller mapping
