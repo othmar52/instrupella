@@ -105,6 +105,18 @@ onMounted(() => {
                                   supported by Chrome, Opera and Firefox */
 }
 
+@media (pointer: coarse) {
+  .touchscreen-noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+  }
+}
+
 .invisible {
   width: 0;
   height: 0;
@@ -146,6 +158,33 @@ onMounted(() => {
   text {
     fill: var(--dm-button-text-color);
   }
+}
+
+.icon.icon-in-text {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.8rem;
+}
+
+.icon.text-success {
+  path,
+  polygon,
+  rect,
+  text {
+    fill: var(--success-color);
+  }
+}
+.icon.text-danger {
+  path,
+  polygon,
+  rect,
+  text {
+    fill: var(--danger-color);
+  }
+}
+
+.icon-arrow-down {
+  transform: rotate(180deg);
 }
 
 .text-primary .icon {

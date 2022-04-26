@@ -21,7 +21,10 @@
     <span
       class="btn btn-primary btn-scroll-to-top"
       v-show="showScrollToTop"
-      @click="storage.setScrollToTop(true)">🡅</span>
+      @click="storage.setScrollToTop(true)"
+    >
+      <IconArrow additionalClasses="icon-in-text" />
+    </span>
   </div>
 </template>
 
@@ -32,6 +35,7 @@ import { useMidiStore } from "@/midistore.js";
 import Deck from '@/components/Deck/Deck.vue'
 import TrackList from '@/components/TrackList/TrackList.vue'
 import BlazingBaton from '@/components/BlazingBaton/BlazingBaton.vue'
+import IconArrow from '@/components/Icons/Arrow.vue'
 const props = defineProps({
   midiLearn: {
     type: Boolean,

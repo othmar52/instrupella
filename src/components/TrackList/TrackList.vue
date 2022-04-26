@@ -46,7 +46,7 @@
         <th></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="touchscreen-noselect">
       <tr
         v-for="track in filteredEntries"
         :key="track.id"
@@ -60,8 +60,8 @@
           <span v-html="formatArtistTitle(track)"></span>
         </td>
         <td>
-          <span v-if="track.like > 0" class="text-success">&#129093;</span>
-          <span v-if="track.like < 0" class="text-danger">&#129095;</span>
+          <IconArrow v-if="track.like > 0" additionalClasses="icon-in-text text-success" />
+          <IconArrow v-if="track.like < 0" additionalClasses="icon-in-text text-danger icon-arrow-down" />
         </td>
         <td>{{ track.key }}</td>
         <td>
@@ -75,9 +75,11 @@
             @mouseup="storage.sniffAudioStop()"
             @touchend="storage.sniffAudioStop()"
           >
-          <strong :class="`btn btn-default ${storage.getSniffAudioIsPlaying === track.id ? 'btn-primary' : ''}`">&#9658;</strong>
+          <strong :class="`btn btn-default ${storage.getSniffAudioIsPlaying === track.id ? 'btn-primary' : ''}`">
+            <IconPlay additionalClasses="icon-in-text" />
+          </strong>
         </span>
-        <span @click="storage.loadTrack(0, track.id)">
+        <span @click="storage.loadTrack(0, track.id)" class="noselect">
           <strong v-if="storage.getDeckIndexForTrackId(track.id) < 0">
             <span :class="`ml-5 btn btn-default ${midistorage.getAdditionalClassForGuiElement('d.0.loadTrack')}`">LOAD</span>
           </strong>
@@ -99,6 +101,8 @@ import mapValueMixin from '../../mixins/utils/mapValue'
 import BpmFilter from '@/components/TrackList/BpmFilter.vue'
 import BpmFilterMidi from '@/components/TrackList/BpmFilterMidi.vue'
 import ColoredTempo from '@/components/ColoredTempo.vue'
+import IconArrow from '@/components/Icons/Arrow.vue'
+import IconPlay from '@/components/Icons/Play.vue'
 import { useMainStore } from "@/store.js";
 import { useMidiStore } from "@/midistore.js";
 

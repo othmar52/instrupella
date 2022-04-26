@@ -7,7 +7,7 @@ having another "instrument" next to dozens of synthesizers, drum machines, etc. 
 
 ## why not use any existing DJ app?
 After trying dozens of dj apps i did not find any that met my requirements
- - play/perform acapella tracks or parts of it perfectly in sync to any music
+ - play/perform acapella tracks or parts of it perfectly in sync to any music/tempo
  - useable on touchscreen/iPad (i do have timcode vinyl but its really an overhead for such a dummy task)
  - precise control for pitching
  - precise control for nudging
@@ -26,7 +26,7 @@ screenshot of current development status:
   - [x] highlight loaded track in tracklist
   - [x] display beat in case its different from 4/4
   - [x] add possibility for prelistening random timestamps (without loading into wavesurfer player)
-        ( consider to respect (non)silence )
+        ( consider to respect (non)silence or saved cuepoints )
   - [ ] volume control for pre listening
   - [x] make tracklist browsable by midi controller + sniff audio + load to deck
 
@@ -73,7 +73,7 @@ screenshot of current development status:
   - [x] vertical centering of icons in buttons
   - [x] volume control
   - [ ] optional sync to midi clock / CV-clock
-  - [ ] midi mapping / learn
+  - [x] midi mapping
   - [ ] respect seek, nudge, tempo change, etc. in metronome sound
   - [ ] metronome sound is very quiet on iPad when track is playing - do we need a separate audio context? (not reproduceable in desktop browsers)
   - [x] drop BeatGridPlugin as soon as new version of wavesurfer is released
@@ -103,8 +103,8 @@ screenshot of current development status:
   - [x] position of reload-button to top within settings modal
   - [ ] add timestretch GET-parameter to reload url (or local storage)
   - [x] make beatgrid bars for quarter notes brighter
-  - [ ] replace ascii chars with svg (🡅, &#129093;, &#129095;, ...)
-  - [ ] ensure sniff-audio-play-button has no selectable text (maybe solved by replace with svg)
+  - [x] replace ascii chars with svg (🡅, &#129093;, &#129095;, &#9658;, ...)
+  - [x] ensure sniff-audio-play-button has no selectable text (maybe solved by replace with svg)
   - [ ] change default zoom on mobile devices from 400 to 500 px / sec
   - [ ] compatibility to file:/// protocol (tracklist fetch + reload)
   - [x] hide / smaller size for a few control elements in case midi controller is connected
@@ -122,7 +122,7 @@ screenshot of current development status:
 
 ## low prio TODO
   - [ ] drag event on **track overview** for immediate seek during drag
-  - [ ] add some kind of delay/easeOut when swiping **big wave** instead of quick stop
+  - [ ] add some kind of delay/easeOut when dragging/swiping/jogwheeling **big wave** instead of quick stop
   - [ ] improve playback during wave swipe (change playbackRate and length according to swipe move to get vinyl like sound)
   - [ ] choose from several metronome sounds
   - [ ] optional enter url for loading on deck (mp3, youtube, soundcloud, etc.)
@@ -134,6 +134,7 @@ screenshot of current development status:
   - [ ] consider to have assignable samples on left half of MIDI controller "Numark DJ2GO2"
   - [ ] compatibility to mobile portrait orientation
   - [ ] npm served dev-instance does not work in Firefox (built version works)
+  - [ ] midi learn
 
 
 ## Resources for development

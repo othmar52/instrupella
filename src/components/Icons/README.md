@@ -12,9 +12,11 @@ https://www.svgrepo.com/download/3476/back-arrow-to-first-track.svg
 https://www.svgrepo.com/download/335445/pause.svg  
 https://www.svgrepo.com/download/327472/play.svg  
 https://www.svgrepo.com/download/348985/cog.svg  
-https://www.svgrepo.com/svg/361116/debug-line-by-line
-https://www.svgrepo.com/svg/352599/trash-alt
-https://www.svgrepo.com/svg/354747/clock-14
+https://www.svgrepo.com/svg/361116/debug-line-by-line  
+https://www.svgrepo.com/svg/352599/trash-alt  
+https://www.svgrepo.com/svg/354747/clock-14  
+https://www.svgrepo.com/svg/218184/up-arrow-multimedia-option  
+
 
 MIDI DIN https://www.onlinewebfonts.com/icon/496521
 <div>Icon made from <a href="http://www.onlinewebfonts.com/icon">Icon Fonts</a> is licensed by CC BY 3.0</div>
