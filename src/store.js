@@ -459,6 +459,16 @@ export const useMainStore = defineStore({
       }
       this.setHotCuesChange(deckIndex, true)
     },
+    analyzeTrackPostHook(deckIndex) {
+      // TODO make auto seek configurable
+      if (this.decks[deckIndex].track.silences.length === 0) {
+        return
+      }
+      if (this.decks[deckIndex].track.silences[0].start > 0) {
+        return
+      }
+      this.seekToSecond(deckIndex, this.decks[deckIndex].track.silences[0].end)
+    },
     nudgeAhead(deckIndex, skipLength=null) {
       this.decks[deckIndex].nudgeAhead = (skipLength === null)
         ? this.decks[deckIndex].skipLength

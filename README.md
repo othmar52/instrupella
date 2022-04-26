@@ -119,6 +119,10 @@ screenshot of current development status:
   - [ ] support multiple midi input controllers simultaneously
   - [ ] add some kind of manual with shows midi controller mapping of configured controllers
   - [ ] initial led status of midi controller
+  - [x] set playhead to audio begin after load in case track starts with silence
+
+## hardware
+  - [ ] add buffered audio splitter for headphome/main out with potentiometers (@see https://electronics.stackexchange.com/questions/197827/how-to-split-audio-with-buffers)
 
 
 ## low prio TODO
