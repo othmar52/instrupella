@@ -483,6 +483,10 @@ export const useMainStore = defineStore({
     },
     setVolume(deckIndex, volume) {
       this.decks[deckIndex].volume = volume
+      if (!this.sniffAudioNode) {
+        return
+      }
+      this.sniffAudioNode.volume = volume
     },
     setVolumeMidi(deckIndex, volume) {
       this.setVolume(deckIndex, volume * 1/127)
@@ -696,6 +700,9 @@ export const useMainStore = defineStore({
         }
         this.sniffAudioNode.currentTime = this.sniffAudioSegment * this.sniffAudioTrack.length/maxSegments;
       }
+      // TODO: does it make sense to have a separate volume control?
+      // for now use volume from deck 1
+      this.sniffAudioNode.volume = this.decks[0].volume
       this.sniffAudioNode.play()
       this.sniffAudioIsPlaying = this.sniffAudioTrack.id
     },

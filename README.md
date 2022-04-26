@@ -27,7 +27,7 @@ screenshot of current development status:
   - [x] display beat in case its different from 4/4
   - [x] add possibility for prelistening random timestamps (without loading into wavesurfer player)
         ( consider to respect (non)silence or saved cuepoints )
-  - [ ] volume control for pre listening
+  - [x] volume control for pre listening
   - [x] make tracklist browsable by midi controller + sniff audio + load to deck
 
 ### database
@@ -118,6 +118,7 @@ screenshot of current development status:
   - [x] toggle hot cue delete mode via midi (use existing midi shift?)
   - [ ] support multiple midi input controllers simultaneously
   - [ ] add some kind of manual with shows midi controller mapping of configured controllers
+  - [ ] initial led status of midi controller
 
 
 ## low prio TODO
