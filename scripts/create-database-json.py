@@ -51,6 +51,8 @@ pathSearchReplace = [
 ]
 '''
 
+
+
 musicDir = "/MUSIC/aca2/"
 pathSearchReplace = [
     "/MUSIC/aca2/",
@@ -142,7 +144,19 @@ def getPropsToMerge():
 def createPeakFile(musicFilePath, targetJsonPath):
     #print(r'"%s"' % musicFilePath)
     #print(targetJsonPath)
-    p1 = Popen(["/usr/bin/audiowaveform", "-i", musicFilePath, "-o", targetJsonPath, "--pixels-per-second", str(peakPixelsPerSecond), "--bits", "8"], shell=True, stdout=PIPE, stderr=PIPE)
+    if os.path.isfile(targetJsonPath):
+        # we already have a peak json file
+        return
+
+    cmdArgs = [
+        "/usr/bin/audiowaveform",
+        "-i", str(musicFilePath),
+        "-o", str(targetJsonPath),
+        "--pixels-per-second", str(peakPixelsPerSecond),
+        "--bits", "8"
+    ]
+    #print(' '.join(cmdArgs))
+    p1 = Popen(cmdArgs, stdout=PIPE, stderr=PIPE)
     p1.communicate()
 
     if os.path.isfile(targetJsonPath):
@@ -276,6 +290,8 @@ def getTagsForFile(dbItem):
 
 # thanks to https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout-in-python#43952192
 def printStatusline(msg: str):
+    #print(msg)
+    #return
     last_msg_length = len(printStatusline.last_msg) if hasattr(printStatusline, 'last_msg') else 0
     print(' ' * last_msg_length, end='\r')
     print(msg, end='\r')
@@ -316,15 +332,18 @@ def createDatabaseJson():
         if createPeakFiles == True:
             md5 = hashlib.md5(path.encode()).hexdigest()
             peakJsonFileName = Path(path).stem[0:30]
-            peakJsonFilePath = f'{peakfilesDir}/{peakJsonFileName}-{md5}.json'
+            peakJsonFilePath = f'{peakfilesDir}/{peakJsonFileName}-{md5}-{peakPixelsPerSecond}.json'
             createPeakFile(file, peakJsonFilePath)
 
             if os.path.isfile(peakJsonFilePath):
                 if detectSilence == True:
                     dbItem["silences"] = detectSilences(peakJsonFilePath)
-                dbItem["peakfile"] = peakJsonFilePath.replace(pathSearchReplace[0], pathSearchReplace[1])
-                
+                dbItem["peakfile"] = peakJsonFilePath.replace(
+                    pathSearchReplace[0],
+                    pathSearchReplace[1]
+                )
 
+        # TODO: consider to skip bpm detection if it already exists
         dbItem["bpmdetect"] = toFixed(detectBpm(file))
         dbItem["key"] = str(detectKey(file))
         jsonObject.append(dbItem)
@@ -349,15 +368,16 @@ def detectSilences(jsonFilePath):
     # returns JSON object as
     # a dictionary
     silences = []
-    silenceTreshold = 1.0
+    silenceTresholdSeconds = 1.0
     lastSilenceStart = 0
     currentlySilence = False
 
     data = json.load(f)
+    silenceTresholdPeak = max(data['data'])/10
     currentSecond = 0
     secondsPerValue = 1/peakPixelsPerSecond/2
     for val in data['data']:
-        if val < 0.0001:
+        if val < silenceTresholdPeak:
             if currentlySilence == False:
                 lastSilenceStart = currentSecond
                 currentlySilence = True
@@ -365,7 +385,7 @@ def detectSilences(jsonFilePath):
         else:
             if currentlySilence == True:
                 currentlySilence = False
-                if currentSecond - lastSilenceStart > silenceTreshold:
+                if currentSecond - lastSilenceStart > silenceTresholdSeconds:
                     #print('have silence', lastSilenceStart, currentSecond, currentSecond - lastSilenceStart)
                     silences.append(
                         {
@@ -379,6 +399,18 @@ def detectSilences(jsonFilePath):
         currentSecond += secondsPerValue
         #print(val, currentSecond)
 
+    # append possible trailing silence as well
+    currentSecond -= secondsPerValue
+    if currentlySilence == True and currentSecond - lastSilenceStart > silenceTresholdSeconds:
+        #print('have trailing silence', lastSilenceStart, currentSecond, currentSecond - lastSilenceStart)
+        silences.append(
+            {
+                'start': toFixed(lastSilenceStart),
+                'end': toFixed(currentSecond),
+                'duration': toFixed(currentSecond - lastSilenceStart)
+            }
+        )
+        #sys.exit()
     f.close()
     return silences
 
