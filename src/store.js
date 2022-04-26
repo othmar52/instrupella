@@ -256,6 +256,7 @@ export const useMainStore = defineStore({
         downbeat: null,
         peakfile: "",
         hotcues: [],
+        silences: [],
         tempoDrift: false,
         downbeatDrift: false,
         like: 0,
@@ -680,26 +681,42 @@ export const useMainStore = defineStore({
         this.sniffAudioStart(this.currentTrackFocus)
       }
     },
+    // try to avoid silence for playing a random timestamp
+    getSniffAudioTimestamp(track, segment, maxSegments) {
+      let targetTimestamp = segment * track.length/maxSegments
+      if (segment === 0 && track.downbeat > 0) {
+        targetTimestamp = track.downbeat
+      }
+      if (track.silences.length === 0) {
+        return targetTimestamp
+      }
+      for (const silence of track.silences) {
+        if (targetTimestamp >= silence.start && targetTimestamp <= silence.end) {
+          return (silence.end < track.length)
+            ? silence.end
+            : silence.begin - 3
+        }
+      }
+      return targetTimestamp
+    },
     sniffAudioStart(track) {
-      // console.log('sniffAudioStart')
-      // TODO replace segments with selected timestamps
-      // (respect downbeat if available and respect silences)
       this.currentFocus = 1
       const maxSegments = 7
       if (!this.sniffAudioTrack || this.sniffAudioTrack.id !== track.id) {
         this.sniffAudioTrack = track
         this.sniffAudioNode = new Audio(track.path)
         this.sniffAudioSegment = 0
-        if (track.downbeat > 0) {
-          this.sniffAudioNode.currentTime = track.downbeat
-        }
       } else {
         this.sniffAudioSegment ++
-        if (this.sniffAudioSegment > maxSegments-1) {
-          this.sniffAudioSegment = 0
-        }
-        this.sniffAudioNode.currentTime = this.sniffAudioSegment * this.sniffAudioTrack.length/maxSegments;
       }
+      if (this.sniffAudioSegment > maxSegments-1) {
+        this.sniffAudioSegment = 0
+      }
+      this.sniffAudioNode.currentTime = this.getSniffAudioTimestamp(
+        track,
+        this.sniffAudioSegment,
+        maxSegments
+      )
       // TODO: does it make sense to have a separate volume control?
       // for now use volume from deck 1
       this.sniffAudioNode.volume = this.decks[0].volume
