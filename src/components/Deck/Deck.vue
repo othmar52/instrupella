@@ -166,9 +166,11 @@ const trackLoad = (percent) => {
 }
 const trackReady = () => {
   trackAnalyzed.value = true
+  storage.analyzeTrackPostHook(props.deck.index)
 }
 const waveformReady = () => {
   trackAnalyzed.value = true
+  storage.analyzeTrackPostHook(props.deck.index)
 }
 const error = (errormsg) => {
   console.log('TODO: handle player error', errormsg)

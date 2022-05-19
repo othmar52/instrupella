@@ -49,6 +49,7 @@ screenshot of current development status:
     - with pad
     - vocoder
     - non 4/4
+  - [ ] detect silences in m4a files by temporary converting to wav/dat (audiowaveform has no native m4a support)
 
 ### general
   - [ ] metronome (generic track on 2nd deck)
@@ -105,11 +106,13 @@ screenshot of current development status:
   - [x] make beatgrid bars for quarter notes brighter
   - [x] replace ascii chars with svg (🡅, &#129093;, &#129095;, &#9658;, ...)
   - [x] ensure sniff-audio-play-button has no selectable text (maybe solved by replace with svg)
-  - [ ] change default zoom on mobile devices from 400 to 500 px / sec
+  - [x] change default zoom from 400 to 500 px / sec
   - [ ] compatibility to file:/// protocol (tracklist fetch + reload)
   - [x] hide / smaller size for a few control elements in case midi controller is connected
+  - [ ] but don't hide elements on large viewports
   - [x] observe & handle midi controller connect/disconnect during runtime
   - [x] force landscape orientation on mobile chrome
+  - [x] force fullscreen when "added to home screen"
   - [x] display viewport dimensions in settings
   - [x] hide blazing baton when we dont have an incoming MIDI clock
   - [x] hide midi learn button until midi learn is implemented
@@ -120,9 +123,11 @@ screenshot of current development status:
   - [ ] add some kind of manual with shows midi controller mapping of configured controllers
   - [ ] initial led status of midi controller
   - [x] set playhead to audio begin after load in case track starts with silence
+  - [ ] unmute audio when using jogwheel during pause
 
 ## hardware
   - [ ] add buffered audio splitter for headphome/main out with potentiometers (@see https://electronics.stackexchange.com/questions/197827/how-to-split-audio-with-buffers)
+  - [ ] dual log pot for stereo https://www.adafruit.com/product/3394
 
 
 ## low prio TODO
@@ -140,6 +145,7 @@ screenshot of current development status:
   - [ ] compatibility to mobile portrait orientation
   - [ ] npm served dev-instance does not work in Firefox (built version works)
   - [ ] midi learn
+  - [ ] add different get params for loading audio files prelistening/load to deck. for having a separation in webserver logs
 
 
 ## Resources for development

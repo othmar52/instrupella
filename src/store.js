@@ -348,7 +348,7 @@ export const useMainStore = defineStore({
         currentSecond: 0,
         skipLength: 0.05,
         timestretch: false,
-        pixelPerSecond: 400,
+        pixelPerSecond: 500,
         jogWheelDebounce: 0,
         hotCues: this.getDefaultHotCues(),
 

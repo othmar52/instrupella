@@ -391,7 +391,7 @@ const doDrag = (event) => {
   }
   player.value.seekAndCenter(targetSeekValue)
 
-  // TODO: change playBackRate and lengthToPlay accoring to drag event
+  // TODO: change playBackRate and lengthToPlay according to drag event
   // for now keep it simple and repeat a millisecond in current pitch during drag
   const targetSecond2 = targetSecond + 0.001
   player.value.play(targetSecond, targetSecond2)
