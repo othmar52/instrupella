@@ -2,10 +2,11 @@
   <div class="pitch-control d-flex">
     <div class="">
       <VSlider
-        :minSliderValue="min"
-        :maxSliderValue="max"
+        :bottomSliderValue="max"
+        :topSliderValue="min"
         :showSliderValue="true"
         :midiLearn="midiLearn"
+        :additionalClasses="additionalPitchSliderClasses"
         @sliderChange="sliderChange"
         ref="slider"
       />
@@ -27,10 +28,10 @@
         </div>
       </div>
       <ButtonIcon
-        componentName="IconPlus"
+        componentName="IconMinus"
         :permaClasses="buttonClasses"
         :midiLearn="midiLearn"
-        @click="$refs.slider.increment()"
+        @click="$refs.slider.decrement()"
       />
       <ButtonIcon
         componentName="IconArrowsToCenter"
@@ -39,10 +40,10 @@
         @click="$refs.slider.reset()"
       />
       <ButtonIcon
-        componentName="IconMinus"
+        componentName="IconPlus"
         :permaClasses="buttonClasses"
         :midiLearn="midiLearn"
-        @click="$refs.slider.decrement()"
+        @click="$refs.slider.increment()"
       />
     </div>
   </div>
@@ -53,12 +54,17 @@ import { ref, onMounted, computed, watch } from 'vue'
 import VSlider from '@/components/VSlider.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import { useMainStore } from "@/store.js";
+import { useMidiStore } from "@/midistore.js";
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const slider = ref(null)
 const buttonClasses = ref('btn btn-square btn-lg m-10 mr-0')
-const range = ref(0.1)
-const min = ref(0.9)
-const max = ref(1.1)
+
+
+const additionalPitchSliderClasses = computed(() => {
+  return midistorage.getAdditionalClassForGuiElement(`d.${props.deck.index}.pitchSlider`)
+})
+
 const props = defineProps({
   center: {
     type: Number,
@@ -73,16 +79,16 @@ const props = defineProps({
     default: false
   }
 })
-
+const range = ref(props.deck.pitchRange)
+const min = ref(1 - props.deck.pitchRange)
+const max = ref(1 + props.deck.pitchRange)
 // helper var used for bidirektional control
 // slider -> store (via GUI)
 // store -> slider (via midi)
 let playbackRateString = ''
 
 const changeRange = (newRange, id) => {
-  range.value = newRange
-  min.value = props.center - newRange
-  max.value = props.center + newRange
+  storage.setPitchRange(props.deck.index, newRange)
 
   // TODO: how to properly close halfmoon dropdown on click?
   setTimeout(() => {
@@ -98,6 +104,12 @@ const sliderChange = (newPitchValue) => {
   )
 }
 
+watch(() => props.deck.pitchRange, (pitchRange) => {
+  range.value = pitchRange
+  min.value = props.center - pitchRange
+  max.value = props.center + pitchRange
+})
+
 watch(() => props.deck.playbackRate, (playbackRate) => {
   if (playbackRate.toString() !== playbackRateString) {
     playbackRateString = playbackRate.toString()
@@ -111,6 +123,7 @@ const pitchLabel = computed(() => {
 
 onMounted(() => {
   halfmoon.onDOMContentLoaded()
+  changeRange(props.deck.pitchRange, 'pitch-control-items')
 })
 </script>
 

@@ -4,15 +4,16 @@
     style="position: absolute; width: 22.5%; height: 80%; z-index: 200; opacity: 0.7;">
     
     </div>
-    <div class="vslider slider" ref="sliderWrapper">
+    <div :class="`vslider slider ${additionalClasses}`" ref="sliderWrapper">
       <input
         type="range"
         orient="vertical"
+        ref="sliderElement"
         @touchstart="disableScroll"
         @touchend="enableScroll"
-        :min="props.minSliderValue"
+        :max="sliderMaxValue"
         :step="props.step"
-        :max="props.maxSliderValue"
+        :min="sliderMinValue"
         v-model="localSliderValue"
       />
 
@@ -24,14 +25,15 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue'
 const localSliderValue = ref(1)
+const sliderElement = ref(null)
 const bodyStyles = ref(document.querySelector('body').style)
 const props = defineProps({
-  minSliderValue: {
+  bottomSliderValue: {
     type: [Number, String],
     default: 0.5,
     validator: value => !isNaN(value - parseFloat(value))
   },
-  maxSliderValue: {
+  topSliderValue: {
     type: [Number, String],
     default: 1.5,
     validator: value => !isNaN(value - parseFloat(value))
@@ -48,13 +50,27 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  additionalClasses: {
+    type: String,
+    default: ''
+  },
   midiLearn: {
     type: Boolean,
     default: false
   }
 })
 const factor = computed(() => {
-  return localSliderValue.value.toFixed(3)
+  return localSliderValue.value.toFixed(2)
+})
+const sliderMaxValue = computed(() => {
+  return (props.bottomSliderValue > props.topSliderValue)
+    ? props.bottomSliderValue
+    : props.topSliderValue
+})
+const sliderMinValue = computed(() => {
+  return (props.bottomSliderValue > props.topSliderValue)
+    ? props.topSliderValue
+    : props.bottomSliderValue
 })
 
 const emit = defineEmits([
@@ -73,18 +89,18 @@ const enableScroll = () => {
   bodyStyles.value.removeProperty('top')
 }
 const increment = () => {
-  if (localSliderValue.value + props.step <= props.maxSliderValue) {
+  if (localSliderValue.value + props.step <= sliderMaxValue.value) {
     localSliderValue.value += props.step
     return
   }
-  localSliderValue.value = props.maxSliderValue
+  localSliderValue.value = sliderMaxValue.value
 }
 const decrement = () => {
-  if (localSliderValue.value - props.step >= props.minSliderValue) {
+  if (localSliderValue.value - props.step >= sliderMinValue.value) {
     localSliderValue.value -= props.step
     return
   }
-  localSliderValue.value = props.minSliderValue
+  localSliderValue.value = sliderMinValue.value
 }
 const reset = () => {
   localSliderValue.value = 1.0
@@ -94,25 +110,34 @@ const setSliderValueFromMidi = (newValue) => {
   localSliderValue.value = parseFloat(newValue)
 }
 
+const ensureSliderValueWithinMinMax = () => {
+  if (localSliderValue.value > sliderMaxValue.value) {
+    localSliderValue.value = sliderMaxValue.value
+    return
+  }
+  if (localSliderValue.value < sliderMinValue.value) {
+    localSliderValue.value = sliderMinValue.value
+  }
+}
+
 watch(localSliderValue, (newValue) => {
   localSliderValue.value = parseFloat(newValue)
   emit('sliderChange', localSliderValue.value)
 })
 
-watch(() => props.maxSliderValue, () => {
-  if (localSliderValue.value > props.maxSliderValue) {
-    localSliderValue.value = props.maxSliderValue
-  }
+watch(() => props.topSliderValue, () => {
+  ensureSliderValueWithinMinMax()
 })
 
-watch(() => props.minSliderValue, () => {
-  if (localSliderValue.value < props.minSliderValue) {
-    localSliderValue.value = props.minSliderValue
-  }
+watch(() => props.bottomSliderValue, () => {
+  ensureSliderValueWithinMinMax()
 })
 
 onMounted(() => {
-
+  if (props.topSliderValue < props.bottomSliderValue) {
+    // flip slider top to bottom
+    sliderElement.value.style.transform = 'translate(-50%, -50%) rotate(90deg)';
+  }
 })
 
 defineExpose({
@@ -127,6 +152,7 @@ defineExpose({
 $track-w: 15em;
 $track-h: .25em;
 $thumb-d: 3.5em;
+$thumb-d-small: 1.5em;
 
 @mixin track() {
   box-sizing: border-box;
@@ -142,6 +168,10 @@ $thumb-d: 3.5em;
   width: $thumb-d/3;
   height: $thumb-d;
   background-color: var(--dm-button-primary-bg-color);
+}
+@mixin thumb-small() {
+  width: $thumb-d-small/3;
+  height: $thumb-d-small;
 }
 
 .vslider {
@@ -188,4 +218,18 @@ input[type=range][orient=vertical] {
 
   &::-ms-tooltip { display: none }
 }
+
+
+.slider-small input[type=range][orient=vertical] {
+  &::-webkit-slider-thumb {
+    margin-top: .5*($track-h - $thumb-d-small);
+    @include thumb-small
+  }
+  &::-moz-range-thumb { @include thumb-small }
+  &::-ms-thumb {
+    margin-top: 0;
+    @include thumb-small
+  }
+}
+
 </style>

@@ -45,10 +45,6 @@ const props = defineProps({
     type: Object,
     default: null
   },
-  amount: {
-    type: Number,
-    default: 5
-  },
   midiLearn: {
     type: Boolean,
     default: false

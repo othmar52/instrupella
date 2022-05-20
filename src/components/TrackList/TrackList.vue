@@ -1,9 +1,13 @@
 <template>
   <div class="card">
+  <BpmFilterMidi
+    :bpmFilterValues="bpmFilterMidiValues"  
+    @setBpmFilter="setBpmFilter"
+  />
   <table class="track-list table table-striped table-hover">
     <thead>
       <tr>
-        <th colspan="7">
+        <th colspan="6">
           <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-2">
@@ -40,36 +44,46 @@
         <th>BPM</th>
         <th>LENGTH</th>
         <th></th>
-        <th></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody class="touchscreen-noselect">
       <tr
         v-for="track in filteredEntries"
         :key="track.id"
         :class="trackRowClass(track)"
         :id="`track-row-${track.id}`"
       >
-        <td v-html="formatArtistTitle(track)"></td>
         <td>
-          <span v-if="track.like > 0" class="text-success">&#129093;</span>
-          <span v-if="track.like < 0" class="text-danger">&#129095;</span>
+          <strong v-if="storage.getDeckIndexForTrackId(track.id) >= 0">
+            <span class="btn btn-default btn-primary">D{{storage.getDeckIndexForTrackId(track.id)*1 + 1}}</span>
+          </strong>
+          <span v-html="formatArtistTitle(track)"></span>
+        </td>
+        <td>
+          <IconArrow v-if="track.like > 0" additionalClasses="icon-in-text text-success" />
+          <IconArrow v-if="track.like < 0" additionalClasses="icon-in-text text-danger icon-arrow-down" />
         </td>
         <td>{{ track.key }}</td>
         <td>
           <ColoredTempo :track="track" />
         </td>
         <td>{{ formatDuration(track.length) }}</td>
-        <td
-          @mousedown="storage.sniffAudioStart(track)"
-          @touchstart="storage.sniffAudioStart(track)"
-          @mouseup="storage.sniffAudioStop()"
-          @touchend="storage.sniffAudioStop()"
-        >
-          <strong class="btn btn-default btn-primary">&#9658;</strong>
-        </td>
-        <td @click="storage.loadTrack(0, track.id)">
-          <strong class="btn btn-default btn-primary">LOAD</strong>
+        <td class="d-flex">
+          <span
+            @mousedown="storage.sniffAudioStart(track)"
+            @touchstart="storage.sniffAudioStart(track)"
+            @mouseup="storage.sniffAudioStop()"
+            @touchend="storage.sniffAudioStop()"
+          >
+          <strong :class="`btn btn-default ${storage.getSniffAudioIsPlaying === track.id ? 'btn-primary' : ''}`">
+            <IconPlay additionalClasses="icon-in-text" />
+          </strong>
+        </span>
+        <span @click="storage.loadTrack(0, track.id)" class="noselect">
+          <strong v-if="storage.getDeckIndexForTrackId(track.id) < 0">
+            <span :class="`ml-5 btn btn-default ${midistorage.getAdditionalClassForGuiElement('d.0.loadTrack')}`">LOAD</span>
+          </strong>
+        </span>
         </td>
       </tr>
     </tbody>
@@ -83,15 +97,22 @@ import utils from '../../mixins/utils'
 import rangeMixin from '../../mixins/utils/range'
 import formatDurationMixin from '../../mixins/format/duration'
 import formatArtistTitleMixin from '../../mixins/format/artisttitle'
-
+import mapValueMixin from '../../mixins/utils/mapValue'
 import BpmFilter from '@/components/TrackList/BpmFilter.vue'
+import BpmFilterMidi from '@/components/TrackList/BpmFilterMidi.vue'
 import ColoredTempo from '@/components/ColoredTempo.vue'
+import IconArrow from '@/components/Icons/Arrow.vue'
+import IconPlay from '@/components/Icons/Play.vue'
 import { useMainStore } from "@/store.js";
+import { useMidiStore } from "@/midistore.js";
+
 const { formatArtistTitle } = formatArtistTitleMixin()
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const { getBpm } = utils()
 const { range } = rangeMixin()
 const { formatDuration } = formatDurationMixin()
+const { mapValue } = mapValueMixin()
 const props = defineProps({
   tracks: {
     type: Array,
@@ -99,6 +120,7 @@ const props = defineProps({
   }
 })
 const bpmFilterValues = ref([])
+const bpmFilterMidiValues = ref([])
 const bpmFilter = ref(null)
 const length = ref(0)
 const searchInput = ref('')
@@ -137,6 +159,15 @@ watch(() => storage.scrollToNextTrack, (value) => {
 })
 
 
+watch(() => storage.scrollToFocusedTrack, (value) => {
+  if (value === false) {
+    return
+  }
+  storage.setScrollToFocusedTrack(false)
+  handleTrackFocusChange()
+})
+
+
 watch(() => storage.scrollToPreviousTrack, (value) => {
   if (value === false) {
     return
@@ -153,13 +184,30 @@ watch(() => storage.scrollToPreviousTrack, (value) => {
   handleTrackFocusChange()
 })
 
-const handleTrackFocusChange = () => {
+watch(() => storage.scrollToRandomTrack, (value) => {
+  if (value === false) {
+    return
+  }
+  storage.setScrollToRandomTrack(false)
+  if (filteredEntries.value.length === 0) {
+    focusedTrackIndex = 0
+    return
+  }
+  focusedTrackIndex = Math.floor(Math.random() * filteredEntries.value.length)
+  handleTrackFocusChange(true)
+})
+
+const handleTrackFocusChange = (sniffAudio = false) => {
   // console.log(`#track-row-${filteredEntries.value[focusedTrackIndex].id}`)
   document.querySelector(`#track-row-${filteredEntries.value[focusedTrackIndex].id}`).scrollIntoView({
     behavior: 'auto',
     block: 'center'
   })
   storage.setCurrentTrackFocus(filteredEntries.value[focusedTrackIndex])
+  if (sniffAudio === false) {
+    return
+  }
+  storage.sniffAudioStartMidi()
 }
 
 const loadRandom = () => {
@@ -170,14 +218,14 @@ const loadRandom = () => {
 }
 
 const trackRowClass = (track) => {
-  if (storage.getCurrentTrackFocus && storage.getCurrentTrackFocus.id === track.id) {
-    return 'table-primary'
-  }
-  return storage.getDeckIndexForTrackId(track.id) >= 0 ? 'table-primary' : ''
+  return (storage.getCurrentTrackFocus && storage.getCurrentTrackFocus.id === track.id)
+    ? 'table-primary'
+    : ''
 }
 
 const setBpmFilter = (tempo) => {
   bpmFilter.value = tempo
+  // console.log('setBpmFilter', tempo)
   searchEntries()
 }
 
@@ -220,7 +268,7 @@ const tempoMatches = (trackTempo, tempo) => {
 
 watch(() => props.tracks, () => {
   bpmFilterValues.value = []
-  for (const tempo of range(0, 180, bpmFilterStep)) {
+  for (const tempo of range(0, 215, bpmFilterStep)) {
     const tracksWithTempo = props.tracks.filter(track => {
       return tempoMatches(getBpm(track), tempo)
     })
@@ -228,8 +276,61 @@ watch(() => props.tracks, () => {
       bpmFilterValues.value.push(tempo)
     }
   }
+  assertMidiFilterValues()
   searchEntries()
 })
+
+/**
+ * this fills an array with index cc value (0-127) and values tempos of existing tracks
+ * we have to ensure:
+ *   that each cc value brings a tempo result
+ *   to exclude tempos that do not exist
+ */
+const assertMidiFilterValues = () => {
+  const tmpFilterValues = []
+  for (const track of props.tracks) {
+    const trackTempo = parseInt(getBpm(track))
+    const fuzzyTempoDiff = Math.floor(bpmFilterStep/2)
+    for(const tempo of range(trackTempo - fuzzyTempoDiff, trackTempo + fuzzyTempoDiff)) {
+      if (tempo < 0) {
+        continue
+      }
+      tmpFilterValues.push(tempo)
+    }
+    let trackTempoFactor = trackTempo * 2
+    for(const tempo of range(trackTempoFactor - fuzzyTempoDiff, trackTempoFactor + fuzzyTempoDiff)) {
+      if (tempo < 0) {
+        continue
+      }
+      if (tempo > 200) {
+        continue
+      }
+      tmpFilterValues.push(tempo)
+    }
+    trackTempoFactor = parseInt(trackTempo / 2)
+    for(const tempo of range(trackTempoFactor - fuzzyTempoDiff, trackTempoFactor + fuzzyTempoDiff)) {
+      if (tempo < 0) {
+        continue
+      }
+      if (tempo > 200) {
+        continue
+      }
+      tmpFilterValues.push(tempo)
+    }
+  }
+  let tmpFilterValues2 = tmpFilterValues.filter(
+    (value, index, self) => self.indexOf(value) === index
+  ).sort((a, b) => a - b)
+
+  bpmFilterMidiValues.value = ['none']
+  // we need exactly 127 values (1 - 127)
+  for (const ccValue of range(0, 127)) {
+    let grabIndex = Math.floor(mapValue(ccValue, 0, 127, 0, tmpFilterValues2.length))
+    bpmFilterMidiValues.value.push(tmpFilterValues2[grabIndex])
+  }
+
+  searchEntries()
+}
 </script>
 
 <style scoped lang="scss">

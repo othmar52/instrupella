@@ -242,7 +242,7 @@ const wavesurferOptions = () => {
         secondaryColor: 'tomato',
         primaryFontColor: 'white', // 1 bar
         secondaryFontColor: '#ff4d4f', // 4 bars
-        unlabeledNotchColor: '#232323', // quarter note
+        unlabeledNotchColor: '#585858', // quarter note
         height: 150,
         secondaryLabelInterval: 16,
         primaryLabelInterval: 4,
@@ -391,7 +391,7 @@ const doDrag = (event) => {
   }
   player.value.seekAndCenter(targetSeekValue)
 
-  // TODO: change playBackRate and lengthToPlay accoring to drag event
+  // TODO: change playBackRate and lengthToPlay according to drag event
   // for now keep it simple and repeat a millisecond in current pitch during drag
   const targetSecond2 = targetSecond + 0.001
   player.value.play(targetSecond, targetSecond2)
@@ -411,10 +411,14 @@ const updateMarkers = () => {
   }
 }
 
-
 watch(() => props.deck.playbackRate, () => {
   try {
     player.value.setPlaybackRate(props.deck.playbackRate)
+    seekToSecondAndCenter(
+      player.value.getCurrentTime()
+    )
+    // TODO: we have some audio distortion during fast pitch changes
+    // why does player.value.drawer.recenter(targetCenterValue) not work?
   } catch (e) { }
 })
 

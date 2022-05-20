@@ -7,10 +7,10 @@
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
         <a href="#settings" class="btn-lg" role="button"><IconMidiDin /></a>
         <a href="#settings" class="btn-lg" role="button"><IconClock /></a>
-        <a href="#" :class="`btn-lg ${midiLearn ? 'text-danger' : ''}`" role="button" @click="toggleMidiLearn"><IconMidiLearn /></a>
+        <!--a href="#" :class="`btn-lg ${midiLearn ? 'text-danger' : ''}`" role="button" @click="toggleMidiLearn"><IconMidiLearn /></a-->
       </div>
       <div class="navbar-content">
-        <h4 class="navbar-text text-monoXspace m-5">INSTRU
+        <h4 class="navbar-text m-5">INSTRU
           <img alt="Vue logo" src="./assets/instrupella.svg" width="40">
           PELLA
         </h4>
@@ -89,6 +89,12 @@ onMounted(() => {
   --content-and-card-spacing: 1.5rem;
 }
 
+@media screen and (max-width: 800px) {
+  :root {
+    --content-and-card-spacing: 0.5rem;
+  }
+}
+
 .noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -97,6 +103,24 @@ onMounted(() => {
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Opera and Firefox */
+}
+
+@media (pointer: coarse) {
+  .touchscreen-noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+  }
+}
+
+.invisible {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .icon {
@@ -134,6 +158,33 @@ onMounted(() => {
   text {
     fill: var(--dm-button-text-color);
   }
+}
+
+.icon.icon-in-text {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.8rem;
+}
+
+.icon.text-success {
+  path,
+  polygon,
+  rect,
+  text {
+    fill: var(--success-color);
+  }
+}
+.icon.text-danger {
+  path,
+  polygon,
+  rect,
+  text {
+    fill: var(--danger-color);
+  }
+}
+
+.icon-arrow-down {
+  transform: rotate(180deg);
 }
 
 .text-primary .icon {
@@ -181,5 +232,26 @@ onMounted(() => {
        -moz-hyphens: auto;
         -ms-hyphens: auto;
             hyphens: auto;
+}
+
+
+.backdropped {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: rgba(0,0,0, 0.6);
+  text-align: center;
+  overflow: hidden;
+  z-index: 1000;
+  &>* {
+    position: fixed;
+    margin: auto;
+    font-size: 10vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 </style>
