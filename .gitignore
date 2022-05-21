@@ -1,4 +1,7 @@
 public/acatest
+wavesurfer.js-async
+README.local.md
+vinylsound.diff
 
 .DS_Store
 node_modules
