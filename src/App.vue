@@ -6,7 +6,10 @@
       <div class="navbar-content">
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
         <a href="#settings" class="btn-lg" role="button"><IconMidiDin /></a>
-        <a href="#settings" class="btn-lg" role="button"><IconClock /></a>
+        <a href="#settings" class="btn-lg" role="button"><IconClock :additionalClasses="`icon-in-text ${getHaveClockDevice ? 'text-success' : ''}`"/></a>
+        <span v-if="getHaveClockDevice">
+          {{ parseFloat(getExternalClockTempo).toFixed(1) }} BPM
+        </span>
         <!--a href="#" :class="`btn-lg ${midiLearn ? 'text-danger' : ''}`" role="button" @click="toggleMidiLearn"><IconMidiLearn /></a-->
       </div>
       <div class="navbar-content">
@@ -30,6 +33,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useMainStore } from "@/store.js";
+import { useMidiStore } from "@/midistore.js";
 import InstruPella from './components/InstruPella.vue'
 import Settings from './components/Settings.vue'
 import IconCog from './components/Icons/Cog.vue'
@@ -50,6 +54,7 @@ window.oncontextmenu = function () { return false }
 
 const settings = ref({})
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const defaultSettings = () => {
   return {
     midi: {
@@ -72,6 +77,8 @@ const toggleMidiLearn = () => {
 }
 
 const midiLearn = computed(() => storage.midiLearn)
+const getHaveClockDevice = computed(() => midistorage.getHaveClockDevice)
+const getExternalClockTempo = computed(() => midistorage.getExternalClockTempo)
 
 onMounted(() => {
   settings.value = defaultSettings()

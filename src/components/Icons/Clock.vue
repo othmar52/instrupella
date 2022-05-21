@@ -1,6 +1,6 @@
 <template>
 <svg
-   class="icon icon-clock"
+   :class="`icon icon-clock ${additionalClasses}`"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -27,7 +27,12 @@
 </template>
 
 <script setup>
-
+defineProps({
+  additionalClasses: {
+    type: String,
+    default: ''
+  }
+})
 </script>
 
 <style lang="scss">

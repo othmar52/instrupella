@@ -72,7 +72,7 @@ export const useMainStore = defineStore({
     midiLearnItem: null,
     midiShift: 0,
     bpmFilterMidi: 0,
-    showIncomingMidiClock: false,
+    showBlazingBaton: true,
     trackProps: useStorage('trackProps', []),
     decks: [],
     tracks: [],
@@ -98,8 +98,8 @@ export const useMainStore = defineStore({
     getMidiLearn() {
       return this.midiLearn <= 0
     },
-    getShowIncomingMidiClock() {
-      return this.showIncomingMidiClock
+    getShowBlazingBaton() {
+      return this.showBlazingBaton
     },
     getBpmFilterMidi() {
       return this.bpmFilterMidi
@@ -234,8 +234,8 @@ export const useMainStore = defineStore({
         this.toggleHotCueDeleteMode(deckIndex, false)
       }
     },
-    setShowIncomingMidiClock(value) {
-      this.showIncomingMidiClock = value
+    setShowBlazingBaton(value) {
+      this.showBlazingBaton = value
     },
     setWorkingTempo(value) {
       this.workingTempo = parseFloat(value)
@@ -405,7 +405,7 @@ export const useMainStore = defineStore({
         ? !this.decks[deckIndex].sync
         : forceNewState
       this.decks[deckIndex].sync = newSyncState
-      this.checkFireMidiEvent(
+      this.midistorage.checkFireMidiEvent(
         newSyncState
           ? `d.${deckIndex}.syncOn`
           : `d.${deckIndex}.syncOff`

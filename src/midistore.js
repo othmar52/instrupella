@@ -4,6 +4,7 @@ import { useMainStore } from '@/store.js';
 
 const DJ2GO2 = 'DJ2GO2'
 const CONTROLHUB = 'CONTROL Hub'
+const USBMIDICABLE = 'USB Midi Cable'
 
 const midiInputMainMappings = {
   [DJ2GO2]: {
@@ -36,7 +37,8 @@ const midiInputMainMappings = {
     '1-noteoff-0': 'g.midiShiftOff',
     '2-controlchange-9': 'd.0.setPlaybackRateMidi'
   },
-  [CONTROLHUB]: {}
+  [CONTROLHUB]: {},
+  [USBMIDICABLE]: {}
 }
 
 const midiOutputMappings = {
@@ -58,7 +60,8 @@ const midiOutputMappings = {
     'd.0.hotCue4Dimmed': ['sendNoteOn', [4, [6], { rawAttack: 1 }]],
     'd.0.hotCue4On': ['sendNoteOn', [4, [6], { rawAttack: 2 }]]
   },
-  [CONTROLHUB]: {}
+  [CONTROLHUB]: {},
+  [USBMIDICABLE]: {}
 }
 const addGuiElementClass = {
   [DJ2GO2]: {
@@ -69,7 +72,8 @@ const addGuiElementClass = {
     'd.0.nudgeBehind': 'invisible',
     'd.0.nudgeAhead': 'invisible'
   },
-  [CONTROLHUB]: {}
+  [CONTROLHUB]: {},
+  [USBMIDICABLE]: {}
 }
 
 export const useMidiStore = defineStore({
@@ -84,11 +88,19 @@ export const useMidiStore = defineStore({
     midiInputClock: null,
     midiOutput: null,
     midiInputMainPriority: [DJ2GO2, CONTROLHUB],
-    midiInputClockPriority: [CONTROLHUB],
+    midiInputClockPriority: [USBMIDICABLE, CONTROLHUB],
     midiOutputPriority: [DJ2GO2],
     midiInputMainMapping: null,
     midiOutputMapping: null,
     midiInputMainGuiElementClasses: null,
+    clock: {
+      isRunning: false,
+      tickCounter: 0,
+      quarterNoteCounter: 0,
+      timestampLastQuarterNote: null,
+      ppqn: 24,
+      tempo: 0
+    },
     guiAlerts: []
   }),
   getters: {
@@ -97,6 +109,18 @@ export const useMidiStore = defineStore({
     },
     getMidiOutputPorts() {
       return this.midiOutputPorts
+    },
+    getHaveClockDevice() {
+      return this.midiInputClock !== null
+    },
+    getExternalClockTempo() {
+      return parseFloat(this.clock.tempo)
+    },
+    getExternalClockIsRunning() {
+      return this.clock.isRunning
+    },
+    getExternalClockQuarterNoteCounter() {
+      return this.clock.quarterNoteCounter
     },
     getHaveGuiAlerts() {
       return this.guiAlerts.length > 0
@@ -153,6 +177,7 @@ export const useMidiStore = defineStore({
       this.midiOutputPorts = this.webmidi.outputs
       this.setupMidiPort('midiInputMain', 'midiInputPorts')
       this.setupMidiPort('midiOutput', 'midiOutputPorts')
+      this.setupMidiPort('midiInputClock', 'midiInputPorts')
     },
     setupMidiPort(portType, portPool) {
       let midiPort = null
@@ -224,6 +249,42 @@ export const useMidiStore = defineStore({
             break
           default:
             this.handleIncomingMidiEvent(midiEvent)
+        }
+      })
+    },
+    midiInputClockSetupCallback(portIdentifier) {
+      this.midiInputClock.addListener('midimessage', midiEvent => {
+        switch (midiEvent.message.type) {
+          case 'clock':
+            this.clock.tickCounter++
+            if (this.clock.tickCounter % this.clock.ppqn === 0) {
+              this.clock.quarterNoteCounter++
+              const currentMillisecond = performance.now()
+              const milliSecondsPerQuarterNote = currentMillisecond - this.clock.timestampLastQuarterNote
+              const newTempo = 60000 / milliSecondsPerQuarterNote
+
+              this.clock.timestampLastQuarterNote = currentMillisecond
+              if (this.clock.quarterNoteCounter < 3) {
+                this.clock.tempo = newTempo
+                return
+              }
+              // debounced tempo
+              this.clock.tempo = (this.clock.tempo * 0.7 + newTempo * 0.3)
+            }
+            return
+          case 'start':
+            this.clock.isRunning = true
+            this.clock.tickCounter = 0
+            this.clock.quarterNoteCounter = 1
+            this.clock.timestampLastQuarterNote = performance.now()
+            return
+          case 'stop':
+            this.clock.isRunning = false
+            this.clock.tickCounter = 0
+            this.clock.quarterNoteCounter = 1
+            this.clock.timestampLastQuarterNote = performance.now()
+          default:
+            break
         }
       })
     },
