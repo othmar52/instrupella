@@ -377,8 +377,8 @@ export const useMainStore = defineStore({
         if (!this.decks[deckIndex].track) {
           continue
         }
-        const newPlaybackRate = tempo / getBpm(this.decks[deckIndex].track)
-        if (newPlaybackRate < 0.2 || newPlaybackRate > 2) {
+        const newPlaybackRate = tempo / getBpm(this.decks[deckIndex].track) * this.decks[deckIndex].tempoFactor
+        if (newPlaybackRate < 0.2 || newPlaybackRate > 5) {
           continue
         }
         this.setPlaybackRate(deckIndex, newPlaybackRate)
