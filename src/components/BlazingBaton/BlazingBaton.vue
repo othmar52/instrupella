@@ -1,12 +1,15 @@
 <template>
   <div class="blazing-baton">
-    <h4 class="text-muted">{{numericBaton4Bars}}<span :class="classHyphen1">-</span>{{numericBaton1Bar}}<span :class="classHyphen2">-</span>{{numericBatonQuarter}}
+    <span class="text-muted">{{numericBaton4Bars}}<span :class="classHyphen1">-</span>{{numericBaton1Bar}}<span :class="classHyphen2">-</span>{{numericBatonQuarter}}
+
+    </span>
+    <div class="baton-leds">
     <span
       v-for="idx in range(0,16)"
       :key="idx"
       :class="`btn btn-sm btn-square mr-5 ${ledClasses[idx]}`"
     ></span>
-    </h4>
+    </div>
   </div>
 </template>
 
@@ -160,5 +163,16 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-
+.blazing-baton {
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  .btn-square {
+    height: 1rem;
+    &:nth-child(4n+1) {
+      display: inline-block;
+      margin-left: 1rem;
+    }
+  }
+}
 </style>
