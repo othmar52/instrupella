@@ -92,7 +92,8 @@ export const useMainStore = defineStore({
     currentTrackFocus: null,
     loadCurrentTrackFocusToDeck: false,
     focusItems: ['top', 'track-list'],
-    currentFocus: 0
+    currentFocus: 0,
+    busy: false
   }),
   getters: {
     getMidiLearn() {
@@ -145,6 +146,9 @@ export const useMainStore = defineStore({
     },
     getLoadCurrentTrackFocusToDeck() {
       return this.loadCurrentTrackFocusToDeck
+    },
+    getIsBusy() {
+      return this.busy
     }
   },
   actions: {
@@ -365,6 +369,21 @@ export const useMainStore = defineStore({
       }
       this.decks.push(deck)
     },
+    syncTempoToExternalClock(tempo) {
+      for (const deckIndex of this.decks.keys()) {
+        if (this.decks[deckIndex].sync === false) {
+          continue
+        }
+        if (!this.decks[deckIndex].track) {
+          continue
+        }
+        const newPlaybackRate = tempo / getBpm(this.decks[deckIndex].track)
+        if (newPlaybackRate < 0.2 || newPlaybackRate > 2) {
+          continue
+        }
+        this.setPlaybackRate(deckIndex, newPlaybackRate)
+      }
+    },
     setPixelsPerSecond(deckIndex, pxPerSec) {
       this.decks[deckIndex].pixelPerSecond = parseInt(pxPerSec)
     },
@@ -449,6 +468,7 @@ export const useMainStore = defineStore({
       this.setLoadCurrentTrackFocusToDeck(deckIndex)
     },
     loadTrack(deckIndex, trackIndex) {
+      this.busy = true
       this.setScrollToTop(true)
       this.currentFocus = 0
       this.setWorkingTempo(getBpm(this.tracks[trackIndex]))
@@ -478,7 +498,10 @@ export const useMainStore = defineStore({
       this.setHotCuesChange(deckIndex, true)
     },
     analyzeTrackPostHook(deckIndex) {
-      // TODO make auto seek configurable
+      // TODO next line is maybe not true on loading tracks in multiple decks simultaneously
+      this.busy = false
+
+      // TODO make auto seek (skip leading silence) configurable
       if (this.decks[deckIndex].track.silences.length === 0) {
         return
       }

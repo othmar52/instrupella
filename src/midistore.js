@@ -264,12 +264,27 @@ export const useMidiStore = defineStore({
               const newTempo = 60000 / milliSecondsPerQuarterNote
 
               this.clock.timestampLastQuarterNote = currentMillisecond
+
+              if (this.mainstorage.getIsBusy === true) {
+                // do not calculate tempo during heavy performance issues
+                // console.log('skip calculating tempo')
+                return
+              }
+              if (newTempo < 40 || newTempo > 250) {
+                // we dont have a reasonable value
+                return
+              }
               if (this.clock.quarterNoteCounter < 3) {
                 this.clock.tempo = newTempo
                 return
               }
               // debounced tempo
+              // console.log('debounce tempo', this.clock.tempo, newTempo)
               this.clock.tempo = (this.clock.tempo * 0.7 + newTempo * 0.3)
+              if (this.clock.quarterNoteCounter % 4 === 2) {
+                // console.log('resyncing tempo')
+                this.mainstorage.syncTempoToExternalClock(this.clock.tempo)
+              }
             }
             return
           case 'start':
