@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { WebMidi } from 'webmidi'
 import { useMainStore } from '@/store.js';
+import getNegativeDownbeatMixin from './mixins/utils/negativeDownbeat'
+import getSecondsPerQuarterNoteMixin from './mixins/utils/secondsPerQuarterNote'
+const { getSecondsPerQuarterNote } = getSecondsPerQuarterNoteMixin()
+
+const { getNegativeDownbeat } = getNegativeDownbeatMixin()
 
 const DJ2GO2 = 'DJ2GO2'
 const CONTROLHUB = 'CONTROL Hub'
@@ -98,7 +103,14 @@ export const useMidiStore = defineStore({
       tickCounter: 0,
       quarterNoteCounter: 0,
       timestampLastQuarterNote: null,
+      timestampLastBar: null,
+      timestampLast4Bar: null,
+      timestampLast16Bar: null,
+      secondsPerQuarterNote: 0,
       ppqn: 24,
+      tickWidths: [],
+      lastTickMicroSecond: null,
+      debounceTickAmount: 50,
       tempo: 0
     },
     guiAlerts: []
@@ -252,6 +264,15 @@ export const useMidiStore = defineStore({
         }
       })
     },
+    mode(arr){
+      return arr.sort((a,b) =>
+            arr.filter(v => v===a).length
+          - arr.filter(v => v===b).length
+      ).pop();
+    },
+    tickWidthToBpm(tickWidhtMicroSeconds) {
+      return (60 / (tickWidhtMicroSeconds * 0.000001 * this.clock.ppqn)).toFixed(2)
+    },
     midiInputClockSetupCallback(portIdentifier) {
       this.midiInputClock.addListener('midimessage', midiEvent => {
         switch (midiEvent.message.type) {
@@ -264,6 +285,21 @@ export const useMidiStore = defineStore({
               const newTempo = 60000 / milliSecondsPerQuarterNote
 
               this.clock.timestampLastQuarterNote = currentMillisecond
+
+              if (this.clock.quarterNoteCounter % 4 === 1) {
+                this.clock.timestampLastBar = currentMillisecond
+                // console.log('this.clock.timestampLastBar', this.clock.timestampLastBar)
+              }
+
+              if (this.clock.quarterNoteCounter % 16 === 1) {
+                this.clock.timestampLast4Bar = currentMillisecond
+                // console.log('this.clock.timestampLast4Bar', this.clock.timestampLast4Bar)
+              }
+
+              if (this.clock.quarterNoteCounter % 64 === 1) {
+                this.clock.timestampLast16Bar = currentMillisecond
+                // console.log('this.clock.timestampLast4Bar', this.clock.timestampLast4Bar)
+              }
 
               if (this.mainstorage.getIsBusy === true) {
                 // do not calculate tempo during heavy performance issues
@@ -279,29 +315,42 @@ export const useMidiStore = defineStore({
                 return
               }
               // debounced tempo
-              // console.log('debounce tempo', this.clock.tempo, newTempo)
-              this.clock.tempo = (this.clock.tempo * 0.7 + newTempo * 0.3)
-              if (this.clock.quarterNoteCounter % 4 === 2) {
-                // console.log('resyncing tempo')
+              this.clock.tickWidths.push(parseFloat(newTempo).toFixed(2))
+              if (this.clock.tickWidths.length > this.clock.debounceTickAmount) {
+                this.clock.tickWidths.shift()
+              }
+              const newTempoDebounced = this.mode(JSON.parse(JSON.stringify(this.clock.tickWidths)))
+
+              this.clock.tempo = parseFloat(
+                (this.clock.tempo * 0.7 + newTempoDebounced * 0.3).toFixed(2)
+              )
+              this.clock.secondsPerQuarterNote = 60 / this.clock.tempo
+              if (this.clock.quarterNoteCounter % 4 === 2 ) {
                 this.mainstorage.syncTempoToExternalClock(this.clock.tempo)
               }
             }
             return
           case 'start':
+            this.resetCockHelperVars()
             this.clock.isRunning = true
-            this.clock.tickCounter = 0
-            this.clock.quarterNoteCounter = 1
-            this.clock.timestampLastQuarterNote = performance.now()
             return
           case 'stop':
+            this.resetCockHelperVars()
             this.clock.isRunning = false
-            this.clock.tickCounter = 0
-            this.clock.quarterNoteCounter = 1
-            this.clock.timestampLastQuarterNote = performance.now()
+            return
           default:
             break
         }
       })
+    },
+    resetCockHelperVars() {
+      this.clock.tickCounter = 0
+      this.clock.quarterNoteCounter = 1
+      this.clock.tickWidths = []
+      this.clock.timestampLastQuarterNote = performance.now()
+      this.clock.timestampLastBar = this.clock.timestampLastQuarterNote
+      this.clock.timestampLast4Bar = this.clock.timestampLastQuarterNote
+      this.clock.timestampLast16Bar = this.clock.timestampLastQuarterNote
     },
     midiOutputSetupCallback(portIdentifier) {
       this.midiOutputMapping = midiOutputMappings[portIdentifier]
@@ -338,6 +387,151 @@ export const useMidiStore = defineStore({
     },
     fireMidiEvent(funcName, args) {
       this.midiOutput[funcName](...args)
+    },
+    getCurrentSyncOffset(deckIndex, resolution = 4) {
+      console.log('-------------------------------------------------------')
+      console.log('getCurrentSyncOffset')
+      console.log('-------------------------------------------------------')
+      if (this.clock.isRunning === false) {
+        console.log('clock is stop')
+        return 0
+      }
+      if (this.mainstorage.getWorkingTempo === 0) {
+        console.log('getWorkingTempo is zero')
+        return 0
+      }
+      if (!this.mainstorage.decks[deckIndex].track) {
+        console.log('no track')
+        return 0
+      }
+      const trackDuration = this.mainstorage.decks[deckIndex].track.length
+      // TODO: do we need 2nd arg 'overrideTempo'?
+      // console.log('track.secondsPerQuarterNote', 60 / this.mainstorage.getWorkingTempo * this.mainstorage.decks[deckIndex].playbackRate)
+      const secondsPerQuarterNoteTrack = getSecondsPerQuarterNote(
+        this.mainstorage.decks[deckIndex].track
+      )
+      let secondsPerResolutionTrack = secondsPerQuarterNoteTrack
+      let secondsPerResolutionClock = JSON.parse(JSON.stringify(this.clock.secondsPerQuarterNote))
+      let lastResolutionTimestampClock = JSON.parse(JSON.stringify(this.clock.timestampLastQuarterNote))/1000
+      switch (resolution) {
+        case 0.25:
+          // already defined as default
+          break
+        case 1:
+          secondsPerResolutionTrack *= 4
+          secondsPerResolutionClock *= 4
+          lastResolutionTimestampClock = JSON.parse(JSON.stringify(this.clock.timestampLastBar))/1000
+          break
+        case 4:
+          secondsPerResolutionTrack *= 16
+          secondsPerResolutionClock *= 16
+          lastResolutionTimestampClock = JSON.parse(JSON.stringify(this.clock.timestampLast4Bar))/1000
+          break
+        default:
+          console.log('invalid resolution. valid values are 0.25|1|4')
+          return
+      }
+      const distancePrevResolutionClock = performance.now()/1000 - lastResolutionTimestampClock
+      const distanceNextResolutionClock = lastResolutionTimestampClock + secondsPerResolutionClock - performance.now()/1000
+      const percentWithinGridClock = distancePrevResolutionClock / (secondsPerResolutionClock / 100)
+      
+      const negativeDownbeatTrack = getNegativeDownbeat(
+        this.mainstorage.getWorkingTempo,
+        this.mainstorage.getWorkingDownbeat
+      )
+      let prevResolutionTrack = negativeDownbeatTrack
+      let nextResolutionTrack = negativeDownbeatTrack
+      let newDownbeat = negativeDownbeatTrack
+      while(newDownbeat < trackDuration + secondsPerResolutionTrack) {
+        if (newDownbeat < this.mainstorage.decks[deckIndex].currentSecond) {
+          newDownbeat += secondsPerResolutionTrack
+          continue
+        }
+        prevResolutionTrack = newDownbeat - secondsPerResolutionTrack
+        nextResolutionTrack = newDownbeat
+        break
+      }
+      const distancePrevResolutionTrack = this.mainstorage.decks[deckIndex].currentSecond - prevResolutionTrack
+      const distanceNextResolutionTrack = nextResolutionTrack - this.mainstorage.decks[deckIndex].currentSecond
+      const percentWithinGridTrack = distancePrevResolutionTrack / (secondsPerResolutionTrack / 100)
+
+      let targetSecondTrack = 0
+
+      const percentDistance = Math.abs(percentWithinGridTrack - percentWithinGridClock)
+      // scenario 1: play has been pressed a little to late
+      // example 1
+      //    percentWithinGridClock = 30
+      //    percentWithinGridTrack = 20
+      // example 2
+      //    percentWithinGridClock = 5
+      //    percentWithinGridTrack = 90
+      if (percentWithinGridClock > percentWithinGridTrack
+        && percentWithinGridClock - percentWithinGridTrack < 50) {
+        console.log('ex 1', percentWithinGridClock, percentWithinGridTrack)
+        // force track percent within grid same as clock percent within grid
+        targetSecondTrack = prevResolutionTrack + percentWithinGridClock * (secondsPerResolutionTrack/100)
+      }
+      if (percentWithinGridClock < percentWithinGridTrack
+        && percentWithinGridClock + 100 - percentWithinGridTrack < 50) {
+        console.log('ex 2', percentWithinGridClock, percentWithinGridTrack)
+        // force track percent within grid same as clock percent within grid
+        // but in next resolution sector
+        targetSecondTrack = nextResolutionTrack + percentWithinGridClock * (secondsPerResolutionTrack/100)
+      }
+      // scenario 2: play has been pressed a little to early
+      // example 3
+      //    percentWithinGridClock = 20
+      //    percentWithinGridTrack = 30
+      // example 4
+      //    percentWithinGridClock = 90
+      //    percentWithinGridTrack = 5
+      if (percentWithinGridClock < percentWithinGridTrack
+        && percentWithinGridTrack - percentWithinGridClock < 50) {
+        console.log('ex 3', percentWithinGridClock, percentWithinGridTrack)
+        // force track percent within grid same as clock percent within grid
+        // TODO consider to wait for x seconds to really start playing
+        targetSecondTrack = prevResolutionTrack + percentWithinGridClock * (secondsPerResolutionTrack/100)
+      }
+      if (percentWithinGridClock > percentWithinGridTrack
+        && percentWithinGridTrack+100 - percentWithinGridClock < 50) {
+        console.log('ex 4', percentWithinGridClock, percentWithinGridTrack)
+        // force track percent within PREVIOUS grid same as clock percent within grid
+        // TODO consider to wait for x seconds to really start playing
+        targetSecondTrack = prevResolutionTrack-secondsPerResolutionTrack + percentWithinGridClock * (secondsPerResolutionTrack/100)
+      }
+      // scenario 3: play has been pressed perfectly in time (pretty impossible)
+      // example 5
+      //    percentWithinGridClock = 30
+      //    percentWithinGridTrack = 30
+      if (percentWithinGridClock === percentWithinGridTrack) {
+        console.log('ex 5', percentWithinGridClock, percentWithinGridTrack)
+        targetSecondTrack = prevResolutionTrack + percentWithinGridClock * (secondsPerResolutionTrack/100)
+      }
+
+      // TODO: for some reaason we have to add a few miliseconds!?
+      this.mainstorage.seekToSecond(deckIndex, parseFloat(targetSecondTrack) + 0.05)
+
+      /*
+      console.log('percentDistance', percentDistance)
+      console.log('clock.secondsPerQuarterNote', this.clock.secondsPerQuarterNote)
+      console.log('workingTempo', this.mainstorage.getWorkingTempo * this.mainstorage.decks[deckIndex].playbackRate)
+      console.log('workingDownbeat', this.mainstorage.getWorkingDownbeat)
+      console.log('deck.playbackRate', this.mainstorage.decks[deckIndex].playbackRate)
+      console.log('clock.timestampLastQuarterNote', this.clock.timestampLastQuarterNote)
+      console.log('distancePrevResolutionClock', distancePrevResolutionClock)
+      console.log('distanceNextResolutionClock', distanceNextResolutionClock)
+      console.log('negativeDownbeatTrack', negativeDownbeatTrack)
+      console.log('trackDuration', trackDuration)
+      console.log('prevResolutionTrack', prevResolutionTrack)
+      console.log('nextResolutionTrack', nextResolutionTrack)
+      console.log('distancePrevResolutionTrack', distancePrevResolutionTrack)
+      console.log('distanceNextResolutionTrack', distanceNextResolutionTrack)
+      console.log('percentWithinGridClock', percentWithinGridClock)
+      console.log('percentWithinGridTrack', percentWithinGridTrack)
+      console.log('targetSecondTrack', targetSecondTrack)
+      */
+
+      return 1
     }
   }
 })

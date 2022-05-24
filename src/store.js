@@ -351,7 +351,7 @@ export const useMainStore = defineStore({
         volume: 1,
         playbackRate: 1,
         pitchRange: 0.1,
-        tempoFactor: 1, // normal, double or half tempo
+        tempoFactor: 1, // normal(1), double(2) or half(.5) tempo
         currentSecond: 0,
         skipLength: 0.05,
         timestretch: false,
@@ -454,6 +454,9 @@ export const useMainStore = defineStore({
       if (this.decks[deckIndex].hotCues.nowPlaying === true && newPlayState === false) {
         this.decks[deckIndex].hotCues.stopAfterRelease = true
         return
+      }
+      if (newPlayState && this.decks[deckIndex].sync === true) {
+        this.midistorage.getCurrentSyncOffset(deckIndex)
       }
       this.decks[deckIndex].play = newPlayState
     },
