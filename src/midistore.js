@@ -99,6 +99,7 @@ export const useMidiStore = defineStore({
       currentTempoTrackDivision: 0.25,
       quarterNoteCounter: 0,
       timestampLastQuarterNote: null,
+      timestampLastHalfNote: null,
       timestampLastBar: null,
       timestampLast4Bar: null,
       timestampLast16Bar: null,
@@ -261,12 +262,14 @@ export const useMidiStore = defineStore({
       let newTempo = null
       if (this.mainstorage.getIsBusy === true) {
         this.clock.timestampLastQuarterNote = null
+        this.clock.timestampLastHalfNote = null
         this.clock.timestampLastBar = null
         this.clock.timestampLast4Bar = null
         this.clock.timestampLast16Bar = null
         return newTempo
       }
       this.clock.timestampLastQuarterNote = currentMillisecond
+      this.clock.timestampLastHalfNote = currentMillisecond
       this.clock.timestampLastBar = currentMillisecond
       this.clock.timestampLast4Bar = currentMillisecond
       if (this.clock.timestampLast16Bar !== null) {
@@ -279,11 +282,13 @@ export const useMidiStore = defineStore({
       let newTempo = null
       if (this.mainstorage.getIsBusy === true) {
         this.clock.timestampLastQuarterNote = null
+        this.clock.timestampLastHalfNote = null
         this.clock.timestampLastBar = null
         this.clock.timestampLast4Bar = null
         return newTempo
       }
       this.clock.timestampLastQuarterNote = currentMillisecond
+      this.clock.timestampLastHalfNote = currentMillisecond
       this.clock.timestampLastBar = currentMillisecond
 
       if (this.clock.currentTempoTrackDivision > 4) {
@@ -310,10 +315,12 @@ export const useMidiStore = defineStore({
       this.clock.timestampLastBar = currentMillisecond
       if (this.mainstorage.getIsBusy === true) {
         this.clock.timestampLastQuarterNote = null
+        this.clock.timestampLastHalfNote = null
         this.clock.timestampLastBar = null
         return newTempo
       }
       this.clock.timestampLastQuarterNote = currentMillisecond
+      this.clock.timestampLastHalfNote = currentMillisecond
       if (this.clock.currentTempoTrackDivision > 1) {
         // at this point only greater divisions are used for tempo calculation
         return newTempo
@@ -334,6 +341,9 @@ export const useMidiStore = defineStore({
       let newTempo = null
       const timestampTempoCalculation = this.clock.timestampLastQuarterNote
       this.clock.timestampLastQuarterNote = currentMillisecond
+      if (this.clock.quarterNoteCounter % 2 === 1) {
+        this.clock.timestampLastHalfNote = currentMillisecond
+      }
       if (this.mainstorage.getIsBusy === true) {
         this.clock.timestampLastQuarterNote = null
         return newTempo
@@ -377,19 +387,19 @@ export const useMidiStore = defineStore({
             switch(1) {
               case this.clock.quarterNoteCounter % 64:
                 newTempo = this.midiInputClockNext16Bars(currentMillisecond)
-                newTempo && console.log('newTempo tracked from 16 bars', newTempo)
+                // newTempo && console.log('newTempo tracked from 16 bars', newTempo)
                 break
               case this.clock.quarterNoteCounter % 16:
                 newTempo = this.midiInputClockNext4Bars(currentMillisecond)
-                newTempo && console.log('newTempo tracked from 4 bars', newTempo)
+                // newTempo && console.log('newTempo tracked from 4 bars', newTempo)
                 break
               case this.clock.quarterNoteCounter % 4:
                 newTempo = this.midiInputClockNextBar(currentMillisecond)
-                newTempo && console.log('newTempo tracked from 1 bar', newTempo)
+                // newTempo && console.log('newTempo tracked from 1 bar', newTempo)
                 break
               default:
                 newTempo = this.midiInputClockNextQuarter(currentMillisecond)
-                newTempo && console.log('newTempo tracked from quarter note', newTempo)
+                // newTempo && console.log('newTempo tracked from quarter note', newTempo)
                 break
             }
 
@@ -409,6 +419,7 @@ export const useMidiStore = defineStore({
     resetTempoDetection() {
       console.log('resetTempoDetection')
       this.clock.timestampLastQuarterNote = null
+      this.clock.timestampLastHalfNote = null
       this.clock.timestampLastBar = null
       this.clock.timestampLast4Bar = null
       this.clock.timestampLast16Bar = null
@@ -421,6 +432,7 @@ export const useMidiStore = defineStore({
       this.clock.currentTempoTrackDivision = 0.25
       this.clock.quarterNoteCounter = 1
       this.clock.timestampLastQuarterNote = performance.now()
+      this.clock.timestampLastHalfNote = this.clock.timestampLastQuarterNote
       this.clock.timestampLastBar = this.clock.timestampLastQuarterNote
       this.clock.timestampLast4Bar = this.clock.timestampLastQuarterNote
       this.clock.timestampLast16Bar = this.clock.timestampLastQuarterNote
@@ -461,9 +473,43 @@ export const useMidiStore = defineStore({
     fireMidiEvent(funcName, args) {
       this.midiOutput[funcName](...args)
     },
-    getCurrentSyncOffset(deckIndex, resolution = 4) {
+    /**
+     * we may have to fake/calculate a previous timestamp
+     * because we havent reached resolution since last start
+     */
+    getLastTimestampForResolution(resolution) {
+      let tstamp
+      let multiplyQuarterNotes
+      switch (resolution) {
+        case 4:
+          tstamp = JSON.parse(JSON.stringify(this.clock.timestampLast4Bar))
+          multiplyQuarterNotes = (this.clock.quarterNoteCounter % 16) - 1
+          break
+        case 1:
+          tstamp = JSON.parse(JSON.stringify(this.clock.timestampLastBar))
+          multiplyQuarterNotes = (this.clock.quarterNoteCounter % 4) - 1
+          break
+        case 0.5:
+          tstamp = JSON.parse(JSON.stringify(this.clock.timestampLastHalfNote))
+          multiplyQuarterNotes = (this.clock.quarterNoteCounter % 2) - 1
+          break
+        case 0.25:
+          tstamp = JSON.parse(JSON.stringify(this.clock.timestampLastQuarterNote))
+          multiplyQuarterNotes = 0
+          break
+      }
+      if (tstamp) {
+        // console.log('no need zo calculate last resolution timestamp', tstamp)
+        return tstamp
+      }
+      // console.log('calculated getLastTimestampForResolution', multiplyQuarterNotes)
+      return JSON.parse(JSON.stringify(this.clock.timestampLastQuarterNote)) - multiplyQuarterNotes * this.clock.secondsPerQuarterNote*1000
+      
+    },
+    resyncDeck(deckIndex) {
+      const resolution = this.mainstorage.decks[deckIndex].syncResolution
       console.log('-------------------------------------------------------')
-      console.log('getCurrentSyncOffset')
+      console.log('resyncDeck')
       console.log('-------------------------------------------------------')
       if (this.clock.isRunning === false) {
         console.log('clock is stop')
@@ -483,27 +529,32 @@ export const useMidiStore = defineStore({
       const secondsPerQuarterNoteTrack = getSecondsPerQuarterNote(
         this.mainstorage.decks[deckIndex].track
       )
+      this.getLastTimestampForResolution(resolution)
       let secondsPerResolutionTrack = secondsPerQuarterNoteTrack
       let secondsPerResolutionClock = JSON.parse(JSON.stringify(this.clock.secondsPerQuarterNote))
-      let lastResolutionTimestampClock = JSON.parse(JSON.stringify(this.clock.timestampLastQuarterNote))/1000
+      let lastResolutionTimestampClock = this.getLastTimestampForResolution(resolution)/1000
       switch (resolution) {
         case 0.25:
           // already defined as default
           break
+        case 0.5:
+          secondsPerResolutionTrack *= 2
+          secondsPerResolutionClock *= 2
+          break
         case 1:
           secondsPerResolutionTrack *= 4
           secondsPerResolutionClock *= 4
-          lastResolutionTimestampClock = JSON.parse(JSON.stringify(this.clock.timestampLastBar))/1000
           break
         case 4:
           secondsPerResolutionTrack *= 16
           secondsPerResolutionClock *= 16
-          lastResolutionTimestampClock = JSON.parse(JSON.stringify(this.clock.timestampLast4Bar))/1000
           break
         default:
           console.log('invalid resolution. valid values are 0.25|1|4')
           return
       }
+      secondsPerResolutionTrack *= this.mainstorage.decks[deckIndex].tempoFactorSync
+
       const distancePrevResolutionClock = performance.now()/1000 - lastResolutionTimestampClock
       const distanceNextResolutionClock = lastResolutionTimestampClock + secondsPerResolutionClock - performance.now()/1000
       const percentWithinGridClock = distancePrevResolutionClock / (secondsPerResolutionClock / 100)

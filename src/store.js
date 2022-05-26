@@ -356,6 +356,7 @@ export const useMainStore = defineStore({
         pitchRange: 0.1,
         tempoFactor: 1, // displayed bpm: normal(1), double(2) or half(.5) tempo
         tempoFactorSync: 1, // playback sync: normal(1), double(2) or half(.5) tempo
+        syncResolution: 1, // 1 bar, 4 bars, 0.25 bars
         currentSecond: 0,
         skipLength: 0.05,
         timestretch: false,
@@ -428,6 +429,7 @@ export const useMainStore = defineStore({
         ? !this.decks[deckIndex].sync
         : forceNewState
       this.decks[deckIndex].sync = newSyncState
+      newSyncState && this.midistorage.resyncDeck(deckIndex)
       this.midistorage.resetTempoDetection()
       this.midistorage.checkFireMidiEvent(
         newSyncState
@@ -461,7 +463,7 @@ export const useMainStore = defineStore({
         return
       }
       if (newPlayState && this.decks[deckIndex].sync === true) {
-        this.midistorage.getCurrentSyncOffset(deckIndex)
+        this.midistorage.resyncDeck(deckIndex)
       }
       this.decks[deckIndex].play = newPlayState
     },
@@ -488,6 +490,7 @@ export const useMainStore = defineStore({
       this.decks[deckIndex].track = this.tracks[trackIndex]
       this.decks[deckIndex].tempoFactor = 1
       this.decks[deckIndex].tempoFactorSync = 1
+      this.decks[deckIndex].syncResolution = 1
       this.decks[deckIndex].currentSecond = 0
       this.togglePlay(deckIndex, false)
       this.toggleMute(deckIndex, false)
@@ -577,6 +580,25 @@ export const useMainStore = defineStore({
         return
       }
       this.decks[deckIndex].tempoFactorSync = 1
+    },
+    loopSyncResolution(deckIndex, forceResolution=false) {
+      if (forceResolution !== false) {
+        this.decks[deckIndex].syncResolution = forceResolution
+        return
+      }
+      if (this.decks[deckIndex].syncResolution === 1) {
+        this.decks[deckIndex].syncResolution = 4
+        return
+      }
+      if (this.decks[deckIndex].syncResolution === 4) {
+        this.decks[deckIndex].syncResolution = 0.25
+        return
+      }
+      if (this.decks[deckIndex].syncResolution === 0.25) {
+        this.decks[deckIndex].syncResolution = 0.5
+        return
+      }
+      this.decks[deckIndex].syncResolution = 1
     },
     setPitchRange(deckIndex, pitchRange) {
       this.decks[deckIndex].pitchRange = pitchRange
