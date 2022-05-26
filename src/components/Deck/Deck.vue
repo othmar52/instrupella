@@ -74,7 +74,7 @@
             @click="storage.fireControlElement(`d.${deck.index}.toggleMute`)"
           />
           <Button
-            label="SNYC"
+            label="SYNC"
             :permaClasses="`${buttonClasses}`"
             :activeClass="deck.sync ? 'btn-primary' : ''"
             @click="storage.fireControlElement(`d.${deck.index}.toggleSync`)"

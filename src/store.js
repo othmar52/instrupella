@@ -191,6 +191,9 @@ export const useMainStore = defineStore({
     setBpmFilterMidi(deckIndex, midiValue) {
       this.bpmFilterMidi = midiValue
     },
+    setBusy(busyValue) {
+      this.busy = busyValue
+    },
     loopFocus() {
       if (this.currentFocus == 0) {
         this.currentFocus = 1
@@ -424,6 +427,7 @@ export const useMainStore = defineStore({
         ? !this.decks[deckIndex].sync
         : forceNewState
       this.decks[deckIndex].sync = newSyncState
+      this.midistorage.resetTempoDetection()
       this.midistorage.checkFireMidiEvent(
         newSyncState
           ? `d.${deckIndex}.syncOn`

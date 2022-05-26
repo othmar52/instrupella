@@ -42,10 +42,7 @@ const midiInputMainMappings = {
     '1-noteoff-1': 'g.midiShiftOff',
     '1-noteoff-0': 'g.midiShiftOff',
     '2-controlchange-9': 'd.0.setPlaybackRateMidi'
-  },
-  [CONTROLHUB]: {},
-  [USBMIDICABLE]: {},
-  [DIGITAKT]: {}
+  }
 }
 
 const midiOutputMappings = {
@@ -66,10 +63,7 @@ const midiOutputMappings = {
     'd.0.hotCue4Off': ['sendNoteOn', [4, [6], { rawAttack: 0 }]],
     'd.0.hotCue4Dimmed': ['sendNoteOn', [4, [6], { rawAttack: 1 }]],
     'd.0.hotCue4On': ['sendNoteOn', [4, [6], { rawAttack: 2 }]]
-  },
-  [CONTROLHUB]: {},
-  [USBMIDICABLE]: {},
-  [DIGITAKT]: {}
+  }
 }
 const addGuiElementClass = {
   [DJ2GO2]: {
@@ -79,10 +73,7 @@ const addGuiElementClass = {
     'd.0.volumeSlider': 'slider-small',
     'd.0.nudgeBehind': 'invisible',
     'd.0.nudgeAhead': 'invisible'
-  },
-  [CONTROLHUB]: {},
-  [USBMIDICABLE]: {},
-  [DIGITAKT]: {}
+  }
 }
 
 export const useMidiStore = defineStore({
@@ -105,6 +96,7 @@ export const useMidiStore = defineStore({
     clock: {
       isRunning: false,
       tickCounter: 0,
+      currentTempoTrackDivision: 0.25,
       quarterNoteCounter: 0,
       timestampLastQuarterNote: null,
       timestampLastBar: null,
@@ -112,9 +104,6 @@ export const useMidiStore = defineStore({
       timestampLast16Bar: null,
       secondsPerQuarterNote: 0,
       ppqn: 24,
-      tickWidths: [],
-      lastTickMicroSecond: null,
-      debounceTickAmount: 50,
       tempo: 0
     },
     guiAlerts: []
@@ -255,7 +244,7 @@ export const useMidiStore = defineStore({
       return null
     },
     midiInputMainSetupCallback(portIdentifier) {
-      this.midiInputMainMapping = midiInputMainMappings[portIdentifier]
+      this.midiInputMainMapping = midiInputMainMappings[portIdentifier] || {}
       this.midiInputMainGuiElementClasses = addGuiElementClass[portIdentifier]
       this.midiInputMain.addListener('midimessage', midiEvent => {
         switch (midiEvent.message.type) {
@@ -267,15 +256,6 @@ export const useMidiStore = defineStore({
             this.handleIncomingMidiEvent(midiEvent)
         }
       })
-    },
-    mode(arr){
-      return arr.sort((a,b) =>
-            arr.filter(v => v===a).length
-          - arr.filter(v => v===b).length
-      ).pop();
-    },
-    tickWidthToBpm(tickWidhtMicroSeconds) {
-      return (60 / (tickWidhtMicroSeconds * 0.000001 * this.clock.ppqn)).toFixed(2)
     },
     midiInputClockNext16Bars(currentMillisecond) {
       let newTempo = null
@@ -305,6 +285,19 @@ export const useMidiStore = defineStore({
       }
       this.clock.timestampLastQuarterNote = currentMillisecond
       this.clock.timestampLastBar = currentMillisecond
+
+      if (this.clock.currentTempoTrackDivision > 4) {
+        // at this point only greater divisions are used for tempo calculation
+        this.clock.timestampLast4Bar = currentMillisecond
+        return newTempo
+      }
+
+      if (this.clock.timestampLast16Bar !== null && this.clock.quarterNoteCounter % 64 === 49) {
+        // console.log('increase currentTempoTrackDivision', 16)
+        this.clock.currentTempoTrackDivision = 16
+        this.clock.timestampLast4Bar = currentMillisecond
+        return null
+      }
       if (this.clock.timestampLast4Bar !== null) {
         newTempo = 60000 / ((currentMillisecond - this.clock.timestampLast4Bar) / 16)
       }
@@ -313,65 +306,54 @@ export const useMidiStore = defineStore({
     },
     midiInputClockNextBar(currentMillisecond) {
       let newTempo = null
+      const timestampTempoCalculation = this.clock.timestampLastBar
+      this.clock.timestampLastBar = currentMillisecond
       if (this.mainstorage.getIsBusy === true) {
         this.clock.timestampLastQuarterNote = null
         this.clock.timestampLastBar = null
         return newTempo
       }
       this.clock.timestampLastQuarterNote = currentMillisecond
-      if (this.clock.quarterNoteCounter >= 16) {
+      if (this.clock.currentTempoTrackDivision > 1) {
         // at this point only greater divisions are used for tempo calculation
-        this.clock.timestampLastBar = currentMillisecond
         return newTempo
       }
-      if (this.clock.timestampLastBar !== null) {
-        newTempo = 60000 / ((currentMillisecond - this.clock.timestampLastBar) / 4)
+
+      if (this.clock.timestampLast4Bar !== null && this.clock.quarterNoteCounter % 16 === 13) {
+        // console.log('increase currentTempoTrackDivision', 4)
+        this.clock.currentTempoTrackDivision = 4
+        return null
       }
-      this.clock.timestampLastBar = currentMillisecond
+      // console.log('this.clock.quarterNoteCounter % 16', this.clock.quarterNoteCounter % 16)
+      if (timestampTempoCalculation !== null) {
+        newTempo = 60000 / ((currentMillisecond - timestampTempoCalculation) / 4)
+      }
       return newTempo
     },
     midiInputClockNextQuarter(currentMillisecond) {
       let newTempo = null
+      const timestampTempoCalculation = this.clock.timestampLastQuarterNote
+      this.clock.timestampLastQuarterNote = currentMillisecond
       if (this.mainstorage.getIsBusy === true) {
         this.clock.timestampLastQuarterNote = null
         return newTempo
       }
-      if (newTempo !== null) {
-        // we already have a tempo. no need to track/calculate...
-        this.clock.timestampLastQuarterNote = currentMillisecond
-        return newTempo
-      }
-      if (this.clock.quarterNoteCounter >= 16) {
+      if (this.clock.currentTempoTrackDivision > 0.25) {
         // at this point only greater divisions are used for tempo calculation
-        this.clock.timestampLastQuarterNote = currentMillisecond
         return newTempo
       }
-      if (this.clock.timestampLastQuarterNote === null) {
-        this.clock.timestampLastQuarterNote = currentMillisecond
+      if (timestampTempoCalculation === null) {
         return newTempo
       }
-      const milliSecondsPerQuarterNote = currentMillisecond - this.clock.timestampLastQuarterNote
+
+      if (this.clock.timestampLastBar !== null && this.clock.quarterNoteCounter % 4 === 3) {
+        // console.log('increase currentTempoTrackDivision', 1)
+        this.clock.currentTempoTrackDivision = 1
+        return null
+      }
+      const milliSecondsPerQuarterNote = currentMillisecond - timestampTempoCalculation
       newTempo = 60000 / milliSecondsPerQuarterNote
-
-
-      if (this.clock.quarterNoteCounter < 5) {
-        // at the very start use undebounced tempo calculation
-        this.clock.timestampLastQuarterNote = currentMillisecond
-        return newTempo
-      }
-      return null
-      // debounced tempo
-      this.clock.tickWidths.push(parseFloat(newTempo).toFixed(2))
-      if (this.clock.tickWidths.length > this.clock.debounceTickAmount) {
-        this.clock.tickWidths.shift()
-      }
-      let newTempoDebounced = this.mode(JSON.parse(JSON.stringify(this.clock.tickWidths)))
-
-      newTempoDebounced = parseFloat(
-        (this.clock.tempo * 0.7 + newTempoDebounced * 0.3).toFixed(2)
-      )
-      this.clock.timestampLastQuarterNote = currentMillisecond
-      return newTempoDebounced
+      return newTempo
     },
     midiInputClockSetupCallback(portIdentifier) {
       this.midiInputClock.addListener('midimessage', midiEvent => {
@@ -395,19 +377,20 @@ export const useMidiStore = defineStore({
             switch(1) {
               case this.clock.quarterNoteCounter % 64:
                 newTempo = this.midiInputClockNext16Bars(currentMillisecond)
-                // console.log('newTempo 16 bars', newTempo)
+                newTempo && console.log('newTempo tracked from 16 bars', newTempo)
                 break
               case this.clock.quarterNoteCounter % 16:
                 newTempo = this.midiInputClockNext4Bars(currentMillisecond)
-                // console.log('newTempo 4 bars', newTempo)
+                newTempo && console.log('newTempo tracked from 4 bars', newTempo)
                 break
               case this.clock.quarterNoteCounter % 4:
                 newTempo = this.midiInputClockNextBar(currentMillisecond)
-                // console.log('newTempo 1 bar', newTempo)
+                newTempo && console.log('newTempo tracked from 1 bar', newTempo)
                 break
               default:
                 newTempo = this.midiInputClockNextQuarter(currentMillisecond)
-                // console.log('newTempo quarter', newTempo)
+                newTempo && console.log('newTempo tracked from quarter note', newTempo)
+                break
             }
 
             if (newTempo > 40 && newTempo < 250) {
@@ -423,17 +406,27 @@ export const useMidiStore = defineStore({
         }
       })
     },
+    resetTempoDetection() {
+      console.log('resetTempoDetection')
+      this.clock.timestampLastQuarterNote = null
+      this.clock.timestampLastBar = null
+      this.clock.timestampLast4Bar = null
+      this.clock.timestampLast16Bar = null
+      this.clock.currentTempoTrackDivision = 0.25
+      // somtimes mainstorage.analyzeTrackPostHook() is not called...
+      this.mainstorage.setBusy(false)
+    },
     resetCockHelperVars() {
       this.clock.tickCounter = 0
+      this.clock.currentTempoTrackDivision = 0.25
       this.clock.quarterNoteCounter = 1
-      this.clock.tickWidths = []
       this.clock.timestampLastQuarterNote = performance.now()
       this.clock.timestampLastBar = this.clock.timestampLastQuarterNote
       this.clock.timestampLast4Bar = this.clock.timestampLastQuarterNote
       this.clock.timestampLast16Bar = this.clock.timestampLastQuarterNote
     },
     midiOutputSetupCallback(portIdentifier) {
-      this.midiOutputMapping = midiOutputMappings[portIdentifier]
+      this.midiOutputMapping = midiOutputMappings[portIdentifier] || {}
       // console.log('midiOutputSetupCallback', portIdentifier)
     },
     handleIncomingMidiEvent(midiEvent) {

@@ -7,7 +7,7 @@
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
         <a href="#settings" class="btn-lg" role="button"><IconMidiDin /></a>
         <a href="#settings" class="btn-lg" role="button"><IconClock :additionalClasses="`icon-in-text ${getHaveClockDevice ? 'text-success' : ''}`"/></a>
-        <span v-if="getHaveClockDevice">
+        <span v-if="getHaveClockDevice" @click="midistorage.resetTempoDetection">
           {{ parseFloat(getExternalClockTempo).toFixed(1) }} BPM
         </span>
         <!--a href="#" :class="`btn-lg ${midiLearn ? 'text-danger' : ''}`" role="button" @click="toggleMidiLearn"><IconMidiLearn /></a-->
