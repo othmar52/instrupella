@@ -354,7 +354,8 @@ export const useMainStore = defineStore({
         volume: 1,
         playbackRate: 1,
         pitchRange: 0.1,
-        tempoFactor: 1, // normal(1), double(2) or half(.5) tempo
+        tempoFactor: 1, // displayed bpm: normal(1), double(2) or half(.5) tempo
+        tempoFactorSync: 1, // playback sync: normal(1), double(2) or half(.5) tempo
         currentSecond: 0,
         skipLength: 0.05,
         timestretch: false,
@@ -380,7 +381,7 @@ export const useMainStore = defineStore({
         if (!this.decks[deckIndex].track) {
           continue
         }
-        const newPlaybackRate = tempo / getBpm(this.decks[deckIndex].track) * this.decks[deckIndex].tempoFactor
+        const newPlaybackRate = tempo / getBpm(this.decks[deckIndex].track) * this.decks[deckIndex].tempoFactorSync
         if (newPlaybackRate < 0.2 || newPlaybackRate > 5) {
           continue
         }
@@ -486,6 +487,7 @@ export const useMainStore = defineStore({
       )
       this.decks[deckIndex].track = this.tracks[trackIndex]
       this.decks[deckIndex].tempoFactor = 1
+      this.decks[deckIndex].tempoFactorSync = 1
       this.decks[deckIndex].currentSecond = 0
       this.togglePlay(deckIndex, false)
       this.toggleMute(deckIndex, false)
@@ -560,6 +562,21 @@ export const useMainStore = defineStore({
         return
       }
       this.decks[deckIndex].tempoFactor = 1
+    },
+    loopTempoFactorSync(deckIndex, forceTempoFactorSync=false) {
+      if (forceTempoFactorSync !== false) {
+        this.decks[deckIndex].tempoFactorSync = forceTempoFactorSync
+        return
+      }
+      if (this.decks[deckIndex].tempoFactorSync === 1) {
+        this.decks[deckIndex].tempoFactorSync = 2
+        return
+      }
+      if (this.decks[deckIndex].tempoFactorSync === 2) {
+        this.decks[deckIndex].tempoFactorSync = 0.5
+        return
+      }
+      this.decks[deckIndex].tempoFactorSync = 1
     },
     setPitchRange(deckIndex, pitchRange) {
       this.decks[deckIndex].pitchRange = pitchRange
