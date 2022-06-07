@@ -1,5 +1,5 @@
 <template>
-  <div class="pitch-control d-flex">
+  <div :class="`pitch-control d-flex ${deck.sync ? 'disabled' : ''}`">
     <div class="">
       <VSlider
         :bottomSliderValue="max"
@@ -128,5 +128,10 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-
+.pitch-control {
+  position: relative;
+  &.disabled {
+    opacity: 0.1;
+  }
+}
 </style>

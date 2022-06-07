@@ -29,6 +29,7 @@ screenshot of current development status:
         ( consider to respect (non)silence or saved cuepoints )
   - [x] volume control for pre listening
   - [x] make tracklist browsable by midi controller + sniff audio + load to deck
+  - [x] add optional filter for "confirmed tempo only"
 
 ### database
   - [x] add flag to database for marking tracks with changing tempo/downbeat

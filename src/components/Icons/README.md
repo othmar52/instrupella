@@ -16,6 +16,7 @@ https://www.svgrepo.com/svg/361116/debug-line-by-line
 https://www.svgrepo.com/svg/352599/trash-alt  
 https://www.svgrepo.com/svg/354747/clock-14  
 https://www.svgrepo.com/svg/218184/up-arrow-multimedia-option  
+https://www.svgrepo.com/download/153590/lock.svg  
 
 
 MIDI DIN https://www.onlinewebfonts.com/icon/496521

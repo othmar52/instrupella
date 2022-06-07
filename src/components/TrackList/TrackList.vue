@@ -29,6 +29,10 @@
                 :filterValues="bpmFilterValues"
                 @setBpmFilter="setBpmFilter"
               />
+              <span class="custom-switch">
+                <input type="checkbox" id="switch-confirmedTempo" v-model="confirmedTempo" value="">
+                <label for="switch-confirmedTempo">!!!</label>
+              </span>
             </div>
           </div>
           </div>
@@ -124,6 +128,7 @@ const bpmFilterMidiValues = ref([])
 const bpmFilter = ref(null)
 const length = ref(0)
 const searchInput = ref('')
+const confirmedTempo = ref(false)
 const filteredEntries = ref([])
 
 const bpmFilterStep = 5
@@ -156,6 +161,10 @@ watch(() => storage.scrollToNextTrack, (value) => {
     focusedTrackIndex = 0
   }
   handleTrackFocusChange()
+})
+
+watch(() => confirmedTempo.value, (value) => {
+  searchEntries()
 })
 
 
@@ -238,10 +247,16 @@ const searchEntries = () => {
   }
   if (bpmFilter.value !== null) {
     filteredEntries.value = filteredEntries.value.filter(track => {
-      return tempoMatches(getBpm(track), parseInt(bpmFilter.value))
+      const tempo = getBpm(track)
+      return tempoMatches(tempo, parseInt(bpmFilter.value))
         // TODO: make double&half tempo matches optional by configuration
-        || tempoMatches(getBpm(track)/2, parseInt(bpmFilter.value))
-        || tempoMatches(getBpm(track)*2, parseInt(bpmFilter.value))
+        || tempoMatches(tempo/2, parseInt(bpmFilter.value))
+        || tempoMatches(tempo*2, parseInt(bpmFilter.value))
+    })
+  }
+  if (confirmedTempo.value === true) {
+    filteredEntries.value = filteredEntries.value.filter(track => {
+      return track.bpm > 0
     })
   }
   focusedTrackIndex = 0

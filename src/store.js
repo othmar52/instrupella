@@ -26,6 +26,8 @@ const ctrlKeyToFunc = (ctrlKey) => {
 }
 
 const ctrlMap = {
+  'toggleSync': 'toggleSync',
+  'toggleSyncMidi': 'toggleSyncMidi',
   'loopFocus': 'loopFocus',
   'handleBrowseWheelRotate': 'handleBrowseWheelRotate',
   'sniffAudioStart': 'sniffAudioStart',
@@ -70,7 +72,7 @@ export const useMainStore = defineStore({
     midiLearnItem: null,
     midiShift: 0,
     bpmFilterMidi: 0,
-    showIncomingMidiClock: false,
+    showBlazingBaton: true,
     trackProps: useStorage('trackProps', []),
     decks: [],
     tracks: [],
@@ -90,14 +92,15 @@ export const useMainStore = defineStore({
     currentTrackFocus: null,
     loadCurrentTrackFocusToDeck: false,
     focusItems: ['top', 'track-list'],
-    currentFocus: 0
+    currentFocus: 0,
+    busy: false
   }),
   getters: {
     getMidiLearn() {
       return this.midiLearn <= 0
     },
-    getShowIncomingMidiClock() {
-      return this.showIncomingMidiClock
+    getShowBlazingBaton() {
+      return this.showBlazingBaton
     },
     getBpmFilterMidi() {
       return this.bpmFilterMidi
@@ -143,18 +146,22 @@ export const useMainStore = defineStore({
     },
     getLoadCurrentTrackFocusToDeck() {
       return this.loadCurrentTrackFocusToDeck
+    },
+    getIsBusy() {
+      return this.busy
     }
   },
   actions: {
     fireControlElement(controlId, value=null) {
       const deckCtrlParams = ctrlKeyToFunc(controlId)
-      if (deckCtrlParams) {
-        if(this.midiLearnItem !== null) {
-          this.addMidiMapping(controlId)
-          return
-        }
-        this[deckCtrlParams[1]](deckCtrlParams[0], value)
+      if (!deckCtrlParams) {
+        return
       }
+      if(this.midiLearnItem !== null) {
+        this.addMidiMapping(controlId)
+        return
+      }
+      this[deckCtrlParams[1]](deckCtrlParams[0], value)
     },
     setScrollToTop(value) {
       this.scrollToTop = value
@@ -184,6 +191,9 @@ export const useMainStore = defineStore({
     setBpmFilterMidi(deckIndex, midiValue) {
       this.bpmFilterMidi = midiValue
     },
+    setBusy(busyValue) {
+      this.busy = busyValue
+    },
     loopFocus() {
       if (this.currentFocus == 0) {
         this.currentFocus = 1
@@ -205,10 +215,9 @@ export const useMainStore = defineStore({
       }
       if (midiValue === 1) {
         this.scrollToNextTrack = true
+        return
       }
-      if (midiValue === 127) {
-        this.scrollToPreviousTrack = true
-      }
+      this.scrollToPreviousTrack = true
     },
     midiShift1On() {
       //console.log('midiShift', 1)
@@ -232,8 +241,8 @@ export const useMainStore = defineStore({
         this.toggleHotCueDeleteMode(deckIndex, false)
       }
     },
-    setShowIncomingMidiClock(value) {
-      this.showIncomingMidiClock = value
+    setShowBlazingBaton(value) {
+      this.showBlazingBaton = value
     },
     setWorkingTempo(value) {
       this.workingTempo = parseFloat(value)
@@ -341,10 +350,13 @@ export const useMainStore = defineStore({
         track: null,
         play: false,
         mute: false,
+        sync: false,
         volume: 1,
         playbackRate: 1,
         pitchRange: 0.1,
-        tempoFactor: 1, // normal, double or half tempo
+        tempoFactor: 1, // displayed bpm: normal(1), double(2) or half(.5) tempo
+        tempoFactorSync: 1, // playback sync: normal(1), double(2) or half(.5) tempo
+        syncResolution: 1, // 1 bar, 4 bars, 0.25 bars
         currentSecond: 0,
         skipLength: 0.05,
         timestretch: false,
@@ -361,6 +373,27 @@ export const useMainStore = defineStore({
         hotCuesChange: false
       }
       this.decks.push(deck)
+    },
+    syncTempoToExternalClock(tempo=null) {
+      if (tempo === null) {
+        tempo = this.midistorage.clock.tempo
+      }
+      for (const deckIndex of this.decks.keys()) {
+        if (this.decks[deckIndex].sync === false) {
+          continue
+        }
+        if (this.decks[deckIndex].play === false) {
+          continue
+        }
+        if (!this.decks[deckIndex].track) {
+          continue
+        }
+        const newPlaybackRate = tempo / getBpm(this.decks[deckIndex].track) * this.decks[deckIndex].tempoFactorSync
+        if (newPlaybackRate < 0.2 || newPlaybackRate > 5) {
+          continue
+        }
+        this.setPlaybackRate(deckIndex, newPlaybackRate)
+      }
     },
     setPixelsPerSecond(deckIndex, pxPerSec) {
       this.decks[deckIndex].pixelPerSecond = parseInt(pxPerSec)
@@ -397,6 +430,23 @@ export const useMainStore = defineStore({
           : `d.${deckIndex}.muteOff`
       )
     },
+    toggleSync(deckIndex, forceNewState=null) {
+      const newSyncState = (forceNewState === null)
+        ? !this.decks[deckIndex].sync
+        : forceNewState
+      this.decks[deckIndex].sync = newSyncState
+      newSyncState && this.midistorage.resyncDeck(deckIndex)
+      this.midistorage.resetTempoDetection()
+      this.midistorage.checkFireMidiEvent(
+        newSyncState
+          ? `d.${deckIndex}.syncOn`
+          : `d.${deckIndex}.syncOff`
+      )
+    },
+    toggleSyncMidi(deckIndex) {
+      // drop incoming data byte as argument
+      this.toggleSync(deckIndex, null)
+    },
     toggleMuteMidi(deckIndex) {
       // drop incoming data byte as argument
       this.toggleMute(deckIndex, null)
@@ -418,6 +468,9 @@ export const useMainStore = defineStore({
         this.decks[deckIndex].hotCues.stopAfterRelease = true
         return
       }
+      if (newPlayState && this.decks[deckIndex].sync === true) {
+        this.midistorage.resyncDeck(deckIndex)
+      }
       this.decks[deckIndex].play = newPlayState
     },
     loadTrackByPath(deckIndex, path) {
@@ -431,6 +484,7 @@ export const useMainStore = defineStore({
       this.setLoadCurrentTrackFocusToDeck(deckIndex)
     },
     loadTrack(deckIndex, trackIndex) {
+      this.busy = true
       this.setScrollToTop(true)
       this.currentFocus = 0
       this.setWorkingTempo(getBpm(this.tracks[trackIndex]))
@@ -441,6 +495,8 @@ export const useMainStore = defineStore({
       )
       this.decks[deckIndex].track = this.tracks[trackIndex]
       this.decks[deckIndex].tempoFactor = 1
+      this.decks[deckIndex].tempoFactorSync = 1
+      this.decks[deckIndex].syncResolution = 1
       this.decks[deckIndex].currentSecond = 0
       this.togglePlay(deckIndex, false)
       this.toggleMute(deckIndex, false)
@@ -460,7 +516,10 @@ export const useMainStore = defineStore({
       this.setHotCuesChange(deckIndex, true)
     },
     analyzeTrackPostHook(deckIndex) {
-      // TODO make auto seek configurable
+      // TODO next line is maybe not true on loading tracks in multiple decks simultaneously
+      this.busy = false
+
+      // TODO make auto seek (skip leading silence) configurable
       if (this.decks[deckIndex].track.silences.length === 0) {
         return
       }
@@ -512,6 +571,44 @@ export const useMainStore = defineStore({
         return
       }
       this.decks[deckIndex].tempoFactor = 1
+    },
+    loopTempoFactorSync(deckIndex, forceTempoFactorSync=false) {
+      if (forceTempoFactorSync !== false) {
+        this.decks[deckIndex].tempoFactorSync = forceTempoFactorSync
+        return
+      }
+      if (this.decks[deckIndex].tempoFactorSync === 1) {
+        this.decks[deckIndex].tempoFactorSync = 2
+        return
+      }
+      if (this.decks[deckIndex].tempoFactorSync === 2) {
+        this.decks[deckIndex].tempoFactorSync = 0.5
+        return
+      }
+      this.decks[deckIndex].tempoFactorSync = 1
+    },
+    loopSyncResolution(deckIndex, forceResolution=false) {
+      if (forceResolution !== false) {
+        this.decks[deckIndex].syncResolution = forceResolution
+        return
+      }
+      if (this.decks[deckIndex].syncResolution === 1) {
+        this.decks[deckIndex].syncResolution = 4
+        return
+      }
+      if (this.decks[deckIndex].syncResolution === 4) {
+        this.decks[deckIndex].syncResolution = 0
+        return
+      }
+      if (this.decks[deckIndex].syncResolution === 0) {
+        this.decks[deckIndex].syncResolution = 0.25
+        return
+      }
+      if (this.decks[deckIndex].syncResolution === 0.25) {
+        this.decks[deckIndex].syncResolution = 0.5
+        return
+      }
+      this.decks[deckIndex].syncResolution = 1
     },
     setPitchRange(deckIndex, pitchRange) {
       this.decks[deckIndex].pitchRange = pitchRange

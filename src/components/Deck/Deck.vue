@@ -73,15 +73,28 @@
             :midiLearn="midiLearn"
             @click="storage.fireControlElement(`d.${deck.index}.toggleMute`)"
           />
+          <Button
+            label="SYNC"
+            :permaClasses="`${buttonClasses}`"
+            :activeClass="deck.sync ? 'btn-primary' : ''"
+            @click="storage.fireControlElement(`d.${deck.index}.toggleSync`)"
+          />
         </div>
       </div>
     </div>
     <div class="col-3">
       <div class="card pitch-volume-card d-flex justify-content-between">
+        <SyncControl
+          @pitchChange="setPitch"
+          :midiLearn="midiLearn"
+          :deck="deck"
+          v-if="deck.sync"
+        />
         <PitchControl
           @pitchChange="setPitch"
           :midiLearn="midiLearn"
           :deck="deck"
+          v-else
         />
         <VolumeControl
           :midiLearn="midiLearn"
@@ -127,6 +140,7 @@ import WaveBig from '@/components/WaveBig.vue'
 import Button from '@/components/Button.vue'
 import ButtonIcon from '@/components/ButtonIcon.vue'
 import PitchControl from '@/components/PitchControl.vue'
+import SyncControl from '@/components/SyncControl.vue'
 import VolumeControl from '@/components/VolumeControl.vue'
 import Edit from '@/components/Deck/Edit.vue'
 import HotCues from '@/components/HotCues.vue'

@@ -3,10 +3,20 @@
   <div class="page-wrapper with-navbar">
     <div class="sticky-alerts"></div>
     <nav class="navbar justify-content-between">
-      <div class="navbar-content">
+      <div class="navbar-content touchscreen-noselect noselec">
         <a href="#settings" class="btn-lg" role="button"><IconCog /></a>
         <a href="#settings" class="btn-lg" role="button"><IconMidiDin /></a>
-        <a href="#settings" class="btn-lg" role="button"><IconClock /></a>
+        <a href="#settings" class="btn-lg touchscreen-noselect noselect" role="button"><IconClock :additionalClasses="`icon-in-text ${getHaveClockDevice ? 'text-success' : ''}`"/></a>
+        <span v-if="getHaveClockDevice"
+          @mousedown="tempoEventStart"
+          @touchstart="tempoEventStart"
+          @mouseup="tempoEventEnd"
+          @touchend="tempoEventEnd"
+          :class="lockedTempoClass"
+          >
+          {{ parseFloat(getExternalClockTempo).toFixed(1) }} BPM
+          <IconLock :additionalClass="lockedTempoClass" v-if="lockedTempoClass" />
+        </span>
         <!--a href="#" :class="`btn-lg ${midiLearn ? 'text-danger' : ''}`" role="button" @click="toggleMidiLearn"><IconMidiLearn /></a-->
       </div>
       <div class="navbar-content">
@@ -30,12 +40,14 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useMainStore } from "@/store.js";
+import { useMidiStore } from "@/midistore.js";
 import InstruPella from './components/InstruPella.vue'
 import Settings from './components/Settings.vue'
 import IconCog from './components/Icons/Cog.vue'
 import IconMidiLearn from './components/Icons/MidiLearn.vue'
 import IconMidiDin from './components/Icons/MidiDin.vue'
 import IconClock from './components/Icons/Clock.vue'
+import IconLock from './components/Icons/Lock.vue'
 import ButtonIcon from './components/ButtonIcon.vue'
 import Button from './components/Button.vue'
 import IconGithub from './components/Icons/Github.vue'
@@ -48,8 +60,11 @@ window.halfmoon = require('halfmoon')
 // lets disable this:
 window.oncontextmenu = function () { return false }
 
+let lastTempoEvent = null
+
 const settings = ref({})
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const defaultSettings = () => {
   return {
     midi: {
@@ -71,7 +86,27 @@ const toggleMidiLearn = () => {
   storage.toggleMidiLearn()
 }
 
+const lockedTempoClass = computed(() => midistorage.getOverrideTempo > 0 ? 'text-danger' : '')
 const midiLearn = computed(() => storage.midiLearn)
+const getHaveClockDevice = computed(() => midistorage.getHaveClockDevice)
+const getExternalClockTempo = computed(() => midistorage.getExternalClockTempo)
+
+const tempoEventStart = () => {
+  lastTempoEvent = performance.now()
+}
+const tempoEventEnd = () => {
+  const duration = performance.now() - lastTempoEvent
+  if (duration < 1000) {
+    midistorage.resetTempoDetection
+    midistorage.setOverrideTempo(null)
+    return
+  }
+  midistorage.setOverrideTempo(
+    midistorage.getOverrideTempo > 0
+      ? null
+      : midistorage.getExternalClockTempo
+  )
+}
 
 onMounted(() => {
   settings.value = defaultSettings()

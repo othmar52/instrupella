@@ -1,6 +1,6 @@
 <template>
   <a href="#" ref="top" id="top"><!-- used for scroll to top --></a>
-  <BlazingBaton v-if="storage.getShowIncomingMidiClock" ref="baton" />
+  <BlazingBaton v-if="storage.getShowBlazingBaton" ref="baton" />
   <div class="instrupella">
     <Deck
       v-for="deck in decks"
