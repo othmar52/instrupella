@@ -73,13 +73,18 @@
         <span class="ml-20"></span>
         <Button
         label="+1"
-        :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12 ml-30`"
+        :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
         @click="persistLike"
         />
         <Button
         label="-1"
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
         @click="persistUnlike"
+        />
+        <Button
+          :label="muteChannelLabel"
+          :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12 ml-30`"
+          @click="persistLoopMuteAudioChannel"
         />
         <button class="btn btn-default btn-square btn-lg m-5 ml-20 btn-bars" @click="persistToggleTempoDrift">
             <strong class="bars">DRIFT</strong><br><span class="text-muted font-size-12 label-bars">tempo</span>
@@ -88,7 +93,6 @@
             <strong class="bars">DRIFT</strong><br><span class="text-muted font-size-12 label-bars">dBeat</span>
         </button>
         <Metronome :tempo="workingTempo" ref="metronome" />
-
       </div>
     </div>
   </div>
@@ -127,6 +131,18 @@ const props = defineProps({
   }
 })
 const workingTempo = computed(() => storage.getWorkingTempo)
+const muteChannelLabel = computed(() => {
+  if (!props.track) {
+    return 'L|R'
+  }
+  if (props.track.clickchannel === 0) {
+    return 'R'
+  }
+  if (props.track.clickchannel === 1) {
+    return 'L'
+  }
+  return 'L|R'
+})
 const workingDownbeat = computed(() => storage.getWorkingDownbeat)
 
 const metronome = ref(null)
@@ -201,6 +217,23 @@ const persistToggleTempoDrift = () => {
   props.track.tempoDrift = !props.track.tempoDrift
   persistTrackProperty('tempoDrift')
 }
+const persistLoopMuteAudioChannel = () => {
+  if (!props.track) {
+    return
+  }
+  switch (props.track.clickchannel) {
+    case 0:
+      props.track.clickchannel = 1
+      break
+    case 1:
+      props.track.clickchannel = null
+      break
+    default:
+      props.track.clickchannel = 0
+  }
+  persistTrackProperty('clickchannel')
+  emit('changedMuteChannel', props.track.clickchannel)
+}
 const persistLike = () => {
   props.track.like = 1
   persistTrackProperty('like')
@@ -212,7 +245,8 @@ const persistUnlike = () => {
 }
 
 const emit = defineEmits([
-  'updateTrack'
+  'updateTrack',
+  'changedMuteChannel'
 ])
 
 

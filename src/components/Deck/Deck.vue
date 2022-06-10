@@ -112,6 +112,7 @@
           :playbackRate="deck.playbackRate"
           :currentSecond="deck.currentSecond"
           @updateTrack="$emit('updateTrack', $event)"
+          @changedMuteChannel="changeMuteChannel($event)"
         />
       </div>
     </div>
@@ -185,6 +186,9 @@ const trackReady = () => {
 const waveformReady = () => {
   trackAnalyzed.value = true
   storage.analyzeTrackPostHook(props.deck.index)
+}
+const changeMuteChannel = (channelIndex) => {
+  props.deck.muteAudioChannel = channelIndex
 }
 const error = (errormsg) => {
   console.log('TODO: handle player error', errormsg)

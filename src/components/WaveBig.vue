@@ -228,6 +228,36 @@ const initPlayer = (forceReInit = false) => {
     emit('error', error)
   })
 }
+
+// channelIndex to mute: 0 = left, 1 = right
+// the other channel will be duplicated to muted channel
+const muteAudioChannel = (channelIndex) => {
+  if (channelIndex !== 0 && channelIndex !== 1) {
+    player.value.backend.setFilters()
+    return
+  }
+
+  const splitter = player.value.backend.ac.createChannelSplitter(2)
+  const merger = player.value.backend.ac.createChannelMerger(2)
+  const channelGains = [
+    player.value.backend.ac.createGain(),
+    player.value.backend.ac.createGain()
+  ]
+
+  // Here is where the wavesurfer and web audio combine.
+  channelGains[channelIndex].gain.setValueAtTime(0, 0)
+
+  splitter.connect(channelGains[0], 0)
+  splitter.connect(channelGains[1], 1)
+  channelGains[0].connect(merger, 0, 0)
+  channelGains[0].connect(merger, 0, 1)
+  channelGains[1].connect(merger, 0, 0)
+  channelGains[1].connect(merger, 0, 1)
+  player.value.backend.setFilters(
+    [splitter, channelGains[0], channelGains[1], merger]
+  )
+}
+
 const wavesurferOptions = () => {
   const secondsPerQuarterNote = 60 / getBpm(props.deck.track)
   return {
@@ -428,6 +458,10 @@ watch(() => storage.workingDownbeat, () => {
 
 watch(() => storage.workingTempo, () => {
   redrawBeatGrid()
+})
+
+watch(() => props.deck.muteAudioChannel, (value) => {
+  muteAudioChannel(value)
 })
 
 onMounted(() => {

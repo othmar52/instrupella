@@ -357,6 +357,7 @@ export const useMainStore = defineStore({
         tempoFactor: 1, // displayed bpm: normal(1), double(2) or half(.5) tempo
         tempoFactorSync: 1, // playback sync: normal(1), double(2) or half(.5) tempo
         syncResolution: 1, // 1 bar, 4 bars, 0.25 bars
+        muteAudioChannel: null,
         currentSecond: 0,
         skipLength: 0.05,
         timestretch: false,
@@ -494,6 +495,7 @@ export const useMainStore = defineStore({
           : 0
       )
       this.decks[deckIndex].track = this.tracks[trackIndex]
+      this.decks[deckIndex].muteAudioChannel = this.tracks[trackIndex].clickchannel
       this.decks[deckIndex].tempoFactor = 1
       this.decks[deckIndex].tempoFactorSync = 1
       this.decks[deckIndex].syncResolution = 1
