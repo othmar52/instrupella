@@ -663,6 +663,8 @@ export const useMainStore = defineStore({
       }
       this.decks[deckIndex].hotCues.nowPlaying = true
       this.decks[deckIndex].seekToSecondAndPlay = this.decks[deckIndex].hotCues.cues[hotCueIndex].second
+      this.decks[deckIndex].sync && this.midistorage.resyncDeck(deckIndex)
+
       this.midistorage.checkFireMidiEvent(`d.${deckIndex}.hotCue${1+hotCueIndex*1}On`)
     },
     hotCueUp(deckIndex, hotCueIndex) {

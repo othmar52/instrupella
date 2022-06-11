@@ -126,6 +126,8 @@ screenshot of current development status:
   - [x] set playhead to audio begin after load in case track starts with silence
   - [ ] unmute audio when using jogwheel during pause
   - [x] add possibility for forcing single audio channel (some acapellas have a clicktrack on left or right channel)
+  - [ ] add error handling when audiofile cant be loaded
+  - [x] respect external clock sync when playing hotcues
 
 ## hardware
   - [ ] add buffered audio splitter for headphome/main out with potentiometers (@see https://electronics.stackexchange.com/questions/197827/how-to-split-audio-with-buffers)
