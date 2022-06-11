@@ -11,8 +11,9 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useMainStore } from "@/store.js"
-
+import { useMidiStore } from "@/midistore.js";
 const storage = useMainStore()
+const midistorage = useMidiStore()
 const props = defineProps({
   bpmFilterValues: {
     type: Array,
@@ -33,12 +34,17 @@ watch(() => storage.getBpmFilterMidi, (newValue) => {
   fireTimeout = setTimeout(() => {
     // console.log('fire bpmFilterMidi', bpmFilter.value)
     bpmFilterVisible.value = false
-    emit(
-      'setBpmFilter',
-      bpmFilter.value === 'none'
-        ? null
-        : parseInt(bpmFilter.value)
-    )
+
+    let targetBpm = parseInt(bpmFilter.value)
+    if (bpmFilter.value === 'none') {
+      targetBpm = null
+    }
+    if (bpmFilter.value === 'midi') {
+      targetBpm = parseInt(midistorage.getExternalClockTempo)
+    }
+    emit('setBpmFilter', targetBpm)
+
+
   }, 1000)
 })
 

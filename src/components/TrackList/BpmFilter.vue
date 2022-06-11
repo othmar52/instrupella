@@ -10,6 +10,7 @@
       :key="tempo"
       :value="tempo"
     >{{tempo}} BPM</option>
+    <option value="midi">{{midiTempo}} BPM (MIDI clock)</option>
   </select>
   <button class="btn btn-default btn-sm m-5" @click="decrease">&lt;</button>
   <button class="btn btn-default btn-sm m-5" @click="increase">&gt;</button>
@@ -18,6 +19,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useMidiStore } from "@/midistore.js";
+const midistorage = useMidiStore()
 const props = defineProps({
   filterValues: {
     type: Array,
@@ -26,18 +29,23 @@ const props = defineProps({
 })
 
 const bpmFilter = ref('none')
+const midiTempo = ref(0)
 const setBpmFilter = (event) => {
   bpmFilter.value = event.target.value
   fireEmit()
 }
 
 const fireEmit = () => {
-  emit(
-    'setBpmFilter',
-    bpmFilter.value === 'none'
-      ? null
-      : parseInt(bpmFilter.value)
-  )
+  midiTempo.value = parseInt(midistorage.getExternalClockTempo)
+  let targetBpm = parseInt(bpmFilter.value)
+  if (bpmFilter.value === 'none') {
+    targetBpm = null
+  }
+  if (bpmFilter.value === 'midi') {
+    targetBpm = midiTempo.value
+  }
+  console.log('setBpmFilter', targetBpm)
+  emit('setBpmFilter', targetBpm)
 }
 
 const increase = () => {

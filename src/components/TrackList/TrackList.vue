@@ -339,10 +339,11 @@ const assertMidiFilterValues = () => {
 
   bpmFilterMidiValues.value = ['none']
   // we need exactly 127 values (1 - 127)
-  for (const ccValue of range(0, 127)) {
-    let grabIndex = Math.floor(mapValue(ccValue, 0, 127, 0, tmpFilterValues2.length))
+  for (const ccValue of range(0, 126)) {
+    let grabIndex = Math.floor(mapValue(ccValue, 0, 126, 0, tmpFilterValues2.length))
     bpmFilterMidiValues.value.push(tmpFilterValues2[grabIndex])
   }
+  bpmFilterMidiValues.value.push('midi')
 
   searchEntries()
 }

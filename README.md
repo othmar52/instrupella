@@ -64,7 +64,8 @@ screenshot of current development status:
   - [ ] settings page (or modal)
   - [x] simplify bpm filter GUI
   - [x] limit bpm filter values to existing tempo's
-  - [ ] add incoming midi clock as BPM filter value
+  - [x] add incoming midi clock as BPM filter value
+  - [ ] improve incoming midi clock as BPM filter value
   - [ ] switchable wavesurfer backend for timestretch on/off
   - [x] navbar
   - [ ] optional huge pitch slider
