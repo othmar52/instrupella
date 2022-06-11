@@ -383,9 +383,6 @@ export const useMainStore = defineStore({
         if (this.decks[deckIndex].sync === false) {
           continue
         }
-        if (this.decks[deckIndex].play === false) {
-          continue
-        }
         if (!this.decks[deckIndex].track) {
           continue
         }
@@ -436,6 +433,7 @@ export const useMainStore = defineStore({
         ? !this.decks[deckIndex].sync
         : forceNewState
       this.decks[deckIndex].sync = newSyncState
+      this.syncTempoToExternalClock()
       newSyncState && this.midistorage.resyncDeck(deckIndex)
       this.midistorage.resetTempoDetection()
       this.midistorage.checkFireMidiEvent(
@@ -502,6 +500,7 @@ export const useMainStore = defineStore({
       this.decks[deckIndex].currentSecond = 0
       this.togglePlay(deckIndex, false)
       this.toggleMute(deckIndex, false)
+      this.syncTempoToExternalClock()
       // TODO: read persisted hot cues from track
       this.decks[deckIndex].hotCues = {
         deleteMode: false,

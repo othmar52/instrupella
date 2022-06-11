@@ -74,7 +74,7 @@ screenshot of current development status:
   - [x] add filesize as track property
   - [x] vertical centering of icons in buttons
   - [x] volume control
-  - [ ] optional sync to midi clock / CV-clock
+  - [x] optional sync to midi clock
   - [x] midi mapping
   - [ ] respect seek, nudge, tempo change, etc. in metronome sound
   - [ ] metronome sound is very quiet on iPad when track is playing - do we need a separate audio context? (not reproduceable in desktop browsers)
@@ -125,6 +125,7 @@ screenshot of current development status:
   - [ ] initial led status of midi controller
   - [x] set playhead to audio begin after load in case track starts with silence
   - [ ] unmute audio when using jogwheel during pause
+  - [x] add possibility for forcing single audio channel (some acapellas have a clicktrack on left or right channel)
 
 ## hardware
   - [ ] add buffered audio splitter for headphome/main out with potentiometers (@see https://electronics.stackexchange.com/questions/197827/how-to-split-audio-with-buffers)
