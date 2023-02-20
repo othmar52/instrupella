@@ -47,6 +47,7 @@ const lastSetSongPosition = ref(false)
 
 const track = computed(() => props.deck.track)
 
+let isReady = false
 const props = defineProps({
   deck: {
     type: Object,
@@ -54,7 +55,7 @@ const props = defineProps({
   }
 })
 
-const redrawBeatGrid = (clear=false) => {
+const redrawBeatGrid = () => {
   if (!player.value) {
     return
   }
@@ -66,23 +67,34 @@ const redrawBeatGrid = (clear=false) => {
   }
   try {
     player.value.timeline.params.offset = getBeatGridOffset()
+    player.value.timeline.params.timeInterval = function () {
+      return 60 / workingTempo.value
+    }
+    player.value.timeline.render()
+  } catch (e) { }
+}
+
+const clearBeatGrid = () => {
+  if (!player.value) {
+    return
+  }
+  try {
+    player.value.timeline.params.offset = 10000
     // avoid rendering invalid beatgrid during load
-    player.value.timeline.params.timeInterval = clear
-      ? 10000
-      : function () {
-          return 60 / workingTempo.value
-        }
+    player.value.timeline.params.timeInterval = function () {
+      return 10000
+    }
     player.value.timeline.render()
   } catch (e) { }
 }
 
 watch(() => props.deck.track, (newTrack) => {
+  // avoid rendering invalid beatgrid during load
+  isReady = false
+  clearBeatGrid()
   if (!newTrack) {
     return
   }
-  // avoid rendering invalid beatgrid during load
-  //player.value.timeline.params.timeInterval = 10000
-  redrawBeatGrid(true)
   player.value.load(newTrack.path)
 })
 
@@ -208,10 +220,12 @@ const initPlayer = (forceReInit = false) => {
     storage.toggleMute(props.deck.index, false)
   })
   player.value.on('ready', () => {
+    isReady = true
     redrawBeatGrid()
     emit('trackReady')
   })
   player.value.on('waveform-ready', () => {
+    isReady = true
     redrawBeatGrid()
     emit('waveformReady')
   })
@@ -453,10 +467,16 @@ watch(() => props.deck.playbackRate, () => {
 })
 
 watch(() => storage.workingDownbeat, () => {
+  if (isReady === false) {
+    return
+  }
   redrawBeatGrid()
 })
 
 watch(() => storage.workingTempo, () => {
+  if (isReady === false) {
+    return
+  }
   redrawBeatGrid()
 })
 
