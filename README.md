@@ -158,6 +158,7 @@ screenshot of current development status:
  - https://wavesurfer-js.org/api/index.html
  - https://webmidijs.org/api
  - https://www.gethalfmoon.com/docs/introduction/
+ - https://grantjam.es/creating-a-simple-metronome-using-javascript-and-the-web-audio-api/
 
 
 ## interesting small midi controllers that maybe useful for instrupella
