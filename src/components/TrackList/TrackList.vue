@@ -71,7 +71,11 @@
         <td>
           <ColoredTempo :track="track" />
         </td>
-        <td>{{ formatDuration(track.length) }}</td>
+        <td>
+          <a @click="storage.setEditTrackIndex(track.id)" href="#track-edit" class="text-white">
+            {{ formatDuration(track.length) }}
+          </a>
+        </td>
         <td class="d-flex">
           <span
             @mousedown="storage.sniffAudioStart(track)"

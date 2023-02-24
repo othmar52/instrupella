@@ -93,7 +93,8 @@ export const useMainStore = defineStore({
     loadCurrentTrackFocusToDeck: false,
     focusItems: ['top', 'track-list'],
     currentFocus: 0,
-    busy: false
+    busy: false,
+    editTrackIndex: 0
   }),
   getters: {
     getMidiLearn() {
@@ -149,6 +150,12 @@ export const useMainStore = defineStore({
     },
     getIsBusy() {
       return this.busy
+    },
+    getEditTrackIndex() {
+      return this.editTrackIndex
+    },
+    getEditTrack() {
+      return this.tracks[this.editTrackIndex]
     }
   },
   actions: {
@@ -193,6 +200,9 @@ export const useMainStore = defineStore({
     },
     setBusy(busyValue) {
       this.busy = busyValue
+    },
+    setEditTrackIndex(trackIndex) {
+      this.editTrackIndex = trackIndex
     },
     loopFocus() {
       if (this.currentFocus == 0) {
@@ -286,23 +296,40 @@ export const useMainStore = defineStore({
     clearTrackProps() {
       this.trackProps = []
     },
+    castTrackProp(trackPropName, trackPropValue) {
+      if (['bpm', 'bpmdetect', 'downbeat'].includes(trackPropName)) {
+        return parseFloat(parseFloat(trackPropValue).toFixed(3))
+      }
+      if (['tempoDrift', 'downbeatDrift'].includes(trackPropName)) {
+        return Boolean(trackPropValue)
+      }
+      if (['like'].includes(trackPropName)) {
+        return parseInt(trackPropValue)
+      }
+      return String(trackPropValue).trim()
+    },
     addTrackProp(trackProp) {
       // console.log('store.addTrackProp() to', trackProp)
       // update local db
+      const castedTrackProps = {}
+
+      for (const [key, value] of Object.entries(trackProp)) {
+        castedTrackProps[key] = this.castTrackProp(key, value)
+      }
       const indexDb = this.tracks.findIndex(item => item.path === trackProp.path)
       if(indexDb > -1) {
         for (const [key, value] of Object.entries(trackProp)) {
-          this.tracks[indexDb][key] = value
+          this.tracks[indexDb][key] = castedTrackProps[key]
         }
       }
       // update storage with edited properties
       const index = this.trackProps.findIndex(item => item.path === trackProp.path)
       if (index === -1) {
-        this.trackProps.push(trackProp)
+        this.trackProps.push(castedTrackProps)
         return
       }
       for (const [key, value] of Object.entries(trackProp)) {
-        this.trackProps[index][key] = value
+        this.trackProps[index][key] = castedTrackProps[key]
       }
       // console.log('updated object', this.trackProps[index])
       
@@ -492,6 +519,7 @@ export const useMainStore = defineStore({
           ? parseFloat(this.tracks[trackIndex].downbeat)
           : 0
       )
+      this.editTrackIndex = trackIndex
       this.decks[deckIndex].track = this.tracks[trackIndex]
       this.decks[deckIndex].muteAudioChannel = this.tracks[trackIndex].clickchannel
       this.decks[deckIndex].tempoFactor = 1

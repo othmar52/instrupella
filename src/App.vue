@@ -1,5 +1,6 @@
 <template>
   <Settings />
+  <TrackEdit />
   <div class="page-wrapper with-navbar">
     <div class="sticky-alerts"></div>
     <nav class="navbar justify-content-between">
@@ -43,6 +44,7 @@ import { useMainStore } from "@/store.js";
 import { useMidiStore } from "@/midistore.js";
 import InstruPella from './components/InstruPella.vue'
 import Settings from './components/Settings.vue'
+import TrackEdit from './components/TrackEdit.vue'
 import IconCog from './components/Icons/Cog.vue'
 import IconMidiLearn from './components/Icons/MidiLearn.vue'
 import IconMidiDin from './components/Icons/MidiDin.vue'

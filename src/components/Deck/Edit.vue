@@ -92,6 +92,25 @@
         <button class="btn btn-default btn-square btn-lg m-5 btn-bars" @click="persistToggleDownbeatDrift">
             <strong class="bars">DRIFT</strong><br><span class="text-muted font-size-12 label-bars">dBeat</span>
         </button>
+        <Button
+          label="X1"
+          :permaClasses="`btn btn-default btn-square btn-lg m-5 btn-bars`"
+          :activeClass="(sweep) ? 'btn-primary' : ''"
+          @click="toggleSweep('midiShift1On')"
+        />
+        <Button
+          label="X2"
+          :permaClasses="`btn btn-default btn-square btn-lg m-5 btn-bars`"
+          :activeClass="(sweep) ? 'btn-primary' : ''"
+          @click="toggleSweep('midiShift2On')"
+        />
+        <Button
+          label="X3"
+          :permaClasses="`btn btn-default btn-square btn-lg m-5 btn-bars`"
+          :activeClass="(sweep) ? 'btn-primary' : ''"
+          @click="toggleSweep('midiShift3On')"
+        />
+        <a href="#track-edit">tags</a>
         <Metronome :tempo="workingTempo" ref="metronome" />
       </div>
     </div>
@@ -148,6 +167,8 @@ const workingDownbeat = computed(() => storage.getWorkingDownbeat)
 const metronome = ref(null)
 const metronameActive = ref(false)
 
+let sweep = ref(false)
+let sweepInterval = null
 const toggleMetronome = () => {
   metronameActive.value = !metronameActive.value
 }
@@ -163,6 +184,28 @@ const increaseTempo = (event) => {
 }
 const decreaseTempo = (event) => {
   storage.setWorkingTempo(workingTempo.value - getStepFactor(event))
+}
+
+const toggleSweep = (midiShiftFunc) => {
+  sweep.value = !sweep.value
+  if (!sweep.value) {
+    if (sweepInterval) {
+      storage.midiShiftOff()
+      clearInterval(sweepInterval)
+      sweepInterval = null
+    }
+    return
+  }
+  if (!props.track) {
+    sweep.value = false
+    return
+  }
+  storage[midiShiftFunc]()
+  sweepInterval = setInterval(() => sweepLoop(), 100)
+}
+
+const sweepLoop = () => {
+  storage.handleJogWheelRotate(0, 30)
 }
 
 // very left 15% -> minimum (= props.step bpm) 
