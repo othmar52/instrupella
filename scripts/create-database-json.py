@@ -142,7 +142,22 @@ def getPropsToMerge():
     return propsToMerge
 
 def createPeakFile(musicFilePath, targetJsonPath):
-    #print(r'"%s"' % musicFilePath)
+    fileToConvert = musicFilePath
+    # native support is: .mp3, .wav, .flac, .ogg, .oga, .opus, .dat
+    # unsupported: aiff wma m4a
+    # print(r'"%s"' % musicFilePath)
+    tmpPath = Path(musicFilePath)
+    if tmpPath.suffix.lower() not in ['.mp3', '.wav', '.flac', '.ogg', '.oga', '.opus', '.dat']:
+        cmdArgs = [
+            "/usr/bin/ffmpeg", "-y",
+            "-i", str(musicFilePath),
+            "/tmp/instrupella-tmp.wav"
+        ]
+        #print(' '.join(cmdArgs))
+        p1 = Popen(cmdArgs, stdout=PIPE, stderr=PIPE)
+        p1.communicate()
+        fileToConvert = "/tmp/instrupella-tmp.wav"
+
     #print(targetJsonPath)
     if os.path.isfile(targetJsonPath):
         # we already have a peak json file
@@ -150,7 +165,7 @@ def createPeakFile(musicFilePath, targetJsonPath):
 
     cmdArgs = [
         "/usr/bin/audiowaveform",
-        "-i", str(musicFilePath),
+        "-i", str(fileToConvert),
         "-o", str(targetJsonPath),
         "--pixels-per-second", str(peakPixelsPerSecond),
         "--bits", "8"
@@ -220,7 +235,21 @@ def getDbJson():
 # http://www.pogo.org.uk/~mark/bpm-tools/
 # /usr/bin/bpm-tag -f -n MUSICFILE 2>&1 | grep --color=never " BPM" | awk '{print $(NF-1)}'
 def detectBpm(filePath):
-    p1 = Popen(["/usr/bin/bpm-tag", "-f", "-n", filePath], stdout=PIPE, stderr=PIPE)
+    fileToConvert = filePath
+    # native: mp3 flac ogg
+    # unsupported: aiff wav m4a wma
+    # ??? oga opus dat
+    tmpPath = Path(filePath)
+    if tmpPath.suffix.lower() not in ['.mp3', '.flac', '.ogg']:
+        cmdArgs = [
+            "/usr/bin/ffmpeg", "-y",
+            "-i", str(filePath),
+            "/tmp/instrupella-tmp.mp3"
+        ]
+        p1 = Popen(cmdArgs, stdout=PIPE, stderr=PIPE)
+        p1.communicate()
+        fileToConvert = "/tmp/instrupella-tmp.mp3"
+    p1 = Popen(["/usr/bin/bpm-tag", "-f", "-n", fileToConvert], stdout=PIPE, stderr=PIPE)
     for line in p1.communicate():
         match = re.findall('\ ([0-9.]{1,})\ BPM$', line.decode("utf-8").strip())
         if match:
@@ -257,7 +286,7 @@ def collectAllMusicFiles(startDirectory):
     allFiles = sorted(Path(startDirectory).rglob('*.*'))
     musicFiles = []
     for foundFile in allFiles:
-        if foundFile.suffix.lower() in ['.wav', '.flac', '.mp3', '.mp4', '.ogg', '.oga', '.m4a']:
+        if foundFile.suffix.lower() in ['.wav', '.flac', '.mp3', '.mp4', '.ogg', '.oga', '.m4a', '.aiff', '.wma']:
             musicFiles += [ foundFile ]
             continue
     return musicFiles
