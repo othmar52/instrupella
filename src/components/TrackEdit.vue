@@ -5,14 +5,16 @@
             <a href="#" class="close" role="button" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </a>
-            <h5 class="modal-title">track-edit</h5>
+            <h5 class="modal-title">
+              <strong class="text-muted">track-edit</strong>
+              <span v-if="editTrack" v-html="formatArtistTitle(editTrack)"></span></h5>
             <table class="table table-bordered" v-if="editTrack">
               <tbody>
               <tr>
                 <th>
                   Path
                 </th>
-                <td colspan="5" class="break-word">
+                <td colspan="2" class="break-word">
                   {{editTrack.path}}, {{formatBytes(editTrack.size)}}, {{formatDuration(editTrack.duration)}}
                 </td>
               </tr>
@@ -33,13 +35,25 @@
                     </span>
                 </td>
                 <td v-if="['like'].includes(key)">
-                    TODO: button
+                    <ButtonIcon
+                      componentName="IconThumbUp"
+                      :permaClasses="`btn btn-square btn-default m-5`"
+                      :activeClass="(workProps.like === 1 ) ? 'btn-success' : ''"
+                      @click="toggleThumbUp"
+                    />
+                    <ButtonIcon
+                      componentName="IconThumbDown"
+                      :permaClasses="`btn btn-square btn-default m-5`"
+                      :activeClass="(workProps.like === -1 ) ? 'btn-danger' : ''"
+                      @click="toggleThumbDown"
+                    />
+                    <label :class="`${isModifiedClass(key)}`">{{key}}</label>
                 </td>
               </tr>
               </tbody>
             </table>
             <div class="text-center mt-20">
-                <a href="#" class="btn btn-default" role="button">Close settings</a>
+                <a href="#" class="btn btn-default" role="button">Close</a>
                 <a href="#" @click="saveChanges" class="btn btn-default" role="button">Save changes</a>
             </div>
         </div>
@@ -50,6 +64,10 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useMainStore } from '@/store.js'
+import formatArtistTitleMixin from '../mixins/format/artisttitle'
+import ButtonIcon from '@/components/ButtonIcon.vue'
+
+const { formatArtistTitle } = formatArtistTitleMixin()
 
 const workProps = ref({
   artist: '',
@@ -77,6 +95,14 @@ const formatBytes = (bytes, decimals = 1) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+const toggleThumbUp = () => {
+  workProps.value.like = (workProps.value.like < 1) ? 1 : 0
+}
+
+const toggleThumbDown = () => {
+  workProps.value.like = (workProps.value.like > -1) ? -1 : 0
+}
+
 const saveChanges = () => {
   let hasCanges = false
   const trackProps = { path: editTrack.value.path }
@@ -95,7 +121,11 @@ const saveChanges = () => {
 }
 
 const isModifiedClass = (propName) => {
-  return (workProps.value[propName] == editTrack.value[propName]) ? '' : 'is-invalid text-danger'
+  return (workProps.value[propName] == editTrack.value[propName])
+    ? ''
+    : (['tempoDrift', 'downbeatDrift', 'like'].includes(propName))
+      ? 'text-danger'
+      : 'is-invalid'
 }
 
 // TODO move to util (code duplication in TrackList.vue)

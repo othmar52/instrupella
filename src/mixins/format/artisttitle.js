@@ -1,4 +1,10 @@
 export default () => {
+  const replaceDividers = (string) => {
+    return string
+      .replaceAll(',', '<span class="text-muted">,</span>')
+      .replaceAll('&', '<span class="text-muted">&</span>')
+      .replaceAll(' ft. ', ' <span class="text-muted">ft.</span> ')
+  }
   const formatArtistTitle = (track) => {
     if (track === null) {
       return ''
@@ -9,23 +15,26 @@ export default () => {
     const a = (track.artist) ? track.artist.trim() : ''
     const t = (track.title) ? track.title.trim() : ''
     if (`${a}${t}` === '') {
-      return track.path.split('/').slice(-1).join('/').split('.').slice(0, -1).join('.') + beat
+      return replaceDividers(
+        track.path.split('/').slice(-1).join('/').split('.').slice(0, -1).join('.') + beat
+      )
     }
     if (a.toLowerCase() === t.toLowerCase() && a !== '') {
-      return a + beat
+      return replaceDividers(a) + beat
     }
     if (a !== '' && t !== '') {
-      return `
+      return replaceDividers(`
         <span class="text-white">${t}</span>
         <span class="text-muted">by</span>
         <span class="text-primary">${a}</span>
       ` + beat
+      )
     }
     if (a === '') {
-      return t + beat
+      return replaceDividers(t) + beat
     }
     if (t === '') {
-      return a + beat
+      return replaceDividers(a) + beat
     }
     return `${a} bla ${t}` + beat
   }

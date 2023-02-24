@@ -18,6 +18,8 @@
       <component :is="IconMidi" v-if="componentName === 'IconMidiDin'"></component>
       <component :is="IconMidi" v-if="componentName === 'IconMidiLearn'"></component>
       <component :is="IconClock" v-if="componentName === 'IconClock'"></component>
+      <component :is="IconThumbUp" v-if="componentName === 'IconThumbUp'"></component>
+      <component :is="IconThumbDown" v-if="componentName === 'IconThumbDown'"></component>
     </button>
 </template>
 
@@ -38,6 +40,9 @@ import IconTrash from '@/components/Icons/Trash.vue'
 import IconMidiDin from '@/components/Icons/MidiDin.vue'
 import IconMidiLearn from '@/components/Icons/MidiLearn.vue'
 import IconClock from '@/components/Icons/Clock.vue'
+import IconThumbUp from '@/components/Icons/ThumbUp.vue'
+import IconThumbDown from '@/components/Icons/ThumbDown.vue'
+
 const props = defineProps({
   permaClasses: {
     type: String,

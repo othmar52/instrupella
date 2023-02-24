@@ -169,6 +169,13 @@ onMounted(() => {
   text {
     fill: var(--dm-button-text-color);
   }
+  &.icon-thumb-up,
+  &.icon-thumb-down {
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    top: 3px;
+  }
 }
 
 .btn-lg .icon {

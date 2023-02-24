@@ -300,7 +300,7 @@ export const useMainStore = defineStore({
       if (['bpm', 'bpmdetect', 'downbeat'].includes(trackPropName)) {
         return parseFloat(parseFloat(trackPropValue).toFixed(3))
       }
-      if (['tempoDrift', 'downbeatDrift'].includes(trackPropName)) {
+      if (['tempoDrift', 'downbeatDrift', 'noTempo'].includes(trackPropName)) {
         return Boolean(trackPropValue)
       }
       if (['like'].includes(trackPropName)) {
