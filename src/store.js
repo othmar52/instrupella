@@ -303,7 +303,7 @@ export const useMainStore = defineStore({
       if (['tempoDrift', 'downbeatDrift', 'noTempo'].includes(trackPropName)) {
         return Boolean(trackPropValue)
       }
-      if (['like'].includes(trackPropName)) {
+      if (['like', 'clickchannel'].includes(trackPropName)) {
         return parseInt(trackPropValue)
       }
       return String(trackPropValue).trim()

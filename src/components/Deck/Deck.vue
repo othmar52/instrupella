@@ -111,6 +111,7 @@
           :play="deck.play"
           :playbackRate="deck.playbackRate"
           :currentSecond="deck.currentSecond"
+          :deckIndex="deck.index"
           @updateTrack="$emit('updateTrack', $event)"
           @changedMuteChannel="changeMuteChannel($event)"
         />

@@ -1,5 +1,7 @@
 <template>
-    <button :class="`btn ${permaClasses} ${activeClass}`" ref="btn" type="button">
+    <button v-if="htmlLabel" v-html="label" :class="`btn ${permaClasses} ${activeClass}`" ref="btn" type="button">
+    </button>
+    <button v-else :class="`btn ${permaClasses} ${activeClass}`" ref="btn" type="button">
       {{label}}
     </button>
 </template>
@@ -18,6 +20,10 @@ const props = defineProps({
   label: {
     type: String,
     default: ''
+  },
+  htmlLabel: {
+    type: Boolean,
+    default: false
   }
 })
 watch(() => props.activeClass, () => { })

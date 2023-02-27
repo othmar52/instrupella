@@ -48,7 +48,7 @@
     </div>
     <div class="row">
       <div class="col-2 justify-content-betweenXXXX d-flexXXXX">
-        <span class="font-size-18">Set Downbeat {{workingDownbeat.toFixed(2)}}</span>
+        <span class="font-size-18" @click="storage.seekToSecond(deckIndex, workingDownbeat)">Set Downbeat {{workingDownbeat.toFixed(2)}}</span>
       </div>
       <div class="col-10">
         <button class="btn btn-default btn-square btn-lg m-5 btn-bars" @click="setDownbeat">
@@ -64,6 +64,7 @@
         <Button
         label="RESET"
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
+        @click="resetDownbeat"
         />
         <Button
         label="APPLY"
@@ -74,24 +75,35 @@
         <Button
         label="+1"
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
+        :activeClass="(track.like > 0) ? 'btn-success' : ''"
         @click="persistLike"
         />
         <Button
         label="-1"
         :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12`"
+        :activeClass="(track.like < 0) ? 'btn-danger' : ''"
         @click="persistUnlike"
         />
         <Button
           :label="muteChannelLabel"
           :permaClasses="`btn btn-square btn-default btn-lg m-5 font-size-12 ml-30`"
+          :activeClass="([0,1].includes(track.clickchannel)) ? 'btn-primary' : ''"
           @click="persistLoopMuteAudioChannel"
         />
-        <button class="btn btn-default btn-square btn-lg m-5 ml-20 btn-bars" @click="persistToggleTempoDrift">
-            <strong class="bars">DRIFT</strong><br><span class="text-muted font-size-12 label-bars">tempo</span>
-        </button>
-        <button class="btn btn-default btn-square btn-lg m-5 btn-bars" @click="persistToggleDownbeatDrift">
-            <strong class="bars">DRIFT</strong><br><span class="text-muted font-size-12 label-bars">dBeat</span>
-        </button>
+        <Button
+          label="<strong class='bars'>DRIFT</strong><br><span class='text-muted font-size-12 label-bars'>tempo</span>"
+          :permaClasses="`btn btn-default btn-square btn-lg m-5 ml-20 btn-bars`"
+          :activeClass="track.tempoDrift ? 'btn-danger' : ''"
+          :htmlLabel="true"
+          @click="persistToggleTempoDrift"
+        />
+        <Button
+          label="<strong class='bars'>DRIFT</strong><br><span class='text-muted font-size-12 label-bars'>dBeat</span>"
+          :permaClasses="`btn btn-default btn-square btn-lg m-5 btn-bars`"
+          :activeClass="track.downbeatDrift ? 'btn-danger' : ''"
+          :htmlLabel="true"
+          @click="persistToggleDownbeatDrift"
+        />
         <Button
           label="X1"
           :permaClasses="`btn btn-default btn-square btn-lg m-5 btn-bars`"
@@ -147,6 +159,10 @@ const props = defineProps({
   step: {
     type: Number,
     default: 0.01
+  },
+  deckIndex: {
+    type: Number,
+    default: 0
   }
 })
 const workingTempo = computed(() => storage.getWorkingTempo)
@@ -166,6 +182,7 @@ const workingDownbeat = computed(() => storage.getWorkingDownbeat)
 
 const metronome = ref(null)
 const metronameActive = ref(false)
+const maxIncrease = 0.5
 
 let sweep = ref(false)
 let sweepInterval = null
@@ -180,10 +197,20 @@ const halfTempo = () => {
   storage.setWorkingTempo(workingTempo.value / 2)
 }
 const increaseTempo = (event) => {
-  storage.setWorkingTempo(workingTempo.value + getStepFactor(event))
+  const increase = getStepFactor(event)
+  storage.setWorkingTempo(
+    increase === maxIncrease
+      ? parseFloat(parseInt(workingTempo.value) + 1)
+      : workingTempo.value + increase
+  )
 }
 const decreaseTempo = (event) => {
-  storage.setWorkingTempo(workingTempo.value - getStepFactor(event))
+  const decrease = getStepFactor(event)
+  storage.setWorkingTempo(
+    decrease === maxIncrease
+      ? parseFloat(parseInt(workingTempo.value) - 1)
+      : workingTempo.value - decrease
+  )
 }
 
 const toggleSweep = (midiShiftFunc) => {
@@ -213,7 +240,6 @@ const sweepLoop = () => {
 // everything in between will be calculated
 const getStepFactor = (event) => {
   const boundryPercent = 15
-  const maxIncrease = 0.5
   const x = event.clientX - event.target.getBoundingClientRect().left; //x position within the element.
   const percentX = x / (event.target.getBoundingClientRect().width/100)
   if (percentX < boundryPercent) {
@@ -238,6 +264,11 @@ const setDownbeat = () => {
 const persistDownbeat = () => {
   props.track.downbeat = workingDownbeat.value
   persistTrackProperty('downbeat')
+}
+
+const resetDownbeat = () => {
+  storage.setWorkingDownbeat(.0)
+  persistDownbeat()
 }
 
 const persistTempo = () => {
@@ -278,12 +309,12 @@ const persistLoopMuteAudioChannel = () => {
   emit('changedMuteChannel', props.track.clickchannel)
 }
 const persistLike = () => {
-  props.track.like = 1
+  props.track.like = props.track.like > 0 ? 0 : 1
   persistTrackProperty('like')
 }
 
 const persistUnlike = () => {
-  props.track.like = -1
+  props.track.like = props.track.like < 0 ? 0 : -1
   persistTrackProperty('like')
 }
 
