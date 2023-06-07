@@ -2,6 +2,10 @@
 DJ-like web application (VueJs 3) for playing acapellas to synth jam sessions  
 It's similar to traktor or serato but with very limited functionality  
 
+on [this youtube channel](https://www.youtube.com/@stromwerk742/videos) you will find a bunch of videos where you can see it in action    
+[![instrupella in action](https://github.com/othmar52/instrupella/assets/7056051/9d14a62f-d61c-439b-8b11-5e5fdbb21813)](https://www.youtube.com/watch?v=q7oJLDULJZM)
+
+
 ## GOAL
 having another "instrument" next to dozens of synthesizers, drum machines, etc. that can only play acapellas/vocal samples. it should be very easy to perform in perfect sync without paying too much attention to it. 
 
